@@ -1,0 +1,23 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}پیچک دانش{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/site.css' %}">
+</head>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="/">پیچک دانش</a>
+        <nav>
+            <a href="/">خانه</a>
+            <a href="/admin/">مدیریت</a>
+        </nav>
+    </div>
+</header>
+<main>{% block content %}{% endblock %}</main>
+<footer class="site-footer"><div class="container">پیچک دانش — سکوی یادگیری و رشد دانش‌آموزان</div></footer>
+</body>
+</html>
