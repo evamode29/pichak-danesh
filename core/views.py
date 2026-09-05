@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from core.permissions import current_role
+from exams.models import PlacementAttempt
 
 
 def home(request):
@@ -37,8 +38,16 @@ def dashboard(request):
     role = current_role(request.user)
     student = getattr(request.user, "student_profile", None)
     profile = getattr(request.user, "profile", None)
+    latest_attempt = None
+    if student:
+        latest_attempt = PlacementAttempt.objects.filter(student=student).first()
     return render(
         request,
         "dashboard.html",
-        {"role": role, "student": student, "profile": profile},
+        {
+            "role": role,
+            "student": student,
+            "profile": profile,
+            "latest_attempt": latest_attempt,
+        },
     )
