@@ -72,7 +72,9 @@ class PlacementFlowTests(TestCase):
         self.client.post(reverse("placement-question") + "?q=0", {"answer": "B"})
         response = self.client.post(reverse("placement-question") + "?q=1", {"answer": "A"})
 
-        self.assertRedirects(response, reverse("placement-result"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], reverse("placement-result"))
+
         response = self.client.get(reverse("placement-result"))
 
         self.assertEqual(response.status_code, 200)
