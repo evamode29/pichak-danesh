@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}ورود | پیچک دانش{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+    <div class="container auth-grid">
+        <div class="auth-copy">
+            <span class="eyebrow"><span class="eyebrow-dot"></span> ورود به مسیر رشد</span>
+            <h1>دوباره به <em>پیچک دانش</em> برگرد.</h1>
+            <p>وارد حساب خودت شو تا امتیازها، تمرین‌ها، آزمون‌ها و مسیر پیشرفتت را ادامه بدهی.</p>
+            <div class="auth-points">
+                <span>✓ پیشرفتت ذخیره می‌شود</span>
+                <span>✓ امتیاز و سطح خودت را ببین</span>
+                <span>✓ آماده رقابت در لیگ شو</span>
+            </div>
+        </div>
+        <div class="auth-card">
+            <div class="auth-icon">پ</div>
+            <h2>ورود به حساب</h2>
+            <p class="auth-muted">نام کاربری و رمز عبور خود را وارد کنید.</p>
+            {% if error %}<div class="form-error">{{ error }}</div>{% endif %}
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+                <label>نام کاربری<input name="username" type="text" autocomplete="username" required placeholder="نام کاربری"></label>
+                <label>رمز عبور<input name="password" type="password" autocomplete="current-password" required placeholder="رمز عبور"></label>
+                <button class="button primary auth-submit" type="submit">ورود به پیچک دانش <span>←</span></button>
+            </form>
+            <a class="auth-back" href="/">بازگشت به صفحه اصلی</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
