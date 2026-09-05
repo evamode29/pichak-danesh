@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}تمرین | پیچک دانش{% endblock %}
+
+{% block content %}
+<section class="placement-page result-page">
+  <div class="container placement-shell result-shell">
+    <div class="result-card">
+      <div class="result-icon">پ</div>
+      <span class="section-kicker">تمرین هدفمند</span>
+      <h1>تمرین‌های سطح شما در حال آماده‌سازی است</h1>
+      <p class="result-lead">فعلاً سؤال کافی برای سطح {{ student.level }} ثبت نشده. به‌زودی تمرین‌های بیشتری اضافه می‌کنیم.</p>
+      <div class="result-actions">
+        <a class="button primary" href="{% url 'dashboard' %}">بازگشت به داشبورد</a>
+        <a class="button secondary" href="{% url 'placement-start' %}">تعیین سطح دوباره</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
