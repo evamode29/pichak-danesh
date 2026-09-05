@@ -1,3 +1,70 @@
 from django.db import models
 
-# Create your models here.
+
+class PlacementTest(models.Model):
+    title = models.CharField(max_length=160, default="آزمون تعیین سطح پایه ششم")
+    grade = models.PositiveSmallIntegerField(default=6)
+    duration_minutes = models.PositiveSmallIntegerField(default=15)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-id"]
+
+    def __str__(self):
+        return self.title
+
+
+class PlacementQuestion(models.Model):
+    class Subject(models.TextChoices):
+        MATH = "math", "ریاضی"
+        SCIENCE = "science", "علوم"
+        PERSIAN = "persian", "فارسی"
+        SOCIAL = "social", "مطالعات اجتماعی"
+
+    class Option(models.TextChoices):
+        A = "A", "گزینه ۱"
+        B = "B", "گزینه ۲"
+        C = "C", "گزینه ۳"
+        D = "D", "گزینه ۴"
+
+    test = models.ForeignKey(PlacementTest, on_delete=models.CASCADE, related_name="questions")
+    text = models.TextField()
+    option_a = models.CharField(max_length=300)
+    option_b = models.CharField(max_length=300)
+    option_c = models.CharField(max_length=300)
+    option_d = models.CharField(max_length=300)
+    correct_option = models.CharField(max_length=1, choices=Option.choices)
+    subject = models.CharField(max_length=20, choices=Subject.choices, default=Subject.MATH)
+    difficulty = models.PositiveSmallIntegerField(default=2)
+    order = models.PositiveSmallIntegerField(default=1)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        indexes = [
+            models.Index(fields=["test", "is_active", "order"]),
+            models.Index(fields=["subject", "difficulty"]),
+        ]
+
+    def __str__(self):
+        return f"{self.test.title} - {self.order}"
+
+
+class PlacementAttempt(models.Model):
+    student = models.ForeignKey(
+        "students.StudentProfile", on_delete=models.CASCADE, related_name="placement_attempts"
+    )
+    test = models.ForeignKey(PlacementTest, on_delete=models.CASCADE, related_name="attempts")
+    score = models.PositiveSmallIntegerField(default=0)
+    correct_answers = models.PositiveSmallIntegerField(default=0)
+    total_questions = models.PositiveSmallIntegerField(default=0)
+    level = models.PositiveSmallIntegerField(default=1)
+    completed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-completed_at", "-id"]
+        indexes = [models.Index(fields=["student", "-completed_at"])]
+
+    def __str__(self):
+        return f"{self.student} - سطح {self.level}"
