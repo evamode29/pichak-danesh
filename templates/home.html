@@ -5,26 +5,73 @@
 {% block content %}
 <section class="hero">
     <div class="container hero-grid">
-        <div>
-            <span class="eyebrow">سکوی هوشمند یادگیری</span>
-            <h1>یادگیری را به یک مسیر هیجان‌انگیز تبدیل کن.</h1>
-            <p>با تعیین سطح، تمرین هدفمند، آزمون‌های آنلاین و رقابت دوستانه، قدم‌به‌قدم پیشرفت کن.</p>
+        <div class="hero-copy">
+            <span class="eyebrow"><span class="eyebrow-dot"></span> سکوی هوشمند یادگیری پایه ششم</span>
+            <h1>یادگیری را به یک <em>مسیر هیجان‌انگیز</em> تبدیل کن.</h1>
+            <p class="hero-lead">از تعیین سطح شروع کن، هدفمند تمرین کن، در آزمون‌ها بدرخش و با امتیاز و لیگ، پیشرفتت را هر روز ببین.</p>
             <div class="actions">
-                <a class="button primary" href="/admin/">ورود دانش‌آموز</a>
-                <a class="button secondary" href="#features">آشنایی بیشتر</a>
+                <a class="button primary" href="/admin/">شروع یادگیری <span>←</span></a>
+                <a class="button secondary" href="#features">امکانات پیچک دانش</a>
+            </div>
+            <div class="hero-trust">
+                <span><b>✓</b> مسیر آموزشی مرحله‌ای</span>
+                <span><b>✓</b> گزارش پیشرفت</span>
+                <span><b>✓</b> رقابت سالم</span>
             </div>
         </div>
-        <div class="hero-card">
-            <div class="hero-card-icon">✦</div>
-            <h2>هر روز یک قدم جلوتر</h2>
-            <p>امتیاز بگیر، سطح خودت را ارتقا بده و جایگاهت را در لیگ ببین.</p>
+        <div class="hero-visual" aria-label="نمایش مسیر پیشرفت دانش‌آموز">
+            <div class="glow"></div>
+            <div class="dashboard-card">
+                <div class="card-top">
+                    <div><span class="mini-label">داشبورد پیشرفت</span><strong>سلام، قهرمان! 👋</strong></div>
+                    <span class="status-pill">● فعال</span>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-head"><span>پیشرفت این هفته</span><strong>۷۸٪</strong></div>
+                    <div class="progress-track"><span></span></div>
+                    <small>۴ تمرین تا رسیدن به مرحله بعد</small>
+                </div>
+                <div class="stat-row">
+                    <div><strong>۸۴۰</strong><span>امتیاز</span></div>
+                    <div><strong>۷</strong><span>سطح</span></div>
+                    <div><strong>۵ 🔥</strong><span>روز متوالی</span></div>
+                </div>
+                <div class="rank-card"><span class="rank-icon">🏆</span><div><small>جایگاه در لیگ</small><strong>نفر ۱۲ <b>↑ ۳</b></strong></div><span class="rank-arrow">←</span></div>
+            </div>
+            <div class="floating-badge badge-one">⭐ +120 امتیاز</div>
+            <div class="floating-badge badge-two">🎯 هدف هفتگی</div>
         </div>
     </div>
 </section>
 
-<section id="features" class="features container">
-    <article><span>01</span><h3>تعیین سطح</h3><p>سطح فعلی خودت را بشناس و مسیر مناسب را شروع کن.</p></article>
-    <article><span>02</span><h3>تمرین هوشمند</h3><p>با تمرین‌های موضوعی، نقاط ضعف خودت را بهتر کن.</p></article>
-    <article><span>03</span><h3>آزمون و رقابت</h3><p>در آزمون‌ها شرکت کن و با امتیاز و لیگ پیشرفتت را دنبال کن.</p></article>
+<section id="features" class="features-section">
+    <div class="container">
+        <div class="section-heading">
+            <span class="section-kicker">چرا پیچک دانش؟</span>
+            <h2>همه‌چیز برای یک <em>پیشرفت واقعی</em></h2>
+            <p>یادگیری را از یک تکلیف تکراری به تجربه‌ای منظم، قابل‌اندازه‌گیری و جذاب تبدیل می‌کنیم.</p>
+        </div>
+        <div class="features">
+            <article class="feature-card featured">
+                <span class="feature-number">۰۱</span><div class="feature-icon">🧭</div>
+                <h3>تعیین سطح</h3><p>با یک ارزیابی کوتاه، نقطه شروع خودت را پیدا کن و مسیر مناسب را بساز.</p><a href="#path">بیشتر بدان <span>←</span></a>
+            </article>
+            <article class="feature-card">
+                <span class="feature-number">۰۲</span><div class="feature-icon">🧠</div>
+                <h3>تمرین هدفمند</h3><p>موضوعات مهم را تمرین کن و روی نقاط ضعفت هوشمندانه کار کن.</p><a href="#path">مشاهده مسیر <span>←</span></a>
+            </article>
+            <article class="feature-card">
+                <span class="feature-number">۰۳</span><div class="feature-icon">🏆</div>
+                <h3>آزمون و لیگ</h3><p>آزمون بده، امتیاز بگیر و جایگاهت را در یک رقابت سالم دنبال کن.</p><a href="/admin/">ورود به پنل <span>←</span></a>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section id="path" class="path-section">
+    <div class="container path-grid">
+        <div><span class="section-kicker">مسیر رشد</span><h2>هر مرحله، یک قدم نزدیک‌تر به بهترین نسخه خودت.</h2></div>
+        <div class="steps"><div><b>۱</b><span>تعیین سطح</span></div><div><b>۲</b><span>تمرین</span></div><div><b>۳</b><span>آزمون</span></div><div><b>۴</b><span>رقابت</span></div></div>
+    </div>
 </section>
 {% endblock %}
