@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}تعیین سطح | پیچک دانش{% endblock %}
+
+{% block content %}
+<section class="placement-page">
+    <div class="container result-shell">
+        <div class="result-card">
+            <div class="result-icon">!</div>
+            <span class="section-kicker">تعیین سطح</span>
+            <h1>آزمون هنوز <em>آماده نیست.</em></h1>
+            <p class="result-lead">فعلاً آزمون فعالی برای پایه شما تعریف نشده است. کمی بعد دوباره سر بزن.</p>
+            <div class="result-actions">
+                <a class="button primary" href="{% url 'dashboard' %}">بازگشت به داشبورد <span>←</span></a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
