@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from core.models import ClassRoom
+from core.models import ClassRoom, UserProfile
 from .models import ParentProfile, StudentProfile
 
 
@@ -36,7 +36,9 @@ class StudentProfileTests(TestCase):
 class StudentApiTests(TestCase):
     def test_students_endpoint_returns_results(self):
         user = User.objects.create_user(username="student2", password="secret123")
+        UserProfile.objects.create(user=user, role=UserProfile.Role.STUDENT)
         StudentProfile.objects.create(user=user, mobile="09120000003")
+        self.client.force_login(user)
         response = self.client.get(reverse("api-students"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()["results"]), 1)
