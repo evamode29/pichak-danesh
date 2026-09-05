@@ -21,13 +21,38 @@
             <div class="dash-stat"><span>تداوم</span><strong>{{ student.streak }} 🔥</strong><small>روز متوالی</small></div>
             <div class="dash-stat"><span>پایه</span><strong>{{ student.grade }}</strong><small>پایه تحصیلی</small></div>
         </div>
+
         <div class="dashboard-grid">
             <article class="dash-main-card">
                 <span class="mini-label">مسیر امروز</span>
-                <h2>آماده‌ای شروع کنیم؟</h2>
-                <p>از تعیین سطح و تمرین شروع کن و بعد سراغ آزمون برو. پیشرفتت همین‌جا ثبت می‌شود.</p>
-                <div class="dash-actions"><a class="button primary" href="#">شروع تمرین <span>←</span></a><a class="button secondary" href="#">آزمون‌ها</a></div>
+                {% if latest_attempt %}
+                <h2>سطح تو مشخص شده؛ وقت تمرین است.</h2>
+                <p>در آخرین تعیین سطح، <strong>{{ latest_attempt.score }}٪</strong> گرفتی و در سطح <strong>{{ student.level }}</strong> قرار گرفتی. تمرین‌های بعدی متناسب با همین سطح انتخاب می‌شوند.</p>
+                <div class="dash-actions">
+                    <a class="button primary" href="{% url 'practice-start' %}">شروع تمرین <span>←</span></a>
+                    <a class="button secondary" href="{% url 'placement-start' %}">تعیین سطح دوباره</a>
+                </div>
+                {% else %}
+                <h2>اول سطح خودت را پیدا کنیم.</h2>
+                <p>با یک آزمون کوتاه، سطح فعلی‌ات را می‌سنجیم و بعد تمرین‌های مناسب خودت را پیشنهاد می‌کنیم.</p>
+                <div class="dash-actions">
+                    <a class="button primary" href="{% url 'placement-start' %}">شروع تعیین سطح <span>←</span></a>
+                    <a class="button secondary" href="{% url 'practice-start' %}">تمرین</a>
+                </div>
+                {% endif %}
             </article>
+
+            <article class="dash-side-card">
+                <span class="mini-label">وضعیت یادگیری</span>
+                {% if latest_attempt %}
+                <h3>سطح {{ student.level }}</h3>
+                <p>آخرین نتیجه تعیین سطح: {{ latest_attempt.score }}٪ · {{ latest_attempt.correct_answers }} پاسخ درست از {{ latest_attempt.total_questions }}</p>
+                {% else %}
+                <h3>هنوز تعیین سطح نشده‌ای</h3>
+                <p>تعیین سطح را انجام بده تا مسیر تمرین اختصاصی تو فعال شود.</p>
+                {% endif %}
+            </article>
+
             <article class="dash-side-card">
                 <span class="mini-label">کلاس من</span>
                 <h3>{% if student.classroom %}{{ student.classroom.name }}{% else %}هنوز کلاسی ثبت نشده{% endif %}</h3>
