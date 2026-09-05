@@ -31,15 +31,22 @@
             <form method="post" class="answer-form">
                 {% csrf_token %}
                 <div class="answer-options">
-                    {% for key,text in 'ABCD'|make_list %}
-                    {% with option='option_'|add:key|lower %}
-                    <label class="answer-option {% if selected == key %}selected{% endif %}">
-                        <input type="radio" name="answer" value="{{ key }}" {% if selected == key %}checked{% endif %} required>
-                        <span class="answer-letter">{{ key }}</span>
-                        <span class="answer-text">{{ question|getattribute:option }}</span>
+                    <label class="answer-option {% if selected == 'A' %}selected{% endif %}">
+                        <input type="radio" name="answer" value="A" {% if selected == 'A' %}checked{% endif %} required>
+                        <span class="answer-letter">A</span><span class="answer-text">{{ question.option_a }}</span>
                     </label>
-                    {% endwith %}
-                    {% endfor %}
+                    <label class="answer-option {% if selected == 'B' %}selected{% endif %}">
+                        <input type="radio" name="answer" value="B" {% if selected == 'B' %}checked{% endif %} required>
+                        <span class="answer-letter">B</span><span class="answer-text">{{ question.option_b }}</span>
+                    </label>
+                    <label class="answer-option {% if selected == 'C' %}selected{% endif %}">
+                        <input type="radio" name="answer" value="C" {% if selected == 'C' %}checked{% endif %} required>
+                        <span class="answer-letter">C</span><span class="answer-text">{{ question.option_c }}</span>
+                    </label>
+                    <label class="answer-option {% if selected == 'D' %}selected{% endif %}">
+                        <input type="radio" name="answer" value="D" {% if selected == 'D' %}checked{% endif %} required>
+                        <span class="answer-letter">D</span><span class="answer-text">{{ question.option_d }}</span>
+                    </label>
                 </div>
                 <button class="button primary placement-next" type="submit">
                     {% if index|add:1 == total %}ثبت و مشاهده نتیجه{% else %}سؤال بعدی{% endif %}
