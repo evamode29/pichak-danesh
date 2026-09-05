@@ -69,4 +69,8 @@ class PracticeFlowTests(TestCase):
 
     def test_practice_result_requires_active_session(self):
         response = self.client.get(reverse("practice-result"))
-        self.assertRedirects(response, reverse("practice-start"))
+        self.assertRedirects(
+            response,
+            reverse("practice-start"),
+            target_status_code=302,
+        )
