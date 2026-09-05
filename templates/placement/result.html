@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}نتیجه تعیین سطح | پیچک دانش{% endblock %}
+
+{% block content %}
+<section class="placement-page result-page">
+    <div class="container result-shell">
+        <div class="result-card">
+            <div class="result-icon">✓</div>
+            <span class="section-kicker">نتیجه تعیین سطح</span>
+            <h1>آفرین! <em>مسیرت مشخص شد.</em> 🌱</h1>
+            <p class="result-lead">نتیجه آزمون تو ثبت شد. از اینجا به بعد تمرین‌ها را متناسب با سطح فعلی‌ات جلو می‌بریم.</p>
+
+            <div class="result-stats">
+                <div><span>درصد</span><strong>{{ attempt.score }}٪</strong></div>
+                <div><span>پاسخ صحیح</span><strong>{{ attempt.correct_answers }} از {{ attempt.total_questions }}</strong></div>
+                <div><span>سطح فعلی</span><strong>{{ attempt.level }}</strong></div>
+            </div>
+
+            <div class="level-message">
+                <div class="level-badge">{{ attempt.level }}</div>
+                <div><small>سطح یادگیری تو</small><strong>{% if attempt.level >= 8 %}آماده چالش‌های جدی هستی!{% elif attempt.level >= 5 %}پایه خوبی داری؛ ادامه بده!{% else %}با تمرین منظم خیلی سریع رشد می‌کنی!{% endif %}</strong></div>
+            </div>
+
+            <div class="result-actions">
+                <a class="button primary" href="{% url 'dashboard' %}">رفتن به داشبورد <span>←</span></a>
+                <a class="button secondary" href="{% url 'placement-start' %}">دوباره تعیین سطح</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
