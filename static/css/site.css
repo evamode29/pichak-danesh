@@ -1,0 +1,28 @@
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; font-family: Tahoma, Arial, sans-serif; background: #f7f8fc; color: #172033; line-height: 1.8; }
+a { color: inherit; text-decoration: none; }
+.container { width: min(1120px, calc(100% - 32px)); margin-inline: auto; }
+.site-header { background: rgba(255,255,255,.92); border-bottom: 1px solid #e8ebf2; position: sticky; top: 0; z-index: 10; backdrop-filter: blur(12px); }
+.header-inner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.brand { font-size: 1.35rem; font-weight: 800; color: #3157d5; }
+nav { display: flex; gap: 22px; color: #596174; font-size: .95rem; }
+.hero { padding: 80px 0 64px; background: radial-gradient(circle at 15% 20%, #e5ebff 0, transparent 34%), linear-gradient(135deg, #ffffff 0%, #f3f6ff 100%); }
+.hero-grid { display: grid; grid-template-columns: 1.35fr .65fr; gap: 56px; align-items: center; }
+.eyebrow { display: inline-block; padding: 6px 12px; border-radius: 999px; background: #e9edff; color: #3157d5; font-size: .85rem; font-weight: 700; }
+h1 { margin: 18px 0; font-size: clamp(2.3rem, 6vw, 4.7rem); line-height: 1.15; letter-spacing: -.04em; max-width: 760px; }
+.hero p { max-width: 650px; color: #626b7d; font-size: 1.1rem; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+.button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 20px; border-radius: 12px; font-weight: 700; }
+.primary { background: #3157d5; color: white; }
+.secondary { background: white; border: 1px solid #dfe4ef; }
+.hero-card { padding: 32px; border-radius: 28px; background: #172033; color: white; box-shadow: 0 24px 60px rgba(23,32,51,.18); }
+.hero-card-icon { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 16px; background: #3157d5; font-size: 1.5rem; }
+.hero-card p { color: #c6ccda; font-size: 1rem; }
+.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 56px 0 80px; }
+.features article { background: white; border: 1px solid #e8ebf2; border-radius: 22px; padding: 28px; }
+.features span { color: #3157d5; font-weight: 800; }
+.features h3 { margin-bottom: 6px; }
+.features p { margin-top: 0; color: #687185; }
+.site-footer { padding: 28px 0; border-top: 1px solid #e8ebf2; color: #70798b; background: white; text-align: center; }
+@media (max-width: 760px) { .hero { padding-top: 48px; } .hero-grid, .features { grid-template-columns: 1fr; } nav { display: none; } h1 { font-size: 2.5rem; } }
