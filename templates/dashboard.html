@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}داشبورد | پیچک دانش{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="container">
+        <div class="dashboard-head">
+            <div>
+                <span class="section-kicker">داشبورد من</span>
+                <h1>سلام، <em>{% if student %}{{ student.user.first_name|default:student.user.username }}{% else %}{{ request.user.first_name|default:request.user.username }}{% endif %}</em> 👋</h1>
+                <p>امروز هم یک قدم برای بهتر شدن بردار.</p>
+            </div>
+            <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="logout-button" type="submit">خروج</button></form>
+        </div>
+
+        {% if student %}
+        <div class="dashboard-stats">
+            <div class="dash-stat"><span>امتیاز</span><strong>{{ student.points }}</strong><small>امتیاز کل</small></div>
+            <div class="dash-stat"><span>سطح</span><strong>{{ student.level }}</strong><small>سطح فعلی</small></div>
+            <div class="dash-stat"><span>تداوم</span><strong>{{ student.streak }} 🔥</strong><small>روز متوالی</small></div>
+            <div class="dash-stat"><span>پایه</span><strong>{{ student.grade }}</strong><small>پایه تحصیلی</small></div>
+        </div>
+        <div class="dashboard-grid">
+            <article class="dash-main-card">
+                <span class="mini-label">مسیر امروز</span>
+                <h2>آماده‌ای شروع کنیم؟</h2>
+                <p>از تعیین سطح و تمرین شروع کن و بعد سراغ آزمون برو. پیشرفتت همین‌جا ثبت می‌شود.</p>
+                <div class="dash-actions"><a class="button primary" href="#">شروع تمرین <span>←</span></a><a class="button secondary" href="#">آزمون‌ها</a></div>
+            </article>
+            <article class="dash-side-card">
+                <span class="mini-label">کلاس من</span>
+                <h3>{% if student.classroom %}{{ student.classroom.name }}{% else %}هنوز کلاسی ثبت نشده{% endif %}</h3>
+                {% if student.classroom %}<p>پایه {{ student.classroom.grade }}{% if student.classroom.academic_year %} · {{ student.classroom.academic_year }}{% endif %}</p>{% else %}<p>کلاس شما بعداً توسط مدیر یا معلم ثبت می‌شود.</p>{% endif %}
+            </article>
+        </div>
+        {% else %}
+        <div class="empty-dashboard"><div class="auth-icon">پ</div><h2>حساب آموزشی شما آماده است</h2><p>این حساب هنوز به پروفایل دانش‌آموزی متصل نشده است.</p></div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
