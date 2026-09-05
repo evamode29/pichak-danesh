@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}تعیین سطح | سؤال {{ index|add:1 }}{% endblock %}
+
+{% block content %}
+<section class="placement-page">
+    <div class="container placement-shell">
+        <div class="placement-top">
+            <div>
+                <span class="section-kicker">تعیین سطح پیچک</span>
+                <h1>ببینیم <em>چقدر آماده‌ای</em> 🎯</h1>
+                <p>{{ test.title }} · چند سؤال کوتاه برای شناخت سطح فعلی تو.</p>
+            </div>
+            <div class="placement-counter">
+                <strong>{{ index|add:1 }}</strong><span>از {{ total }}</span>
+            </div>
+        </div>
+
+        <div class="placement-progress">
+            <div><span style="width:{% widthratio index total 100 %}%"></span></div>
+            <small>پیشرفت آزمون</small>
+        </div>
+
+        <div class="question-card">
+            <div class="question-meta">
+                <span class="question-number">سؤال {{ index|add:1 }}</span>
+                <span class="question-subject">{{ question.get_subject_display }}</span>
+            </div>
+            <h2>{{ question.text }}</h2>
+
+            <form method="post" class="answer-form">
+                {% csrf_token %}
+                <div class="answer-options">
+                    {% for key,text in 'ABCD'|make_list %}
+                    {% with option='option_'|add:key|lower %}
+                    <label class="answer-option {% if selected == key %}selected{% endif %}">
+                        <input type="radio" name="answer" value="{{ key }}" {% if selected == key %}checked{% endif %} required>
+                        <span class="answer-letter">{{ key }}</span>
+                        <span class="answer-text">{{ question|getattribute:option }}</span>
+                    </label>
+                    {% endwith %}
+                    {% endfor %}
+                </div>
+                <button class="button primary placement-next" type="submit">
+                    {% if index|add:1 == total %}ثبت و مشاهده نتیجه{% else %}سؤال بعدی{% endif %}
+                    <span>←</span>
+                </button>
+            </form>
+        </div>
+
+        <a class="placement-exit" href="{% url 'dashboard' %}">بازگشت به داشبورد</a>
+    </div>
+</section>
+{% endblock %}
