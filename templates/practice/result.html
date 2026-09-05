@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}نتیجه تمرین | پیچک دانش{% endblock %}
+
+{% block content %}
+<section class="placement-page result-page">
+  <div class="container placement-shell result-shell">
+    <div class="result-card">
+      <div class="result-icon">✓</div>
+      <span class="section-kicker">تمرین تمام شد</span>
+      <h1>{{ percent }}٪</h1>
+      <p class="result-lead">{{ student.user.first_name|default:student.user.username }}، {{ correct }} پاسخ از {{ total }} سؤال درست بود.</p>
+      <div class="result-stats">
+        <div><span>پاسخ درست</span><strong>{{ correct }}</strong></div>
+        <div><span>امتیاز کسب‌شده</span><strong>{{ earned }}</strong></div>
+        <div><span>سطح فعلی</span><strong>{{ student.level }}</strong></div>
+      </div>
+      <div class="level-message">
+        <div class="level-badge">{{ student.level }}</div>
+        <div><small>مسیر یادگیری شما</small><strong>تمرین بعدی هم بر اساس سطح فعلی شما انتخاب می‌شود.</strong></div>
+      </div>
+      <div class="result-actions">
+        <a class="button primary" href="{% url 'practice-start' %}">تمرین دوباره</a>
+        <a class="button secondary" href="{% url 'dashboard' %}">داشبورد</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
