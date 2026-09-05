@@ -4,20 +4,36 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#172554">
+    <meta name="description" content="پیچک دانش؛ مسیر هوشمند یادگیری، تمرین، آزمون و رقابت برای دانش‌آموزان.">
     <title>{% block title %}پیچک دانش{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/site.css' %}">
 </head>
 <body>
 <header class="site-header">
     <div class="container header-inner">
-        <a class="brand" href="/">پیچک دانش</a>
-        <nav>
-            <a href="/">خانه</a>
-            <a href="/admin/">مدیریت</a>
+        <a class="brand" href="/" aria-label="پیچک دانش">
+            <span class="brand-mark">پ</span>
+            <span>پیچک <strong>دانش</strong></span>
+        </a>
+        <nav class="main-nav" aria-label="منوی اصلی">
+            <a class="active" href="/">خانه</a>
+            <a href="#features">امکانات</a>
+            <a href="#path">مسیر یادگیری</a>
+            <a href="/admin/">ورود</a>
         </nav>
+        <a class="header-cta" href="/admin/">ورود به پنل <span>←</span></a>
     </div>
 </header>
 <main>{% block content %}{% endblock %}</main>
-<footer class="site-footer"><div class="container">پیچک دانش — سکوی یادگیری و رشد دانش‌آموزان</div></footer>
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <div><strong>پیچک دانش</strong><span>یادگیری، تمرین و رشد؛ قدم‌به‌قدم.</span></div>
+        <span>© {% now "Y" %} پیچک دانش</span>
+    </div>
+</footer>
 </body>
 </html>
