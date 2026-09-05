@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from core.models import ClassRoom, UserProfile
+from core.permissions import current_role, require_roles
 from students.models import StudentProfile
 
 
@@ -21,7 +22,7 @@ def _profile_data(user):
         "id": user.id,
         "username": user.username,
         "name": user.get_full_name() or user.username,
-        "role": profile.role if profile else ("admin" if user.is_staff else None),
+        "role": current_role(user),
         "mobile": profile.mobile if profile else None,
         "is_staff": user.is_staff,
     }
@@ -31,17 +32,14 @@ def _profile_data(user):
 def auth_login(request):
     if request.method != "POST":
         return JsonResponse({"detail": "Method not allowed."}, status=405)
-
     data = _json_body(request)
     if data is None:
         return JsonResponse({"detail": "Invalid JSON."}, status=400)
-
     username = str(data.get("username", "")).strip()
     password = str(data.get("password", ""))
     user = authenticate(request, username=username, password=password)
     if user is None:
         return JsonResponse({"detail": "نام کاربری یا رمز عبور نادرست است."}, status=401)
-
     login(request, user)
     return JsonResponse({"user": _profile_data(user)})
 
@@ -62,8 +60,14 @@ def auth_logout(request):
 def classrooms_api(request):
     if request.method != "GET":
         return JsonResponse({"detail": "Method not allowed."}, status=405)
+    error = require_roles(request, UserProfile.Role.ADMIN, UserProfile.Role.TEACHER)
+    if error:
+        return error
 
     classes = ClassRoom.objects.filter(is_active=True).select_related("teacher")
+    if current_role(request.user) == UserProfile.Role.TEACHER:
+        classes = classes.filter(teacher=request.user)
+
     data = [
         {
             "id": item.id,
@@ -81,8 +85,25 @@ def classrooms_api(request):
 def students_api(request):
     if request.method != "GET":
         return JsonResponse({"detail": "Method not allowed."}, status=405)
+    error = require_roles(
+        request,
+        UserProfile.Role.ADMIN,
+        UserProfile.Role.TEACHER,
+        UserProfile.Role.PARENT,
+        UserProfile.Role.STUDENT,
+    )
+    if error:
+        return error
 
     students = StudentProfile.objects.select_related("user", "classroom").all()
+    role = current_role(request.user)
+    if role == UserProfile.Role.TEACHER:
+        students = students.filter(classroom__teacher=request.user)
+    elif role == UserProfile.Role.PARENT:
+        students = students.filter(parents__user=request.user)
+    elif role == UserProfile.Role.STUDENT:
+        students = students.filter(user=request.user)
+
     data = [
         {
             "id": item.id,
@@ -96,7 +117,7 @@ def students_api(request):
             "level": item.level,
             "streak": item.streak,
         }
-        for item in students
+        for item in students.distinct()
     ]
     return JsonResponse({"results": data})
 
@@ -104,6 +125,9 @@ def students_api(request):
 def teachers_api(request):
     if request.method != "GET":
         return JsonResponse({"detail": "Method not allowed."}, status=405)
+    error = require_roles(request, UserProfile.Role.ADMIN)
+    if error:
+        return error
 
     users = UserProfile.objects.filter(role=UserProfile.Role.TEACHER).select_related("user")
     data = [
