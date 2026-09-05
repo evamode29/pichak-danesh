@@ -11,10 +11,8 @@ def practice_start(request):
         return redirect("dashboard")
 
     questions = list(
-        PracticeQuestion.objects.filter(
-            level=student.level,
-            is_active=True,
-        ).order_by("subject", "id")[:5]
+        PracticeQuestion.objects.filter(level=student.level, is_active=True)
+        .order_by("subject", "id")[:5]
     )
     if len(questions) < 5:
         questions = list(
@@ -67,6 +65,12 @@ def practice_question(request):
             "total": len(question_ids),
             "selected": answers.get(str(question.id)),
             "student": student,
+            "question_options": [
+                ("A", question.option_a),
+                ("B", question.option_b),
+                ("C", question.option_c),
+                ("D", question.option_d),
+            ],
         },
     )
 
