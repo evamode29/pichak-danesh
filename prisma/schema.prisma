@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Student {
+  id                Int      @id @default(autoincrement())
+  name              String
+  mobile            String   @unique
+  grade             Int      @default(6)
+
+  points            Int      @default(840)
+  correctAnswers    Int      @default(34)
+  wrongAnswers      Int      @default(8)
+  answeredQuestions Int      @default(42)
+
+  level             Int      @default(7)
+  streak            Int      @default(5)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  practiceAttempts  PracticeAttempt[]
+
+  @@index([points])
+}
+
+model PracticeAttempt {
+  id              Int      @id @default(autoincrement())
+  studentId       Int
+
+  subjectSlug     String
+  subjectTitle    String
+
+  totalQuestions  Int
+  correctAnswers  Int
+  wrongAnswers    Int
+  progress        Int
+  points          Int
+
+  createdAt       DateTime @default(now())
+
+  student         Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([createdAt])
+}
