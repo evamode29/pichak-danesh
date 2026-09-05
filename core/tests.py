@@ -23,7 +23,9 @@ class CoreModelTests(TestCase):
 class CoreApiTests(TestCase):
     def test_classrooms_endpoint(self):
         user = User.objects.create_user(username="teacher2", password="secret123", first_name="رضا")
+        UserProfile.objects.create(user=user, role=UserProfile.Role.TEACHER)
         ClassRoom.objects.create(name="ششم ب", grade=6, teacher=user)
+        self.client.force_login(user)
         response = self.client.get(reverse("api-classrooms"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["results"][0]["teacher_name"], "رضا")
