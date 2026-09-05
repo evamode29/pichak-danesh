@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}تمرین {{ index|add:1 }} | پیچک دانش{% endblock %}
+
+{% block content %}
+<section class="placement-page">
+  <div class="container placement-shell">
+    <div class="placement-top">
+      <div>
+        <span class="section-kicker">تمرین هدفمند</span>
+        <h1>یک سؤال، یک قدم جلوتر</h1>
+        <p>تمرین‌ها بر اساس سطح فعلی شما انتخاب شده‌اند.</p>
+      </div>
+      <div class="placement-counter"><strong>{{ index|add:1 }}</strong><span>از {{ total }}</span></div>
+    </div>
+
+    <div class="placement-progress">
+      <div><span style="width: {% widthratio index total 100 %}%"></span></div>
+      <small>سطح {{ student.level }} · {{ question.get_subject_display }}</small>
+    </div>
+
+    <form method="post" class="question-card">
+      {% csrf_token %}
+      <div class="question-meta">
+        <span class="question-number">سؤال {{ index|add:1 }}</span>
+        <span class="question-subject">{{ question.get_subject_display }}</span>
+      </div>
+      <h2>{{ question.text }}</h2>
+      <div class="answer-options">
+        {% for key,text in question_options %}
+        <label class="answer-option{% if selected == key %} selected{% endif %}">
+          <input type="radio" name="answer" value="{{ key }}"{% if selected == key %} checked{% endif %} required>
+          <span class="answer-letter">{{ key }}</span>
+          <span class="answer-text">{{ text }}</span>
+        </label>
+        {% endfor %}
+      </div>
+      <button class="button primary placement-next" type="submit">{% if index|add:1 == total %}پایان تمرین{% else %}سؤال بعدی{% endif %} <span>←</span></button>
+      <a class="placement-exit" href="{% url 'dashboard' %}">خروج از تمرین</a>
+    </form>
+  </div>
+</section>
+{% endblock %}
