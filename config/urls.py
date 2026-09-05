@@ -12,6 +12,7 @@ urlpatterns = [
     path("logout/", logout_view, name="logout"),
     path("dashboard/", dashboard, name="dashboard"),
     path("placement/", include("exams.urls")),
+    path("practice/", include("practice.urls")),
     path("api/v1/auth/login/", auth_login, name="api-auth-login"),
     path("api/v1/auth/me/", auth_me, name="api-auth-me"),
     path("api/v1/auth/logout/", auth_logout, name="api-auth-logout"),
