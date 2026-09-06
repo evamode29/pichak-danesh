@@ -6,10 +6,18 @@ from core.models import UserProfile
 def current_role(user):
     if not user.is_authenticated:
         return None
-    if user.is_staff or user.is_superuser:
-        return UserProfile.Role.ADMIN
+
+    # The explicit application role takes priority over Django's staff flag.
+    # This prevents teacher accounts from being redirected to Django admin.
     profile = getattr(user, "profile", None)
-    return profile.role if profile else None
+    if profile and profile.role:
+        return profile.role
+
+    # Only users without a profile fall back to Django's admin flags.
+    if user.is_superuser or user.is_staff:
+        return UserProfile.Role.ADMIN
+
+    return None
 
 
 def is_admin(user):
