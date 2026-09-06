@@ -1,0 +1,66 @@
+/* Pichak Danesh — final visual polish layer */
+:root{
+  --pichak-radius:18px;
+  --pichak-radius-lg:24px;
+  --pichak-focus:0 0 0 4px rgba(21,150,109,.12);
+}
+
+/* The old decorative ivy experiment stays dormant until the user's SVG identity is ready. */
+.ivy-frame{display:none!important}
+
+:where(button,a,input,select,textarea):focus-visible{
+  outline:3px solid rgba(37,99,235,.18);
+  outline-offset:2px;
+}
+
+.button,.header-cta,.logout-button,.auth-submit{min-height:46px}
+.button.primary,.button.secondary,.header-cta,.logout-button{cursor:pointer}
+
+.site-header{box-shadow:0 4px 24px rgba(16,42,67,.035)}
+.header-inner{position:relative}
+
+/* Keep dense educational tables readable on narrow screens. */
+.table-wrap,.students-table-wrap,.responsive-table{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* Shared feedback states used by forms and dashboard cards. */
+.alert,.message,.form-error{border-radius:14px}
+
+/* Touch targets and spacing for phones. */
+@media(max-width:700px){
+  .container{width:min(100% - 24px,1160px)}
+  .header-inner{min-height:68px}
+  .brand{font-size:1rem}
+  .brand-mark{width:36px;height:36px;border-radius:12px}
+  .header-cta{padding:8px 12px;font-size:.72rem}
+  .hero-grid,.auth-grid,.dashboard-grid,.path-grid{gap:28px}
+  .hero-visual{min-height:350px}
+  .dashboard-card{max-width:360px}
+  .floating-badge{font-size:.62rem;padding:8px 10px}
+  .dashboard-head{flex-direction:column;align-items:stretch}
+  .dashboard-head .logout-button{align-self:flex-start}
+  .dash-main-card,.dash-side-card{padding:22px}
+  .actions,.dash-actions{width:100%}
+  .actions .button,.dash-actions .button{flex:1 1 150px}
+  .feature-card p{min-height:0}
+}
+
+@media(max-width:480px){
+  .hero{padding:48px 0 56px}
+  h1{font-size:2rem;letter-spacing:-.035em}
+  .hero-lead{font-size:.92rem}
+  .features-section{padding:58px 0 64px}
+  .path-section{padding:56px 0}
+  .steps{grid-template-columns:1fr 1fr}
+  .features{grid-template-columns:1fr}
+  .dashboard-stats{grid-template-columns:1fr 1fr}
+  .dash-stat strong{font-size:1.2rem}
+  .auth-page,.dashboard-page{padding:38px 0 56px}
+  .auth-card{padding:21px}
+  .auth-form input{height:48px}
+  .site-footer{padding:22px 0}
+  .footer-inner{align-items:flex-start}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .button,.feature-card{transition:none!important}
+}
