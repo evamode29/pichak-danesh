@@ -1,12 +1,11 @@
 from django.urls import path
 
+from .history_views import placement_history, placement_result_history
 from .views import (
     placement_answer_key,
     placement_question,
     placement_result,
-    placement_result_history,
     placement_start,
-    placement_history,
     teacher_approve_placement,
     teacher_approve_placement_repeat,
     teacher_class_diagnostic,
