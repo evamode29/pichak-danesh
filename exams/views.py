@@ -1,7 +1,9 @@
+from collections import defaultdict
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import PlacementAttempt, PlacementQuestion, PlacementTest
+from .models import PlacementAttempt, PlacementDiagnosticResult, PlacementQuestion, PlacementTest
 
 
 def _level_from_score(score):
@@ -20,6 +22,57 @@ def _level_from_score(score):
     if score >= 30:
         return 2
     return 1
+
+
+def _diagnostic_analysis(questions, answers):
+    subject_data = defaultdict(lambda: {"correct": 0, "total": 0})
+    topic_data = defaultdict(lambda: {"subject": "", "topic": "", "skill": "", "correct": 0, "total": 0})
+
+    for question in questions:
+        is_correct = answers.get(str(question.id)) == question.correct_option
+        subject = question.subject
+        subject_data[subject]["total"] += 1
+        subject_data[subject]["correct"] += int(is_correct)
+
+        key = (question.subject, question.topic or "بدون مبحث", question.skill or "")
+        topic_data[key]["subject"] = question.get_subject_display()
+        topic_data[key]["topic"] = question.topic or "بدون مبحث"
+        topic_data[key]["skill"] = question.skill
+        topic_data[key]["total"] += 1
+        topic_data[key]["correct"] += int(is_correct)
+
+    subject_order = ["math", "science", "persian", "social"]
+    subject_names = dict(PlacementQuestion.Subject.choices)
+    subjects = []
+    for code in subject_order:
+        data = subject_data.get(code, {"correct": 0, "total": 0})
+        total = data["total"]
+        percentage = round(data["correct"] * 100 / total) if total else 0
+        subjects.append({
+            "code": code,
+            "name": subject_names.get(code, code),
+            "correct": data["correct"],
+            "total": total,
+            "percentage": percentage,
+        })
+
+    topics = []
+    for item in topic_data.values():
+        percentage = round(item["correct"] * 100 / item["total"]) if item["total"] else 0
+        topics.append({**item, "percentage": percentage})
+    topics.sort(key=lambda item: (item["percentage"], item["subject"], item["topic"]))
+
+    strengths = [item for item in topics if item["percentage"] >= 80]
+    weaknesses = [item for item in topics if item["percentage"] < 60]
+    recommendations = []
+    for item in weaknesses[:4]:
+        recommendations.append({
+            "subject": item["subject"],
+            "topic": item["topic"],
+            "skill": item["skill"],
+        })
+
+    return subjects, topics, strengths, weaknesses, recommendations
 
 
 @login_required(login_url="login")
@@ -87,6 +140,7 @@ def placement_result(request):
     total = len(questions)
     score = round((correct / total) * 100) if total else 0
     level = _level_from_score(score)
+
     attempt = PlacementAttempt.objects.create(
         student=student,
         test=test,
@@ -95,9 +149,50 @@ def placement_result(request):
         total_questions=total,
         level=level,
     )
+
+    subjects, topics, strengths, weaknesses, recommendations = _diagnostic_analysis(questions, answers)
+    PlacementDiagnosticResult.objects.bulk_create([
+        PlacementDiagnosticResult(
+            attempt=attempt,
+            subject=question.subject,
+            topic=question.topic or "بدون مبحث",
+            skill=question.skill,
+            correct_answers=sum(
+                1 for q in questions
+                if q.subject == question.subject
+                and (q.topic or "بدون مبحث") == (question.topic or "بدون مبحث")
+                and (q.skill or "") == (question.skill or "")
+                and answers.get(str(q.id)) == q.correct_option
+            ),
+            total_questions=sum(
+                1 for q in questions
+                if q.subject == question.subject
+                and (q.topic or "بدون مبحث") == (question.topic or "بدون مبحث")
+                and (q.skill or "") == (question.skill or "")
+            ),
+            percentage=next(
+                item["percentage"] for item in topics
+                if item["subject"] == question.get_subject_display()
+                and item["topic"] == (question.topic or "بدون مبحث")
+                and item["skill"] == question.skill
+            ),
+        )
+        for question in {(
+            q.subject, q.topic or "بدون مبحث", q.skill
+        ): q for q in questions}.values()
+    ])
+
     student.level = level
     student.points = max(student.points, score * 10)
     student.save(update_fields=["level", "points", "updated_at"])
     request.session.pop("placement_test_id", None)
     request.session.pop("placement_answers", None)
-    return render(request, "placement/result.html", {"attempt": attempt, "student": student})
+    return render(request, "placement/result.html", {
+        "attempt": attempt,
+        "student": student,
+        "subjects": subjects,
+        "topics": topics,
+        "strengths": strengths,
+        "weaknesses": weaknesses,
+        "recommendations": recommendations,
+    })
