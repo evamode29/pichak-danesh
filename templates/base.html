@@ -16,31 +16,21 @@
 <body>
 <header class="site-header">
     <div class="container header-inner">
-        <a class="brand" href="/" aria-label="پیچک دانش">
-            <span class="brand-mark">پ</span>
-            <span>پیچک <strong>دانش</strong></span>
-        </a>
+        <a class="brand" href="/" aria-label="پیچک دانش"><span class="brand-mark">پ</span><span>پیچک <strong>دانش</strong></span></a>
         <nav class="main-nav" aria-label="منوی اصلی">
-            <a class="active" href="/">خانه</a>
-            <a href="#features">امکانات</a>
-            <a href="#path">مسیر یادگیری</a>
-            {% if user.is_authenticated and user.student_profile %}
-            <a href="{% url 'placement-history' %}">تحلیل آزمون</a>
-            {% endif %}
+            <a href="/">خانه</a><a href="{% url 'about' %}">درباره ما</a><a href="#features">امکانات</a><a href="#path">مسیر یادگیری</a>
+            {% if user.is_authenticated and user.student_profile %}<a href="{% url 'placement-history' %}">تحلیل آزمون</a>{% endif %}
             <a href="{% url 'subscription-catalog' %}">اشتراک و بسته‌ها</a>
-            <a href="/login/">ورود</a>
+            {% if user.is_authenticated %}<a href="{% url 'dashboard' %}">داشبورد</a>{% else %}<a href="{% url 'otp-request' %}">ورود دانش‌آموز</a>{% endif %}
         </nav>
-        {% if user.is_authenticated %}
-        <a class="header-cta" href="{% url 'my-subscription' %}">اشتراک من <span>←</span></a>
-        {% else %}
-        <a class="header-cta" href="/login/">ورود <span>←</span></a>
-        {% endif %}
+        {% if user.is_authenticated %}<a class="header-cta" href="{% url 'my-subscription' %}">اشتراک من <span>←</span></a>{% else %}<a class="header-cta" href="{% url 'otp-request' %}">شروع یادگیری <span>←</span></a>{% endif %}
     </div>
 </header>
 <main>{% block content %}{% endblock %}</main>
 <footer class="site-footer">
     <div class="container footer-inner">
         <div><strong>پیچک دانش</strong><span>یادگیری، تمرین و رشد؛ قدم‌به‌قدم.</span></div>
+        <div><a href="{% url 'about' %}">درباره ما</a> · <a href="{% url 'contact' %}">تماس</a> · <a href="{% url 'privacy' %}">حریم خصوصی</a> · <a href="{% url 'terms' %}">قوانین</a> · <a href="{% url 'refund' %}">شرایط خرید</a></div>
         <span>© {% now "Y" %} پیچک دانش</span>
     </div>
 </footer>
