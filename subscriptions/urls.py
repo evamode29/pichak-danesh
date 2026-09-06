@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import catalog, content_detail, my_subscription, request_purchase
+from .views import catalog, content_detail, my_subscription, request_purchase, zarinpal_callback
 
 
 urlpatterns = [
@@ -8,4 +8,5 @@ urlpatterns = [
     path("mine/", my_subscription, name="my-subscription"),
     path("content/<slug:slug>/", content_detail, name="subscription-content"),
     path("buy/<int:product_id>/", request_purchase, name="subscription-buy"),
+    path("payment/zarinpal/callback/", zarinpal_callback, name="zarinpal-callback"),
 ]
