@@ -2,7 +2,9 @@ from collections import defaultdict
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
+from core.permissions import is_teacher
 from .models import PlacementAttempt, PlacementDiagnosticResult, PlacementQuestion, PlacementTest
 
 
@@ -202,3 +204,48 @@ def placement_result(request):
         "weaknesses": weaknesses,
         "recommendations": recommendations,
     })
+
+
+@login_required(login_url="login")
+def placement_answer_key(request, attempt_id):
+    """Show the answer key only after the assigned teacher has approved it."""
+    student = getattr(request.user, "student_profile", None)
+    if not student:
+        return redirect("dashboard")
+
+    attempt = get_object_or_404(
+        PlacementAttempt.objects.select_related("test", "approved_by"),
+        pk=attempt_id,
+        student=student,
+    )
+    if not attempt.answer_key_published:
+        return render(request, "placement/answer_key_locked.html", {"attempt": attempt})
+
+    questions = list(attempt.test.questions.filter(is_active=True))
+    answers = request.session.get("placement_answers", {})
+    # The original answers are intentionally not stored on the attempt yet.
+    # Published keys therefore show the correct option and the student's saved answer when available.
+    return render(request, "placement/answer_key.html", {
+        "attempt": attempt,
+        "questions": questions,
+        "answers": answers,
+    })
+
+
+@login_required(login_url="login")
+def teacher_approve_placement(request, attempt_id):
+    if not is_teacher(request.user):
+        return redirect("dashboard")
+    if request.method != "POST":
+        return redirect("teacher-dashboard")
+
+    attempt = get_object_or_404(
+        PlacementAttempt,
+        pk=attempt_id,
+        student__classroom__teacher=request.user,
+    )
+    attempt.answer_key_published = True
+    attempt.approved_by = request.user
+    attempt.approved_at = timezone.now()
+    attempt.save(update_fields=["answer_key_published", "approved_by", "approved_at"])
+    return redirect("teacher-student-detail", student_id=attempt.student_id)
