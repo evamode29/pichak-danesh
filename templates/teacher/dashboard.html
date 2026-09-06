@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}پنل معلم | پیچک دانش{% endblock %}
+
+{% block content %}
+<section style="padding:48px 0 80px;background:linear-gradient(180deg,#f8f6f2 0%,#fff 55%);min-height:80vh;">
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;margin-bottom:28px;">
+      <div>
+        <span class="section-kicker">پنل آموزشی معلم</span>
+        <h1 style="margin:8px 0;font-size:clamp(30px,5vw,48px);">سلام، {{ request.user.first_name|default:request.user.username }} 👨‍🏫</h1>
+        <p style="margin:0;opacity:.65;line-height:2;">عملکرد کلاس‌ها و مسیر یادگیری دانش‌آموزانت را یکجا مدیریت کن.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="button secondary" href="{% url 'admin:core_classroom_changelist' %}">مدیریت کلاس‌ها</a>
+        <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="button secondary" type="submit">خروج</button></form>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:26px;">
+      <article style="padding:22px;border-radius:22px;background:#fff;border:1px solid rgba(0,0,0,.07);"><small style="opacity:.55;">دانش‌آموزان</small><strong style="display:block;font-size:34px;margin-top:8px;">{{ total_students }}</strong><span style="opacity:.55;font-size:13px;">در کلاس‌های شما</span></article>
+      <article style="padding:22px;border-radius:22px;background:#fff;border:1px solid rgba(0,0,0,.07);"><small style="opacity:.55;">فعال</small><strong style="display:block;font-size:34px;margin-top:8px;">{{ active_students }}</strong><span style="opacity:.55;font-size:13px;">دارای فعالیت آموزشی</span></article>
+      <article style="padding:22px;border-radius:22px;background:#fff;border:1px solid rgba(0,0,0,.07);"><small style="opacity:.55;">مجموع XP</small><strong style="display:block;font-size:34px;margin-top:8px;">{{ total_xp }}</strong><span style="opacity:.55;font-size:13px;">تجربه کسب‌شده</span></article>
+      <article style="padding:22px;border-radius:22px;background:#171717;color:#fff;border:1px solid #171717;"><small style="opacity:.65;">دقت میانگین</small><strong style="display:block;font-size:34px;margin-top:8px;">{{ average_accuracy }}٪</strong><span style="opacity:.65;font-size:13px;">پاسخ‌های تمرینی</span></article>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,2fr);gap:20px;align-items:start;">
+      <aside style="padding:24px;border-radius:24px;background:linear-gradient(145deg,#1b1917,#383027);color:#fff;">
+        <span style="font-size:13px;opacity:.65;">کلاس‌های من</span>
+        <h2 style="margin:8px 0 20px;">{{ classrooms|length }} کلاس</h2>
+        {% for classroom in classrooms %}
+          <div style="padding:14px 0;border-top:1px solid rgba(255,255,255,.12);">
+            <strong>{{ classroom.name }}</strong>
+            <small style="display:block;opacity:.6;margin-top:4px;">پایه {{ classroom.grade }}{% if classroom.academic_year %} · {{ classroom.academic_year }}{% endif %}</small>
+          </div>
+        {% empty %}
+          <p style="opacity:.65;line-height:1.9;">هنوز کلاسی به شما اختصاص داده نشده است.</p>
+        {% endfor %}
+      </aside>
+
+      <section style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:24px;overflow:hidden;">
+        <div style="padding:22px 24px;border-bottom:1px solid rgba(0,0,0,.07);display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
+          <div><span style="font-size:13px;opacity:.55;">گزارش آموزشی</span><h2 style="margin:5px 0 0;">عملکرد دانش‌آموزان</h2></div>
+          <a class="button secondary" href="{% url 'admin:students_studentprofile_changelist' %}">مدیریت دانش‌آموزان</a>
+        </div>
+        {% if students %}
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;min-width:700px;">
+            <thead><tr style="text-align:right;background:#faf8f5;"><th style="padding:15px 20px;">دانش‌آموز</th><th style="padding:15px;">کلاس</th><th style="padding:15px;">سطح</th><th style="padding:15px;">XP</th><th style="padding:15px;">تمرین</th><th style="padding:15px 20px;">دقت</th></tr></thead>
+            <tbody>
+              {% for row in students %}
+              <tr style="border-top:1px solid rgba(0,0,0,.06);">
+                <td style="padding:16px 20px;"><strong>{{ row.student.user.get_full_name|default:row.student.user.username }}</strong><small style="display:block;opacity:.5;margin-top:3px;">{{ row.student.mobile }}</small></td>
+                <td style="padding:16px;">{{ row.student.classroom.name|default:'—' }}</td>
+                <td style="padding:16px;"><strong>سطح {{ row.student.level }}</strong></td>
+                <td style="padding:16px;">{{ row.student.xp }}</td>
+                <td style="padding:16px;">{{ row.attempts }}</td>
+                <td style="padding:16px 20px;min-width:130px;"><strong>{{ row.accuracy }}٪</strong><div style="height:6px;background:#eee;border-radius:99px;margin-top:7px;overflow:hidden;"><div style="height:100%;width:{{ row.accuracy }}%;background:#171717;border-radius:99px;"></div></div></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <div style="padding:50px 24px;text-align:center;opacity:.65;line-height:2;">هنوز دانش‌آموزی در کلاس‌های شما ثبت نشده است.</div>
+        {% endif %}
+      </section>
+    </div>
+
+    <div style="margin-top:20px;padding:20px 24px;border-radius:20px;background:#f3efe9;border:1px solid rgba(0,0,0,.05);display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      <strong>ابزارهای آموزشی</strong>
+      <span style="opacity:.6;">سؤال‌ها و تمرین‌ها از پنل مدیریت قابل مدیریت هستند.</span>
+      <a class="button secondary" href="{% url 'admin:practice_practicequestion_changelist' %}">مدیریت سؤال‌ها</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
