@@ -17,6 +17,11 @@ def home(request):
 
 def login_view(request):
     if request.user.is_authenticated:
+        role = current_role(request.user)
+        if role == "admin":
+            return redirect("admin:index")
+        if role == "teacher":
+            return redirect("teacher-dashboard")
         return redirect("dashboard")
 
     error = None
@@ -26,6 +31,11 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            role = current_role(user)
+            if role == "admin":
+                return redirect("admin:index")
+            if role == "teacher":
+                return redirect("teacher-dashboard")
             return redirect("dashboard")
         error = "نام کاربری یا رمز عبور نادرست است."
 
