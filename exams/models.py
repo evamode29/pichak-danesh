@@ -36,6 +36,8 @@ class PlacementQuestion(models.Model):
     option_d = models.CharField(max_length=300)
     correct_option = models.CharField(max_length=1, choices=Option.choices)
     subject = models.CharField(max_length=20, choices=Subject.choices, default=Subject.MATH)
+    topic = models.CharField(max_length=100, blank=True, default="")
+    skill = models.CharField(max_length=120, blank=True, default="")
     difficulty = models.PositiveSmallIntegerField(default=2)
     order = models.PositiveSmallIntegerField(default=1)
     is_active = models.BooleanField(default=True)
@@ -45,6 +47,7 @@ class PlacementQuestion(models.Model):
         indexes = [
             models.Index(fields=["test", "is_active", "order"]),
             models.Index(fields=["subject", "difficulty"]),
+            models.Index(fields=["subject", "topic", "skill"]),
         ]
 
     def __str__(self):
