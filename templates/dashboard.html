@@ -23,58 +23,39 @@
         </div>
 
         <section class="xp-card" style="margin:24px 0;padding:24px;border-radius:24px;background:linear-gradient(135deg,#171717,#30271f);color:#fff;">
-            <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;">
-                <div><span class="mini-label" style="color:#d7c4ad;">سیستم XP واقعی</span><h2 style="margin:6px 0 4px;">سطح {{ student.level }}</h2><p style="margin:0;opacity:.78;">{{ student.xp }} XP · {{ student.xp_to_next_level }} XP تا سطح بعدی</p></div>
-                <strong style="font-size:32px;">{{ student.level_progress_percent }}٪</strong>
-            </div>
+            <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;"><div><span class="mini-label" style="color:#d7c4ad;">سیستم XP واقعی</span><h2 style="margin:6px 0 4px;">سطح {{ student.level }}</h2><p style="margin:0;opacity:.78;">{{ student.xp }} XP · {{ student.xp_to_next_level }} XP تا سطح بعدی</p></div><strong style="font-size:32px;">{{ student.level_progress_percent }}٪</strong></div>
             <div style="height:10px;background:rgba(255,255,255,.14);border-radius:999px;overflow:hidden;margin-top:18px;"><div style="height:100%;width:{{ student.level_progress_percent }}%;background:#d7c4ad;border-radius:999px;"></div></div>
             <small style="display:block;margin-top:10px;opacity:.7;">برای هر پاسخ درست، XP دریافت می‌کنی و با رسیدن به آستانه بعدی، سطح خودکار بالا می‌رود.</small>
         </section>
 
         <section class="learning-section" style="margin-bottom:24px;">
-            <div class="section-heading-row">
-                <div><span class="mini-label">افتخارات من</span><h2>نشان‌هایی که به دست آورده‌ای 🏆</h2></div>
-                <strong style="font-size:14px;opacity:.65;">{{ badges|length }} نشان</strong>
-            </div>
-            {% if badges %}
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;">
-                {% for badge in badges %}
-                <article style="padding:20px;border:1px solid rgba(0,0,0,.08);border-radius:20px;background:linear-gradient(145deg,#fff,#f7f3ee);text-align:center;">
-                    <div style="font-size:38px;line-height:1;margin-bottom:12px;">{{ badge.icon }}</div>
-                    <h3 style="margin:0 0 6px;">{{ badge.title }}</h3>
-                    <p style="margin:0;opacity:.65;font-size:13px;line-height:1.8;">{{ badge.description }}</p>
+            <div class="section-heading-row"><div><span class="mini-label">ماموریت‌های امروز</span><h2>امروز چه کاری انجام بدهی؟ 🎯</h2></div><strong style="font-size:14px;opacity:.65;">{% for mission in missions %}{% if mission.completed %}✓{% endif %}{% endfor %} / {{ missions|length }} تکمیل</strong></div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;">
+                {% for mission in missions %}
+                <article style="padding:20px;border:1px solid {% if mission.completed %}rgba(72,160,100,.35){% else %}rgba(0,0,0,.08){% endif %};border-radius:20px;background:{% if mission.completed %}linear-gradient(145deg,#f2fbf5,#fff){% else %}linear-gradient(145deg,#fff,#f7f3ee){% endif %};">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;"><span style="font-size:32px;">{{ mission.icon }}</span>{% if mission.completed %}<span style="font-weight:700;">تکمیل شد ✓</span>{% else %}<strong>{{ mission.current }}/{{ mission.target }}</strong>{% endif %}</div>
+                    <h3 style="margin:14px 0 6px;">{{ mission.title }}</h3><p style="margin:0;opacity:.65;font-size:13px;line-height:1.8;">{{ mission.description }}</p>
+                    <div style="height:8px;background:rgba(0,0,0,.08);border-radius:999px;overflow:hidden;margin-top:15px;"><div style="height:100%;width:{{ mission.percent }}%;background:#171717;border-radius:999px;"></div></div>
+                    <small style="display:block;margin-top:9px;opacity:.65;">پاداش: {{ mission.reward_xp }} XP</small>
                 </article>
-                {% endfor %}
+                {% empty %}<div class="empty-panel">ماموریتی برای امروز تعریف نشده است.</div>{% endfor %}
             </div>
-            {% else %}
-            <div class="empty-panel">هنوز نشانی به دست نیاورده‌ای. یک تمرین شروع کن و اولین افتخارت را بگیر 🚀</div>
-            {% endif %}
+        </section>
+
+        <section class="learning-section" style="margin-bottom:24px;">
+            <div class="section-heading-row"><div><span class="mini-label">افتخارات من</span><h2>نشان‌هایی که به دست آورده‌ای 🏆</h2></div><strong style="font-size:14px;opacity:.65;">{{ badges|length }} نشان</strong></div>
+            {% if badges %}<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;">{% for badge in badges %}<article style="padding:20px;border:1px solid rgba(0,0,0,.08);border-radius:20px;background:linear-gradient(145deg,#fff,#f7f3ee);text-align:center;"><div style="font-size:38px;line-height:1;margin-bottom:12px;">{{ badge.icon }}</div><h3 style="margin:0 0 6px;">{{ badge.title }}</h3><p style="margin:0;opacity:.65;font-size:13px;line-height:1.8;">{{ badge.description }}</p></article>{% endfor %}</div>{% else %}<div class="empty-panel">هنوز نشانی به دست نیاورده‌ای. یک تمرین شروع کن و اولین افتخارت را بگیر 🚀</div>{% endif %}
         </section>
 
         <div class="dashboard-grid">
-            <article class="dash-main-card">
-                <span class="mini-label">مسیر امروز</span>
-                {% if latest_attempt %}
-                <h2>سطح تو مشخص شده؛ وقت تمرین است.</h2>
-                <p>در آخرین تعیین سطح، <strong>{{ latest_attempt.score }}٪</strong> گرفتی و در سطح <strong>{{ student.level }}</strong> قرار گرفتی. تمرین‌های بعدی متناسب با همین سطح انتخاب می‌شوند.</p>
-                <div class="dash-actions"><a class="button primary" href="{% url 'practice-start' %}">شروع تمرین <span>←</span></a><a class="button secondary" href="{% url 'placement-start' %}">تعیین سطح دوباره</a></div>
-                {% else %}
-                <h2>اول سطح خودت را پیدا کنیم.</h2>
-                <p>با یک آزمون کوتاه، سطح فعلی‌ات را می‌سنجیم و بعد تمرین‌های مناسب خودت را پیشنهاد می‌کنیم.</p>
-                <div class="dash-actions"><a class="button primary" href="{% url 'placement-start' %}">شروع تعیین سطح <span>←</span></a><a class="button secondary" href="{% url 'practice-start' %}">تمرین</a></div>
-                {% endif %}
-            </article>
-
+            <article class="dash-main-card"><span class="mini-label">مسیر امروز</span>{% if latest_attempt %}<h2>سطح تو مشخص شده؛ وقت تمرین است.</h2><p>در آخرین تعیین سطح، <strong>{{ latest_attempt.score }}٪</strong> گرفتی و در سطح <strong>{{ student.level }}</strong> قرار گرفتی. تمرین‌های بعدی متناسب با همین سطح انتخاب می‌شوند.</p><div class="dash-actions"><a class="button primary" href="{% url 'practice-start' %}">شروع تمرین <span>←</span></a><a class="button secondary" href="{% url 'placement-start' %}">تعیین سطح دوباره</a></div>{% else %}<h2>اول سطح خودت را پیدا کنیم.</h2><p>با یک آزمون کوتاه، سطح فعلی‌ات را می‌سنجیم و بعد تمرین‌های مناسب خودت را پیشنهاد می‌کنیم.</p><div class="dash-actions"><a class="button primary" href="{% url 'placement-start' %}">شروع تعیین سطح <span>←</span></a><a class="button secondary" href="{% url 'practice-start' %}">تمرین</a></div>{% endif %}</article>
             <article class="dash-side-card"><span class="mini-label">وضعیت یادگیری</span>{% if latest_attempt %}<h3>سطح {{ student.level }}</h3><p>آخرین نتیجه تعیین سطح: {{ latest_attempt.score }}٪ · {{ latest_attempt.correct_answers }} پاسخ درست از {{ latest_attempt.total_questions }}</p>{% else %}<h3>هنوز تعیین سطح نشده‌ای</h3><p>تعیین سطح را انجام بده تا مسیر تمرین اختصاصی تو فعال شود.</p>{% endif %}</article>
             <article class="dash-side-card"><span class="mini-label">کلاس من</span><h3>{% if student.classroom %}{{ student.classroom.name }}{% else %}هنوز کلاسی ثبت نشده{% endif %}</h3>{% if student.classroom %}<p>پایه {{ student.classroom.grade }}{% if student.classroom.academic_year %} · {{ student.classroom.academic_year }}{% endif %}</p>{% else %}<p>کلاس شما بعداً توسط مدیر یا معلم ثبت می‌شود.</p>{% endif %}</article>
         </div>
 
         <section class="learning-section"><div class="section-heading-row"><div><span class="mini-label">پیشرفت واقعی</span><h2>وضعیت درس‌ها</h2></div><a class="button secondary" href="{% url 'practice-start' %}">ادامه تمرین</a></div><div class="subject-progress-grid">{% for item in subject_progress %}<article class="subject-progress-card"><div class="subject-progress-top"><div class="subject-icon">{{ item.icon }}</div><div><h3>{{ item.name }}</h3><small>{{ item.total }} پاسخ · {{ item.points }} امتیاز</small></div><strong>{{ item.accuracy }}٪</strong></div><div class="progress-track"><div class="progress-fill" style="width: {{ item.accuracy }}%"></div></div><p>{{ item.correct }} پاسخ درست از {{ item.total }}</p></article>{% endfor %}</div></section>
 
-        <div class="dashboard-lower-grid">
-            <section class="dash-panel"><div class="section-heading-row"><div><span class="mini-label">آخرین فعالیت</span><h2>تمرین‌های اخیر</h2></div></div>{% if recent_practice %}<div class="activity-list">{% for attempt in recent_practice %}<div class="activity-item"><div><strong>{{ attempt.question.get_subject_display }}</strong><p>{{ attempt.question.text|truncatechars:70 }}</p></div>{% if attempt.is_correct %}<span class="activity-result success">+{{ attempt.points_earned }} ✓</span>{% else %}<span class="activity-result">۰ امتیاز</span>{% endif %}</div>{% endfor %}</div>{% else %}<div class="empty-panel">هنوز تمرینی ثبت نشده. اولین تمرینت را شروع کن 🚀</div>{% endif %}</section>
-            <section class="dash-panel"><div class="section-heading-row"><div><span class="mini-label">رقابت دوستانه</span><h2>رتبه‌بندی پایه {{ student.grade }}</h2></div></div><div class="leaderboard-list">{% for item in leaderboard %}<div class="leaderboard-item {% if item.is_me %}is-me{% endif %}"><span class="rank">{{ item.rank }}</span><div class="leader-name">{{ item.user.first_name|default:item.user.username }}{% if item.is_me %} <small>شما</small>{% endif %}</div><strong>{{ item.points }}</strong></div>{% empty %}<div class="empty-panel">هنوز دانش‌آموزی برای رتبه‌بندی ثبت نشده است.</div>{% endfor %}</div></section>
-        </div>
+        <div class="dashboard-lower-grid"><section class="dash-panel"><div class="section-heading-row"><div><span class="mini-label">آخرین فعالیت</span><h2>تمرین‌های اخیر</h2></div></div>{% if recent_practice %}<div class="activity-list">{% for attempt in recent_practice %}<div class="activity-item"><div><strong>{{ attempt.question.get_subject_display }}</strong><p>{{ attempt.question.text|truncatechars:70 }}</p></div>{% if attempt.is_correct %}<span class="activity-result success">+{{ attempt.points_earned }} ✓</span>{% else %}<span class="activity-result">۰ امتیاز</span>{% endif %}</div>{% endfor %}</div>{% else %}<div class="empty-panel">هنوز تمرینی ثبت نشده. اولین تمرینت را شروع کن 🚀</div>{% endif %}</section><section class="dash-panel"><div class="section-heading-row"><div><span class="mini-label">رقابت دوستانه</span><h2>رتبه‌بندی پایه {{ student.grade }}</h2></div></div><div class="leaderboard-list">{% for item in leaderboard %}<div class="leaderboard-item {% if item.is_me %}is-me{% endif %}"><span class="rank">{{ item.rank }}</span><div class="leader-name">{{ item.user.first_name|default:item.user.username }}{% if item.is_me %} <small>شما</small>{% endif %}</div><strong>{{ item.points }}</strong></div>{% empty %}<div class="empty-panel">هنوز دانش‌آموزی برای رتبه‌بندی ثبت نشده است.</div>{% endfor %}</div></section></div>
         {% else %}<div class="empty-dashboard"><div class="auth-icon">پ</div><h2>حساب آموزشی شما آماده است</h2><p>این حساب هنوز به پروفایل دانش‌آموزی متصل نشده است.</p></div>{% endif %}
     </div>
 </section>
