@@ -67,6 +67,9 @@ def dashboard(request):
     leaderboard = []
     badges = []
     missions = []
+    weak_topics = []
+    weakest_subject = None
+    diagnostic_hint = None
 
     if student:
         latest_attempt = PlacementAttempt.objects.filter(student=student).first()
@@ -101,13 +104,60 @@ def dashboard(request):
             accuracy = round((data["correct"] / data["total"]) * 100) if data["total"] else 0
             subject_progress.append({"code": code, "name": name, "icon": subject_icons[code], "total": data["total"], "correct": data["correct"], "points": data["points"], "accuracy": accuracy})
 
+        if latest_attempt:
+            diagnostic_results = list(latest_attempt.diagnostic_results.all())
+            topic_rows = []
+            for result in diagnostic_results:
+                if result.topic:
+                    topic_rows.append({
+                        "subject": subject_names.get(result.subject, result.subject),
+                        "topic": result.topic,
+                        "skill": result.skill,
+                        "percentage": result.percentage,
+                        "correct": result.correct_answers,
+                        "total": result.total_questions,
+                    })
+            weak_topics = sorted(
+                [row for row in topic_rows if row["total"] and row["percentage"] < 70],
+                key=lambda row: (row["percentage"], -row["total"]),
+            )[:3]
+
+            subject_scores = []
+            for code, name in subject_names.items():
+                rows = [r for r in diagnostic_results if r.subject == code]
+                total = sum(r.total_questions for r in rows)
+                correct = sum(r.correct_answers for r in rows)
+                if total:
+                    subject_scores.append((round(correct * 100 / total), name))
+            if subject_scores:
+                weakest_subject = min(subject_scores, key=lambda item: item[0])
+
+            if weak_topics:
+                first = weak_topics[0]
+                diagnostic_hint = f"پیشنهاد امروز: مرور {first['topic']} در {first['subject']}"
+            elif weakest_subject:
+                diagnostic_hint = f"پیشنهاد امروز: چند تمرین بیشتر در {weakest_subject[1]}"
+
         recent_practice = attempts[:5]
         leaderboard = list(StudentProfile.objects.select_related("user").filter(grade=student.grade).order_by("-points", "id")[:10])
         for index, item in enumerate(leaderboard, start=1):
             item.rank = index
             item.is_me = item.pk == student.pk
 
-    return render(request, "dashboard.html", {"role": role, "student": student, "profile": profile, "latest_attempt": latest_attempt, "subject_progress": subject_progress, "recent_practice": recent_practice, "leaderboard": leaderboard, "badges": badges, "missions": missions})
+    return render(request, "dashboard.html", {
+        "role": role,
+        "student": student,
+        "profile": profile,
+        "latest_attempt": latest_attempt,
+        "subject_progress": subject_progress,
+        "recent_practice": recent_practice,
+        "leaderboard": leaderboard,
+        "badges": badges,
+        "missions": missions,
+        "weak_topics": weak_topics,
+        "weakest_subject": weakest_subject,
+        "diagnostic_hint": diagnostic_hint,
+    })
 
 
 def _teacher_student_queryset(user):
