@@ -16,7 +16,7 @@ def home(request):
 
 
 def _redirect_after_login(user):
-    """Send each account to its application area, never based only on is_staff."""
+    """Send each account to its application area, based on the application role."""
     profile = UserProfile.objects.filter(user=user).first()
     role = profile.role if profile else None
 
@@ -31,9 +31,9 @@ def _redirect_after_login(user):
 
 
 def login_view(request):
-    if request.user.is_authenticated:
-        return _redirect_after_login(request.user)
-
+    # Do not redirect an already-authenticated user from /login/.
+    # This is important when the browser still has an admin session:
+    # the user must be able to submit the teacher credentials and switch accounts.
     error = None
     if request.method == "POST":
         username = request.POST.get("username", "").strip()
