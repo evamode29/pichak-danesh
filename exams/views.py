@@ -108,14 +108,20 @@ def placement_question(request):
     index = max(0, min(index, len(questions) - 1))
     question = questions[index]
     answers = request.session.get("placement_answers", {})
+
     if request.method == "POST":
         selected = request.POST.get("answer", "").upper()
         if selected in {"A", "B", "C", "D"}:
             answers[str(question.id)] = selected
             request.session["placement_answers"] = answers
-        if index + 1 < len(questions):
+
+        navigation = request.POST.get("navigation", "next")
+        if navigation == "back" and index > 0:
+            return redirect(f"/placement/question/?q={index - 1}")
+        if navigation == "next" and index + 1 < len(questions):
             return redirect(f"/placement/question/?q={index + 1}")
         return redirect("placement-result")
+
     return render(request, "placement/question.html", {
         "test": test,
         "question": question,
