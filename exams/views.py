@@ -4,7 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
+from core.models import ClassRoom
 from core.permissions import is_teacher
+from students.models import StudentProfile
 from .models import PlacementAttempt, PlacementDiagnosticResult, PlacementQuestion, PlacementTest
 
 
@@ -200,3 +202,97 @@ def teacher_approve_placement_repeat(request, attempt_id):
     attempt.repeat_approved_by = request.user
     attempt.save(update_fields=["repeat_requested", "repeat_approved_at", "repeat_approved_by"])
     return redirect("teacher-student-detail", student_id=attempt.student_id)
+
+
+@login_required(login_url="login")
+def teacher_class_diagnostic(request, classroom_id):
+    if not is_teacher(request.user):
+        return redirect("dashboard")
+
+    classroom = get_object_or_404(ClassRoom, pk=classroom_id, teacher=request.user, is_active=True)
+    students = list(StudentProfile.objects.filter(classroom=classroom).select_related("user").order_by("user__first_name", "user__last_name", "id"))
+    test = PlacementTest.objects.filter(grade=classroom.grade, is_active=True).first()
+
+    context = {
+        "classroom": classroom,
+        "test": test,
+        "student_count": len(students),
+        "participated": 0,
+        "completion_rate": 0,
+        "average_score": 0,
+        "average_level": 0,
+        "subjects": [],
+        "topics": [],
+        "distribution": [],
+        "student_rows": [],
+    }
+
+    if not test or not students:
+        return render(request, "teacher/class_diagnostic.html", context)
+
+    attempts = list(
+        PlacementAttempt.objects.filter(student__in=students, test=test)
+        .select_related("student", "student__user")
+        .order_by("student_id", "-completed_at", "-id")
+    )
+    latest_by_student = {}
+    for attempt in attempts:
+        latest_by_student.setdefault(attempt.student_id, attempt)
+
+    latest_attempts = list(latest_by_student.values())
+    participated = len(latest_attempts)
+    context["participated"] = participated
+    context["completion_rate"] = round(participated * 100 / len(students)) if students else 0
+    context["average_score"] = round(sum(a.score for a in latest_attempts) / participated) if participated else 0
+    context["average_level"] = round(sum(a.level for a in latest_attempts) / participated, 1) if participated else 0
+
+    subject_names = dict(PlacementQuestion.Subject.choices)
+    subject_codes = ["math", "science", "persian", "social"]
+    result_rows = list(PlacementDiagnosticResult.objects.filter(attempt__in=latest_attempts))
+    subject_acc = defaultdict(lambda: {"sum": 0, "count": 0})
+    topic_acc = defaultdict(lambda: {"subject": "", "topic": "", "skill": "", "sum": 0, "count": 0, "weak": 0})
+    student_subjects = defaultdict(dict)
+
+    for result in result_rows:
+        subject_acc[result.subject]["sum"] += result.percentage
+        subject_acc[result.subject]["count"] += 1
+        topic_key = (result.subject, result.topic or "بدون مبحث", result.skill or "")
+        topic_acc[topic_key]["subject"] = subject_names.get(result.subject, result.subject)
+        topic_acc[topic_key]["topic"] = result.topic or "بدون مبحث"
+        topic_acc[topic_key]["skill"] = result.skill
+        topic_acc[topic_key]["sum"] += result.percentage
+        topic_acc[topic_key]["count"] += 1
+        topic_acc[topic_key]["weak"] += int(result.percentage < 60)
+        student_subjects[result.attempt.student_id][result.subject] = result.percentage
+
+    context["subjects"] = [
+        {"code": code, "name": subject_names.get(code, code), "percentage": round(subject_acc[code]["sum"] / subject_acc[code]["count"]) if subject_acc[code]["count"] else 0, "participants": subject_acc[code]["count"]}
+        for code in subject_codes
+    ]
+    context["topics"] = sorted([
+        {**data, "percentage": round(data["sum"] / data["count"]) if data["count"] else 0}
+        for data in topic_acc.values()
+    ], key=lambda item: (item["percentage"], item["subject"], item["topic"]))
+
+    buckets = [("نیازمند تقویت", 0, 59), ("در مسیر رشد", 60, 79), ("خوب", 80, 89), ("عالی", 90, 100)]
+    context["distribution"] = [
+        {"label": label, "count": sum(1 for a in latest_attempts if low <= a.score <= high), "percent": round(sum(1 for a in latest_attempts if low <= a.score <= high) * 100 / participated) if participated else 0}
+        for label, low, high in buckets
+    ]
+
+    rows = []
+    for student in students:
+        attempt = latest_by_student.get(student.id)
+        subject_scores = student_subjects.get(student.id, {})
+        strongest = max(subject_scores.items(), key=lambda x: x[1]) if subject_scores else None
+        weakest = min(subject_scores.items(), key=lambda x: x[1]) if subject_scores else None
+        rows.append({
+            "student": student,
+            "attempt": attempt,
+            "strongest": subject_names.get(strongest[0], strongest[0]) if strongest else "—",
+            "strongest_score": strongest[1] if strongest else 0,
+            "weakest": subject_names.get(weakest[0], weakest[0]) if weakest else "—",
+            "weakest_score": weakest[1] if weakest else 0,
+        })
+    context["student_rows"] = rows
+    return render(request, "teacher/class_diagnostic.html", context)
