@@ -4,106 +4,12 @@
 
 {% block content %}
 <style>
-  .teacher-shell{min-height:calc(100vh - 80px);background:#f7f5f1;padding:28px 0 70px}
-  .teacher-layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:22px;align-items:start}
-  .teacher-sidebar{position:sticky;top:20px;background:#171513;color:#fff;border-radius:26px;padding:18px;box-shadow:0 18px 50px rgba(25,20,15,.12)}
-  .teacher-brand{padding:14px 12px 20px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:12px}
-  .teacher-brand small{display:block;color:#bdb5ad;font-size:12px;margin-bottom:5px}.teacher-brand strong{font-size:20px}
-  .teacher-nav{display:grid;gap:6px}.teacher-nav a{display:flex;align-items:center;gap:10px;padding:12px;border-radius:14px;color:#d9d3cd;text-decoration:none;transition:.2s}.teacher-nav a:hover,.teacher-nav a.active{background:rgba(255,255,255,.09);color:#fff}
-  .teacher-nav .icon{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.07);display:grid;place-items:center}
-  .teacher-user{margin-top:14px;padding:13px;border-radius:16px;background:rgba(255,255,255,.06);font-size:13px}.teacher-user span{display:block;color:#aaa29b;margin-top:3px}
-  .teacher-main{min-width:0}.teacher-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap}.teacher-top h1{font-size:clamp(28px,4vw,42px);margin:5px 0 4px}.teacher-top p{margin:0;color:#77716b;line-height:2}.teacher-kicker{font-size:12px;color:#9a8170;font-weight:700;letter-spacing:.04em}
-  .teacher-actions{display:flex;gap:9px;flex-wrap:wrap}.teacher-action{display:inline-flex;align-items:center;gap:7px;padding:11px 15px;border-radius:13px;text-decoration:none;background:#171513;color:#fff;font-size:13px}.teacher-action.light{background:#fff;color:#292522;border:1px solid #e7e1da}
-  .stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:18px}.stat-card{background:#fff;border:1px solid #e9e3dc;border-radius:22px;padding:19px;box-shadow:0 7px 25px rgba(30,25,20,.035)}.stat-card .label{font-size:12px;color:#89827b}.stat-card .value{font-size:31px;font-weight:800;margin:8px 0 2px}.stat-card .hint{font-size:11px;color:#aaa39c}.stat-card.dark{background:#211e1b;color:#fff;border-color:#211e1b}.stat-card.dark .label,.stat-card.dark .hint{color:#aaa39c}
-  .panel{background:#fff;border:1px solid #e9e3dc;border-radius:24px;overflow:hidden;box-shadow:0 7px 25px rgba(30,25,20,.035)}.panel-head{padding:19px 22px;border-bottom:1px solid #eee9e3;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.panel-head h2{margin:3px 0 0;font-size:19px}.panel-head small{color:#918a83}.panel-link{font-size:12px;color:#725e4f;text-decoration:none}
-  .class-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;padding:18px}.class-card{padding:17px;border:1px solid #ece6df;border-radius:18px;background:#fcfbf9}.class-card .class-icon{width:38px;height:38px;border-radius:13px;background:#eee7df;display:grid;place-items:center;margin-bottom:12px}.class-card strong{display:block;font-size:15px}.class-card span{display:block;color:#918a83;font-size:12px;margin-top:5px}
-  .content-grid{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(240px,.8fr);gap:18px;margin-top:18px}.table-wrap{overflow-x:auto}.teacher-table{width:100%;border-collapse:collapse;min-width:690px}.teacher-table th{padding:13px 16px;background:#faf8f5;color:#827b74;font-size:11px;font-weight:700;text-align:right}.teacher-table td{padding:14px 16px;border-top:1px solid #f0ece7;font-size:13px}.student-name strong{display:block}.student-name small{display:block;color:#a29b94;margin-top:4px;font-size:10px}.accuracy{min-width:115px}.bar{height:6px;background:#eeeae5;border-radius:99px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:#171513;border-radius:99px}.level{display:inline-flex;padding:5px 8px;border-radius:9px;background:#f1ede7;font-size:10px}
-  .insight{padding:19px}.insight-item{padding:13px 0;border-bottom:1px solid #eee9e3}.insight-item:last-child{border-bottom:0}.insight-item strong{font-size:13px}.insight-item p{margin:5px 0 0;color:#89827b;font-size:11px;line-height:1.8}.empty{padding:35px;text-align:center;color:#958e87;font-size:13px}
-  @media(max-width:950px){.teacher-layout{grid-template-columns:1fr}.teacher-sidebar{position:static}.teacher-nav{grid-template-columns:repeat(4,1fr)}.teacher-nav a{justify-content:center}.teacher-nav a span:not(.icon){display:none}.teacher-user{display:none}.stat-grid{grid-template-columns:repeat(2,1fr)}}
-  @media(max-width:600px){.teacher-shell{padding-top:16px}.teacher-nav{grid-template-columns:repeat(2,1fr)}.stat-grid{grid-template-columns:1fr 1fr}.content-grid{grid-template-columns:1fr}.stat-card{padding:15px}.stat-card .value{font-size:26px}}
+  .teacher-shell{min-height:calc(100vh - 80px);background:#f7f5f1;padding:28px 0 70px}.teacher-layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:22px;align-items:start}.teacher-sidebar{position:sticky;top:20px;background:#171513;color:#fff;border-radius:26px;padding:18px;box-shadow:0 18px 50px rgba(25,20,15,.12)}.teacher-brand{padding:14px 12px 20px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:12px}.teacher-brand small{display:block;color:#bdb5ad;font-size:12px;margin-bottom:5px}.teacher-brand strong{font-size:20px}.teacher-nav{display:grid;gap:6px}.teacher-nav a{display:flex;align-items:center;gap:10px;padding:12px;border-radius:14px;color:#d9d3cd;text-decoration:none;transition:.2s}.teacher-nav a:hover,.teacher-nav a.active{background:rgba(255,255,255,.09);color:#fff}.teacher-nav .icon{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.07);display:grid;place-items:center}.teacher-user{margin-top:14px;padding:13px;border-radius:16px;background:rgba(255,255,255,.06);font-size:13px}.teacher-user span{display:block;color:#aaa29b;margin-top:3px}.teacher-main{min-width:0}.teacher-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap}.teacher-top h1{font-size:clamp(28px,4vw,42px);margin:5px 0 4px}.teacher-top p{margin:0;color:#77716b;line-height:2}.teacher-kicker{font-size:12px;color:#9a8170;font-weight:700;letter-spacing:.04em}.teacher-actions{display:flex;gap:9px;flex-wrap:wrap}.teacher-action{display:inline-flex;align-items:center;gap:7px;padding:11px 15px;border-radius:13px;text-decoration:none;background:#171513;color:#fff;font-size:13px}.teacher-action.light{background:#fff;color:#292522;border:1px solid #e7e1da}.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:18px}.stat-card{background:#fff;border:1px solid #e9e3dc;border-radius:22px;padding:19px;box-shadow:0 7px 25px rgba(30,25,20,.035)}.stat-card .label{font-size:12px;color:#89827b}.stat-card .value{font-size:31px;font-weight:800;margin:8px 0 2px}.stat-card .hint{font-size:11px;color:#aaa39c}.stat-card.dark{background:#211e1b;color:#fff;border-color:#211e1b}.stat-card.dark .label,.stat-card.dark .hint{color:#aaa39c}.panel{background:#fff;border:1px solid #e9e3dc;border-radius:24px;overflow:hidden;box-shadow:0 7px 25px rgba(30,25,20,.035)}.panel-head{padding:19px 22px;border-bottom:1px solid #eee9e3;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.panel-head h2{margin:3px 0 0;font-size:19px}.panel-head small{color:#918a83}.panel-link{font-size:12px;color:#725e4f;text-decoration:none}.class-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;padding:18px}.class-card{padding:17px;border:1px solid #ece6df;border-radius:18px;background:#fcfbf9;text-decoration:none;color:inherit;display:block}.class-card:hover{border-color:#cfc5ba;transform:translateY(-1px)}.class-card .class-icon{width:38px;height:38px;border-radius:13px;background:#eee7df;display:grid;place-items:center;margin-bottom:12px}.class-card strong{display:block;font-size:15px}.class-card span{display:block;color:#918a83;font-size:12px;margin-top:5px}.content-grid{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(240px,.8fr);gap:18px;margin-top:18px}.table-wrap{overflow-x:auto}.teacher-table{width:100%;border-collapse:collapse;min-width:690px}.teacher-table th{padding:13px 16px;background:#faf8f5;color:#827b74;font-size:11px;font-weight:700;text-align:right}.teacher-table td{padding:14px 16px;border-top:1px solid #f0ece7;font-size:13px}.student-name strong{display:block}.student-name small{display:block;color:#a29b94;margin-top:4px;font-size:10px}.accuracy{min-width:115px}.bar{height:6px;background:#eeeae5;border-radius:99px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:#171513;border-radius:99px}.level{display:inline-flex;padding:5px 8px;border-radius:9px;background:#f1ede7;font-size:10px}.insight{padding:19px}.insight-item{padding:13px 0;border-bottom:1px solid #eee9e3}.insight-item:last-child{border-bottom:0}.insight-item strong{font-size:13px}.insight-item p{margin:5px 0 0;color:#89827b;font-size:11px;line-height:1.8}.empty{padding:35px;text-align:center;color:#958e87;font-size:13px}@media(max-width:950px){.teacher-layout{grid-template-columns:1fr}.teacher-sidebar{position:static}.teacher-nav{grid-template-columns:repeat(4,1fr)}.teacher-nav a{justify-content:center}.teacher-nav a span:not(.icon){display:none}.teacher-user{display:none}.stat-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.teacher-shell{padding-top:16px}.teacher-nav{grid-template-columns:repeat(2,1fr)}.stat-grid{grid-template-columns:1fr 1fr}.content-grid{grid-template-columns:1fr}.stat-card{padding:15px}.stat-card .value{font-size:26px}}
 </style>
-
-<section class="teacher-shell">
-  <div class="container teacher-layout">
-    <aside class="teacher-sidebar">
-      <div class="teacher-brand"><small>سامانه آموزشی</small><strong>پیچک دانش</strong></div>
-      <nav class="teacher-nav" aria-label="منوی معلم">
-        <a class="active" href="{% url 'teacher-dashboard' %}"><span class="icon">⌂</span><span>داشبورد</span></a>
-        <a href="#classes"><span class="icon">▦</span><span>کلاس‌های من</span></a>
-        <a href="#students"><span class="icon">♙</span><span>دانش‌آموزان</span></a>
-        <a href="#reports"><span class="icon">◒</span><span>گزارش عملکرد</span></a>
-      </nav>
-      <div class="teacher-user">
-        👨‍🏫 {{ request.user.get_full_name|default:request.user.username }}
-        <span>حساب معلم</span>
-      </div>
-    </aside>
-
-    <main class="teacher-main">
-      <header class="teacher-top">
-        <div>
-          <span class="teacher-kicker">داشبورد آموزشی معلم</span>
-          <h1>سلام، {{ request.user.first_name|default:request.user.username }} 👋</h1>
-          <p>وضعیت کلاس‌ها و مسیر یادگیری دانش‌آموزانت را یکجا ببین و مدیریت کن.</p>
-        </div>
-        <div class="teacher-actions">
-          <a class="teacher-action light" href="#students">👥 دانش‌آموزان</a>
-          <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="teacher-action" type="submit" style="border:0;cursor:pointer;font-family:inherit;">خروج</button></form>
-        </div>
-      </header>
-
-      <section class="stat-grid" id="reports">
-        <article class="stat-card"><span class="label">دانش‌آموزان</span><div class="value">{{ total_students }}</div><span class="hint">در کلاس‌های شما</span></article>
-        <article class="stat-card"><span class="label">دانش‌آموزان فعال</span><div class="value">{{ active_students }}</div><span class="hint">دارای فعالیت آموزشی</span></article>
-        <article class="stat-card"><span class="label">مجموع XP</span><div class="value">{{ total_xp }}</div><span class="hint">تجربه کسب‌شده کلاس‌ها</span></article>
-        <article class="stat-card dark"><span class="label">دقت میانگین</span><div class="value">{{ average_accuracy }}٪</div><span class="hint">بر اساس تمرین‌های ثبت‌شده</span></article>
-      </section>
-
-      <section class="panel" id="classes">
-        <div class="panel-head"><div><small>مدیریت کلاس‌ها</small><h2>کلاس‌های من</h2></div><span class="panel-link">{{ classrooms|length }} کلاس فعال</span></div>
-        <div class="class-grid">
-          {% for classroom in classrooms %}
-            <article class="class-card"><div class="class-icon">🏫</div><strong>{{ classroom.name }}</strong><span>پایه {{ classroom.grade }}{% if classroom.academic_year %} · {{ classroom.academic_year }}{% endif %}</span></article>
-          {% empty %}
-            <div class="empty" style="grid-column:1/-1;">هنوز کلاسی به شما اختصاص داده نشده است.</div>
-          {% endfor %}
-        </div>
-      </section>
-
-      <div class="content-grid">
-        <section class="panel" id="students">
-          <div class="panel-head"><div><small>پایش یادگیری</small><h2>عملکرد دانش‌آموزان</h2></div><span class="panel-link">{{ total_students }} نفر</span></div>
-          {% if students %}
-          <div class="table-wrap">
-            <table class="teacher-table">
-              <thead><tr><th>دانش‌آموز</th><th>کلاس</th><th>سطح</th><th>XP</th><th>تمرین</th><th>دقت</th></tr></thead>
-              <tbody>
-                {% for row in students %}
-                <tr>
-                  <td class="student-name"><strong>{{ row.student.user.get_full_name|default:row.student.user.username }}</strong><small>{{ row.student.mobile }}</small></td>
-                  <td>{{ row.student.classroom.name|default:'—' }}</td>
-                  <td><span class="level">سطح {{ row.student.level }}</span></td>
-                  <td><strong>{{ row.student.xp }}</strong></td>
-                  <td>{{ row.attempts }}</td>
-                  <td class="accuracy"><strong>{{ row.accuracy }}٪</strong><div class="bar"><i style="width:{{ row.accuracy }}%"></i></div></td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          {% else %}<div class="empty">هنوز دانش‌آموزی در کلاس‌های شما ثبت نشده است.</div>{% endif %}
-        </section>
-
-        <aside class="panel">
-          <div class="panel-head"><div><small>راهنمای سریع</small><h2>گام بعدی</h2></div></div>
-          <div class="insight">
-            <div class="insight-item"><strong>📊 عملکرد را بررسی کن</strong><p>دقت پاسخ‌ها و میزان فعالیت هر دانش‌آموز را مقایسه کن.</p></div>
-            <div class="insight-item"><strong>🎯 دانش‌آموزان ضعیف‌تر</strong><p>دانش‌آموزانی که تمرین کمتری دارند را برای پیگیری آموزشی شناسایی کن.</p></div>
-            <div class="insight-item"><strong>🚀 هدف بعدی</strong><p>در مرحله بعد بخش تکلیف و آزمون را به همین پنل اضافه می‌کنیم.</p></div>
-          </div>
-        </aside>
-      </div>
-    </main>
-  </div>
-</section>
+<section class="teacher-shell"><div class="container teacher-layout"><aside class="teacher-sidebar"><div class="teacher-brand"><small>سامانه آموزشی</small><strong>پیچک دانش</strong></div><nav class="teacher-nav" aria-label="منوی معلم"><a class="active" href="{% url 'teacher-dashboard' %}"><span class="icon">⌂</span><span>داشبورد</span></a><a href="#classes"><span class="icon">▦</span><span>کلاس‌های من</span></a><a href="{% url 'teacher-students' %}"><span class="icon">♙</span><span>دانش‌آموزان</span></a><a href="#reports"><span class="icon">◒</span><span>گزارش عملکرد</span></a></nav><div class="teacher-user">👨‍🏫 {{ request.user.get_full_name|default:request.user.username }}<span>حساب معلم</span></div></aside>
+<main class="teacher-main"><header class="teacher-top"><div><span class="teacher-kicker">داشبورد آموزشی معلم</span><h1>سلام، {{ request.user.first_name|default:request.user.username }} 👋</h1><p>وضعیت کلاس‌ها و مسیر یادگیری دانش‌آموزانت را یکجا ببین و مدیریت کن.</p></div><div class="teacher-actions"><a class="teacher-action light" href="{% url 'teacher-students' %}">👥 دانش‌آموزان</a><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="teacher-action" type="submit" style="border:0;cursor:pointer;font-family:inherit;">خروج</button></form></div></header>
+<section class="stat-grid" id="reports"><article class="stat-card"><span class="label">دانش‌آموزان</span><div class="value">{{ total_students }}</div><span class="hint">در کلاس‌های شما</span></article><article class="stat-card"><span class="label">دانش‌آموزان فعال</span><div class="value">{{ active_students }}</div><span class="hint">دارای فعالیت آموزشی</span></article><article class="stat-card"><span class="label">مجموع XP</span><div class="value">{{ total_xp }}</div><span class="hint">تجربه کسب‌شده کلاس‌ها</span></article><article class="stat-card dark"><span class="label">دقت میانگین</span><div class="value">{{ average_accuracy }}٪</div><span class="hint">بر اساس تمرین‌های ثبت‌شده</span></article></section>
+<section class="panel" id="classes"><div class="panel-head"><div><small>مدیریت کلاس‌ها</small><h2>کلاس‌های من</h2></div><span class="panel-link">{{ classrooms|length }} کلاس فعال</span></div><div class="class-grid">{% for classroom in classrooms %}<a class="class-card" href="{% url 'teacher-class-detail' classroom.id %}"><div class="class-icon">🏫</div><strong>{{ classroom.name }}</strong><span>پایه {{ classroom.grade }}{% if classroom.academic_year %} · {{ classroom.academic_year }}{% endif %}</span></a>{% empty %}<div class="empty" style="grid-column:1/-1;">هنوز کلاسی به شما اختصاص داده نشده است.</div>{% endfor %}</div></section>
+<div class="content-grid"><section class="panel" id="students"><div class="panel-head"><div><small>پایش یادگیری</small><h2>عملکرد دانش‌آموزان</h2></div><a class="panel-link" href="{% url 'teacher-students' %}">مشاهده همه ←</a></div>{% if students %}<div class="table-wrap"><table class="teacher-table"><thead><tr><th>دانش‌آموز</th><th>کلاس</th><th>سطح</th><th>XP</th><th>تمرین</th><th>دقت</th></tr></thead><tbody>{% for row in students %}<tr><td class="student-name"><a href="{% url 'teacher-student-detail' row.student.id %}" style="color:inherit;text-decoration:none"><strong>{{ row.student.user.get_full_name|default:row.student.user.username }}</strong><small>{{ row.student.mobile }}</small></a></td><td>{{ row.student.classroom.name|default:'—' }}</td><td><span class="level">سطح {{ row.student.level }}</span></td><td><strong>{{ row.student.xp }}</strong></td><td>{{ row.attempts }}</td><td class="accuracy"><strong>{{ row.accuracy }}٪</strong><div class="bar"><i style="width:{{ row.accuracy }}%"></i></div></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty">هنوز دانش‌آموزی در کلاس‌های شما ثبت نشده است.</div>{% endif %}</section>
+<aside class="panel"><div class="panel-head"><div><small>راهنمای سریع</small><h2>گام بعدی</h2></div></div><div class="insight"><div class="insight-item"><strong>📊 عملکرد را بررسی کن</strong><p>روی نام هر دانش‌آموز بزن تا جزئیات عملکرد و درس‌ها را ببینی.</p></div><div class="insight-item"><strong>🏫 کلاس را باز کن</strong><p>با انتخاب هر کلاس، فهرست دانش‌آموزان همان کلاس را ببین.</p></div><div class="insight-item"><strong>🚀 مرحله بعد</strong><p>در قدم بعد بخش تکلیف و آزمون را به پنل معلم اضافه می‌کنیم.</p></div></div></aside></div></main></div></section>
 {% endblock %}
