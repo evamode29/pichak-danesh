@@ -29,7 +29,6 @@ def _level_from_score(score):
 def _diagnostic_analysis(questions, answers):
     subject_data = defaultdict(lambda: {"correct": 0, "total": 0})
     topic_data = defaultdict(lambda: {"subject": "", "topic": "", "skill": "", "correct": 0, "total": 0})
-
     for question in questions:
         is_correct = answers.get(str(question.id)) == question.correct_option
         subject = question.subject
@@ -72,19 +71,22 @@ def placement_start(request):
         return render(request, "placement/not_ready.html")
 
     latest_attempt = PlacementAttempt.objects.filter(student=student, test=test).first()
-    repeat_pending = request.session.get("placement_repeat_pending", False)
-    repeat_approved = request.session.get("placement_repeat_approved", False)
+    if latest_attempt:
+        if request.method == "POST" and request.POST.get("action") == "request-repeat":
+            if not latest_attempt.repeat_requested:
+                latest_attempt.repeat_requested = True
+                latest_attempt.save(update_fields=["repeat_requested"])
+            return render(request, "placement/repeat_locked.html", {"test": test, "attempt": latest_attempt, "repeat_pending": True})
 
-    if latest_attempt and not repeat_approved:
-        return render(request, "placement/repeat_locked.html", {
-            "test": test,
-            "attempt": latest_attempt,
-            "repeat_pending": repeat_pending,
-        })
+        if not latest_attempt.repeat_requested or not latest_attempt.repeat_approved_at:
+            return render(request, "placement/repeat_locked.html", {"test": test, "attempt": latest_attempt, "repeat_pending": latest_attempt.repeat_requested})
 
     if request.method == "POST":
-        request.session.pop("placement_repeat_approved", None)
-        request.session.pop("placement_repeat_pending", None)
+        if latest_attempt:
+            latest_attempt.repeat_requested = False
+            latest_attempt.repeat_approved_at = None
+            latest_attempt.repeat_approved_by = None
+            latest_attempt.save(update_fields=["repeat_requested", "repeat_approved_at", "repeat_approved_by"])
         request.session["placement_test_id"] = test.id
         request.session["placement_answers"] = {}
         return redirect("placement-question")
@@ -150,7 +152,7 @@ def placement_result(request):
             total_questions=sum(1 for q in questions if q.subject == question.subject and (q.topic or "بدون مبحث") == (question.topic or "بدون مبحث") and (q.skill or "") == (question.skill or "")),
             percentage=next(item["percentage"] for item in topics if item["subject"] == question.get_subject_display() and item["topic"] == (question.topic or "بدون مبحث") and item["skill"] == question.skill),
         )
-        for question in { (q.subject, q.topic or "بدون مبحث", q.skill): q for q in questions }.values()
+        for question in {(q.subject, q.topic or "بدون مبحث", q.skill): q for q in questions}.values()
     ])
     student.level = level
     student.points = max(student.points, score * 10)
@@ -193,7 +195,8 @@ def teacher_approve_placement_repeat(request, attempt_id):
     if request.method != "POST":
         return redirect("teacher-dashboard")
     attempt = get_object_or_404(PlacementAttempt, pk=attempt_id, student__classroom__teacher=request.user)
+    attempt.repeat_requested = True
     attempt.repeat_approved_at = timezone.now()
     attempt.repeat_approved_by = request.user
-    attempt.save(update_fields=["repeat_approved_at", "repeat_approved_by"])
+    attempt.save(update_fields=["repeat_requested", "repeat_approved_at", "repeat_approved_by"])
     return redirect("teacher-student-detail", student_id=attempt.student_id)
