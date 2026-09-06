@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}سوابق تحلیل آزمون | پیچک دانش{% endblock %}
+
+{% block content %}
+<style>
+  .history-page{min-height:calc(100vh - 78px);background:#f7f5f2;padding:28px 0 70px}.history-shell{max-width:1000px;margin:auto}.history-hero{border-radius:28px;background:linear-gradient(135deg,#292521,#4a4038);color:#fff;padding:30px 34px;box-shadow:0 24px 65px rgba(45,36,29,.14)}.history-kicker{display:inline-flex;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.1);font-size:10px;color:#ddd4cc}.history-hero h1{font-size:30px;margin:13px 0 7px}.history-hero p{margin:0;color:#d0c7bf;font-size:12px;line-height:2}.history-list{display:grid;gap:12px;margin-top:16px}.history-card{background:#fff;border:1px solid #e7e1da;border-radius:21px;padding:19px 21px;display:flex;align-items:center;justify-content:space-between;gap:18px}.history-main{display:flex;align-items:center;gap:14px}.history-score{width:58px;height:58px;border-radius:17px;background:#f1e9e1;color:#755f4e;display:grid;place-items:center;font-weight:900;font-size:17px}.history-main strong{display:block;color:#302a26;font-size:13px}.history-main small{display:block;color:#8b827b;font-size:10px;margin-top:5px}.history-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}.history-level{padding:7px 10px;border-radius:10px;background:#f5f2ef;color:#665b53;font-size:10px;font-weight:800}.history-link{padding:10px 13px;border-radius:11px;background:#28231f;color:#fff;text-decoration:none;font-size:10px;font-weight:800}.history-empty{margin-top:16px;background:#fff;border:1px dashed #d9d0c8;border-radius:21px;padding:35px;text-align:center;color:#7c726a;font-size:12px}.history-actions{margin-top:16px;text-align:center}.history-actions a{display:inline-flex;padding:12px 18px;border-radius:12px;background:#fff;border:1px solid #e5ded7;color:#4d443d;text-decoration:none;font-size:11px;font-weight:800}@media(max-width:650px){.history-page{padding:15px 0 45px}.history-hero{border-radius:23px;padding:24px 20px}.history-hero h1{font-size:24px}.history-card{align-items:flex-start;flex-direction:column}.history-meta{justify-content:flex-start}.history-main{width:100%}}
+</style>
+
+<section class="history-page">
+  <div class="container history-shell">
+    <div class="history-hero">
+      <span class="history-kicker">پرونده یادگیری تو</span>
+      <h1>سوابق تحلیل آزمون‌ها 📊</h1>
+      <p>تمام تحلیل‌های آزمون تشخیصی تو اینجا باقی می‌مانند؛ حتی اگر بعداً آزمون را دوباره انجام بدهی.</p>
+    </div>
+
+    {% if attempts %}
+      <div class="history-list">
+        {% for attempt in attempts %}
+          <article class="history-card">
+            <div class="history-main">
+              <div class="history-score">{{ attempt.score }}٪</div>
+              <div>
+                <strong>{{ attempt.test.title }}</strong>
+                <small>سطح {{ attempt.level }} از ۱۰ · {{ attempt.correct_answers }} پاسخ صحیح از {{ attempt.total_questions }} · {{ attempt.completed_at|date:"Y/m/d - H:i" }}</small>
+              </div>
+            </div>
+            <div class="history-meta">
+              {% if forloop.first %}<span class="history-level">آخرین تحلیل</span>{% endif %}
+              <a class="history-link" href="{% url 'placement-result-history' attempt.id %}">مشاهده تحلیل ←</a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="history-empty">هنوز آزمون تشخیصی ثبت نکرده‌ای. بعد از اولین آزمون، تحلیل کامل اینجا ذخیره می‌شود.</div>
+    {% endif %}
+
+    <div class="history-actions"><a href="{% url 'dashboard' %}">← بازگشت به داشبورد</a></div>
+  </div>
+</section>
+{% endblock %}
