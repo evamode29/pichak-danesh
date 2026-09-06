@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}پاسخ‌نامه آزمون | پیچک دانش{% endblock %}
+{% block content %}
+<section style="min-height:calc(100vh - 80px);background:#f7f5f2;padding:28px 15px 60px">
+  <div class="container" style="max-width:900px;margin:auto">
+    <div style="background:#292521;color:#fff;border-radius:28px;padding:30px;margin-bottom:16px">
+      <span style="font-size:11px;color:#d8bfa8;font-weight:800">پاسخ‌نامه تأییدشده</span>
+      <h1 style="font-size:30px;margin:10px 0">آزمون تشخیصی شروع ششم</h1>
+      <p style="color:#d0c7bf;font-size:12px;line-height:2;margin:0">این پاسخ‌نامه پس از بررسی و تأیید معلم برایت منتشر شده است.</p>
+    </div>
+    {% for question in questions %}
+    <article style="background:#fff;border:1px solid #e7e1da;border-radius:20px;padding:20px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:start">
+        <div><span style="font-size:10px;color:#927963;font-weight:800">سؤال {{ forloop.counter }} · {{ question.get_subject_display }}</span><h2 style="font-size:15px;line-height:2;margin:8px 0 13px">{{ question.text }}</h2></div>
+        <span style="background:#edf7ef;color:#36764e;border-radius:10px;padding:7px 9px;font-size:10px;font-weight:800;white-space:nowrap">پاسخ صحیح: {{ question.correct_option }}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="padding:11px;border-radius:12px;background:{% if question.correct_option == 'A' %}#edf7ef{% else %}#faf8f5{% endif %};font-size:11px">۱) {{ question.option_a }}</div>
+        <div style="padding:11px;border-radius:12px;background:{% if question.correct_option == 'B' %}#edf7ef{% else %}#faf8f5{% endif %};font-size:11px">۲) {{ question.option_b }}</div>
+        <div style="padding:11px;border-radius:12px;background:{% if question.correct_option == 'C' %}#edf7ef{% else %}#faf8f5{% endif %};font-size:11px">۳) {{ question.option_c }}</div>
+        <div style="padding:11px;border-radius:12px;background:{% if question.correct_option == 'D' %}#edf7ef{% else %}#faf8f5{% endif %};font-size:11px">۴) {{ question.option_d }}</div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
