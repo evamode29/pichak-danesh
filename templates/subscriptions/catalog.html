@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}اشتراک و بسته‌های آموزشی | پیچک دانش{% endblock %}
+{% block content %}
+<style>
+.shop-wrap{max-width:1120px;margin:0 auto;padding:48px 20px 80px}.shop-hero{background:linear-gradient(135deg,#102a43,#15966d);color:#fff;border-radius:28px;padding:34px;box-shadow:0 24px 70px rgba(16,42,67,.16);margin-bottom:28px}.shop-hero h1{margin:0 0 10px;font-size:30px}.shop-hero p{margin:0;opacity:.9;line-height:1.9}.active-box{margin-top:18px;background:rgba(255,255,255,.13);padding:12px 16px;border-radius:14px}.shop-title{font-size:22px;color:#162235;margin:30px 0 16px}.shop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.shop-card{background:#fff;border:1px solid #e6ebf1;border-radius:22px;padding:24px;box-shadow:0 12px 35px rgba(16,42,67,.07)}.shop-card h3{margin:0 0 9px;color:#162235}.shop-card p{color:#68768a;line-height:1.9;min-height:58px}.price{font-size:24px;font-weight:900;color:#15966d;margin:18px 0}.price small{font-size:12px;color:#68768a}.shop-btn{width:100%;border:0;border-radius:13px;padding:12px 16px;background:#102a43;color:#fff;font-family:inherit;font-weight:800;cursor:pointer}.free{background:#eefaf5;color:#15966d;border:1px solid #cdeedf}.plan-meta{font-size:13px;color:#68768a}.code-link{display:inline-block;margin-top:20px;color:#fff;font-weight:800;text-decoration:none}.empty{padding:25px;background:#fff;border:1px dashed #d7dee7;border-radius:18px;color:#68768a}@media(max-width:800px){.shop-grid{grid-template-columns:1fr}.shop-hero{padding:25px}.shop-hero h1{font-size:25px}}
+</style>
+<div class="shop-wrap">
+  <section class="shop-hero">
+    <h1>مسیر یادگیری خودت را کامل کن ✨</h1>
+    <p>اشتراک‌ها و بسته‌های آموزشی پیچک دانش را انتخاب کن. محتوای رایگان همیشه در دسترس است و محتوای ویژه فقط برای حساب‌های دارای دسترسی باز می‌شود.</p>
+    {% if active_subscription %}<div class="active-box">اشتراک فعال شما: <strong>{{ active_subscription.plan.name }}</strong> — تا {{ active_subscription.ends_at|date:"Y/m/d" }}</div>{% endif %}
+    {% if user.is_authenticated %}<a class="code-link" href="{% url 'my-subscription' %}">اشتراک و خریدهای من ←</a>{% endif %}
+  </section>
+
+  <h2 class="shop-title">اشتراک‌های پیشنهادی</h2>
+  <div class="shop-grid">
+    {% for plan in plans %}
+    <article class="shop-card">
+      <h3>{{ plan.name }}</h3><div class="plan-meta">{{ plan.duration_days }} روز دسترسی</div>
+      <p>{{ plan.description|default:"دسترسی به محتوای ویژه و مسیرهای آموزشی پیچک دانش." }}</p>
+      <div class="price">{{ plan.price|floatformat:0 }} <small>تومان</small></div>
+      {% if user.is_authenticated and plan.product %}
+      <form method="post" action="{% url 'subscription-buy' plan.product.id %}">{% csrf_token %}<button class="shop-btn" type="submit">شروع خرید</button></form>
+      {% else %}<a class="shop-btn" href="{% url 'login' %}" style="display:block;text-align:center;text-decoration:none;box-sizing:border-box">ورود برای ادامه</a>{% endif %}
+    </article>
+    {% empty %}<div class="empty">هنوز اشتراکی برای فروش تعریف نشده است.</div>{% endfor %}
+  </div>
+
+  <h2 class="shop-title">بسته‌ها و محصولات آموزشی</h2>
+  <div class="shop-grid">
+    {% for product in products %}
+    <article class="shop-card">
+      <h3>{{ product.title }}</h3><p>{{ product.description|default:"یک بسته آموزشی برای یادگیری هدفمند." }}</p>
+      <div class="price">{% if product.is_free or product.price == 0 %}رایگان{% else %}{{ product.price|floatformat:0 }} <small>تومان</small>{% endif %}</div>
+      {% if user.is_authenticated %}<form method="post" action="{% url 'subscription-buy' product.id %}">{% csrf_token %}<button class="shop-btn {% if product.is_free %}free{% endif %}" type="submit">{% if product.is_free %}فعال‌سازی رایگان{% else %}خرید و دسترسی{% endif %}</button></form>{% else %}<a class="shop-btn" href="{% url 'login' %}" style="display:block;text-align:center;text-decoration:none;box-sizing:border-box">ورود برای ادامه</a>{% endif %}
+    </article>
+    {% empty %}<div class="empty">هنوز محصولی اضافه نشده است.</div>{% endfor %}
+  </div>
+</div>
+{% endblock %}
