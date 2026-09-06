@@ -71,3 +71,23 @@ class PlacementAttempt(models.Model):
 
     def __str__(self):
         return f"{self.student} - سطح {self.level}"
+
+
+class PlacementDiagnosticResult(models.Model):
+    attempt = models.ForeignKey(PlacementAttempt, on_delete=models.CASCADE, related_name="diagnostic_results")
+    subject = models.CharField(max_length=20, choices=PlacementQuestion.Subject.choices)
+    topic = models.CharField(max_length=100, blank=True, default="")
+    skill = models.CharField(max_length=120, blank=True, default="")
+    correct_answers = models.PositiveSmallIntegerField(default=0)
+    total_questions = models.PositiveSmallIntegerField(default=0)
+    percentage = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["subject", "topic", "skill", "id"]
+        indexes = [
+            models.Index(fields=["attempt", "subject"]),
+            models.Index(fields=["subject", "topic", "skill"]),
+        ]
+
+    def __str__(self):
+        return f"{self.attempt} - {self.get_subject_display()} - {self.topic}"
