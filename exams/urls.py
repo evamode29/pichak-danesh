@@ -7,6 +7,7 @@ from .views import (
     placement_start,
     teacher_approve_placement,
     teacher_approve_placement_repeat,
+    teacher_class_diagnostic,
 )
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
     path("answer-key/<int:attempt_id>/", placement_answer_key, name="placement-answer-key"),
     path("teacher/approve/<int:attempt_id>/", teacher_approve_placement, name="teacher-approve-placement"),
     path("teacher/approve-repeat/<int:attempt_id>/", teacher_approve_placement_repeat, name="teacher-approve-placement-repeat"),
+    path("teacher/classes/<int:classroom_id>/diagnostic/", teacher_class_diagnostic, name="teacher-class-diagnostic"),
 ]
