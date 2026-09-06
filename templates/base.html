@@ -27,9 +27,14 @@
             {% if user.is_authenticated and user.student_profile %}
             <a href="{% url 'placement-history' %}">تحلیل آزمون</a>
             {% endif %}
-            <a href="/login/">ورود دانش‌آموز</a>
+            <a href="{% url 'subscription-catalog' %}">اشتراک و بسته‌ها</a>
+            <a href="/login/">ورود</a>
         </nav>
-        <a class="header-cta" href="/login/">ورود دانش‌آموز <span>←</span></a>
+        {% if user.is_authenticated %}
+        <a class="header-cta" href="{% url 'my-subscription' %}">اشتراک من <span>←</span></a>
+        {% else %}
+        <a class="header-cta" href="/login/">ورود <span>←</span></a>
+        {% endif %}
     </div>
 </header>
 <main>{% block content %}{% endblock %}</main>
