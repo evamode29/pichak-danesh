@@ -22,6 +22,21 @@
             <div class="dash-stat"><span>پایه</span><strong>{{ student.grade }}</strong><small>پایه تحصیلی</small></div>
         </div>
 
+        <section class="xp-card" style="margin: 24px 0; padding: 24px; border-radius: 24px; background: linear-gradient(135deg, #171717, #30271f); color: #fff;">
+            <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;">
+                <div>
+                    <span class="mini-label" style="color:#d7c4ad;">سیستم XP واقعی</span>
+                    <h2 style="margin:6px 0 4px;">سطح {{ student.level }}</h2>
+                    <p style="margin:0;opacity:.78;">{{ student.xp }} XP · {{ student.xp_to_next_level }} XP تا سطح بعدی</p>
+                </div>
+                <strong style="font-size:32px;">{{ student.level_progress_percent }}٪</strong>
+            </div>
+            <div style="height:10px;background:rgba(255,255,255,.14);border-radius:999px;overflow:hidden;margin-top:18px;">
+                <div style="height:100%;width:{{ student.level_progress_percent }}%;background:#d7c4ad;border-radius:999px;"></div>
+            </div>
+            <small style="display:block;margin-top:10px;opacity:.7;">برای هر پاسخ درست، XP دریافت می‌کنی و با رسیدن به آستانه بعدی، سطح خودکار بالا می‌رود.</small>
+        </section>
+
         <div class="dashboard-grid">
             <article class="dash-main-card">
                 <span class="mini-label">مسیر امروز</span>
