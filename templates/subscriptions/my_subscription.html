@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}اشتراک من | پیچک دانش{% endblock %}
+{% block content %}
+<style>.account-wrap{max-width:1050px;margin:0 auto;padding:48px 20px 80px}.account-hero,.account-card{background:#fff;border:1px solid #e6ebf1;border-radius:24px;box-shadow:0 14px 40px rgba(16,42,67,.07)}.account-hero{padding:28px;background:linear-gradient(135deg,#102a43,#15966d);color:#fff}.account-hero h1{margin:0 0 8px}.account-hero p{margin:0;opacity:.9}.status{margin-top:18px;background:rgba(255,255,255,.13);border-radius:15px;padding:15px}.account-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}.account-card{padding:24px}.account-card h2{font-size:19px;margin:0 0 16px;color:#162235}.code-form{display:flex;gap:10px}.code-form input{flex:1;border:1px solid #dce3ea;border-radius:12px;padding:12px;font:inherit;direction:ltr;text-align:left}.btn{border:0;border-radius:12px;padding:11px 17px;background:#102a43;color:#fff;font-family:inherit;font-weight:800;cursor:pointer}.row{padding:13px 0;border-bottom:1px solid #eef1f4}.row:last-child{border:0}.muted{color:#68768a;font-size:13px}.green{color:#15966d;font-weight:900}.back{display:inline-block;margin-top:20px;color:#102a43;text-decoration:none;font-weight:800}@media(max-width:760px){.account-grid{grid-template-columns:1fr}.code-form{flex-direction:column}}
+</style>
+<div class="account-wrap">
+  {% if messages %}{% for message in messages %}<div class="account-card" style="padding:14px 18px;margin-bottom:12px">{{ message }}</div>{% endfor %}{% endif %}
+  <section class="account-hero"><h1>اشتراک من 🎓</h1><p>وضعیت دسترسی، خریدها و کدهای فعال‌سازی شما در یکجا.</p>{% if active_subscription %}<div class="status">اشتراک فعال: <strong>{{ active_subscription.plan.name }}</strong> — تا {{ active_subscription.ends_at|date:"Y/m/d" }}</div>{% else %}<div class="status">در حال حاضر اشتراک فعالی ندارید.</div>{% endif %}</section>
+  <div class="account-grid">
+    <section class="account-card"><h2>فعال‌سازی کد</h2><p class="muted">اگر کد اشتراک از مدرسه، معلم یا پیچک دانش دارید، اینجا وارد کنید.</p><form class="code-form" method="post">{% csrf_token %}<input name="code" maxlength="40" placeholder="PICH-XXXX" autocomplete="off"><button class="btn" type="submit">فعال‌سازی</button></form></section>
+    <section class="account-card"><h2>سوابق اشتراک</h2>{% for item in subscriptions %}<div class="row"><strong>{{ item.plan.name }}</strong><div class="muted">{{ item.starts_at|date:"Y/m/d" }} تا {{ item.ends_at|date:"Y/m/d" }}</div></div>{% empty %}<p class="muted">هنوز اشتراکی برای حساب شما ثبت نشده است.</p>{% endfor %}</section>
+  </div>
+  <section class="account-card" style="margin-top:18px"><h2>خریدهای من</h2>{% for item in purchases %}<div class="row"><strong>{{ item.product.title }}</strong><span class="muted"> — {{ item.get_status_display }} — {{ item.amount }} تومان</span></div>{% empty %}<p class="muted">هنوز خریدی ثبت نشده است.</p>{% endfor %}</section>
+  <a class="back" href="{% url 'subscription-catalog' %}">← بازگشت به اشتراک‌ها و بسته‌ها</a>
+</div>
+{% endblock %}
