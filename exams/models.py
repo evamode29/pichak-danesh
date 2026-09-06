@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -63,11 +64,23 @@ class PlacementAttempt(models.Model):
     correct_answers = models.PositiveSmallIntegerField(default=0)
     total_questions = models.PositiveSmallIntegerField(default=0)
     level = models.PositiveSmallIntegerField(default=1)
+    answer_key_published = models.BooleanField(default=False)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approved_placement_attempts",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-completed_at", "-id"]
-        indexes = [models.Index(fields=["student", "-completed_at"])]
+        indexes = [
+            models.Index(fields=["student", "-completed_at"]),
+            models.Index(fields=["answer_key_published", "-completed_at"]),
+        ]
 
     def __str__(self):
         return f"{self.student} - سطح {self.level}"
