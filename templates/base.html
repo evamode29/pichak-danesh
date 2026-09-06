@@ -24,6 +24,9 @@
             <a class="active" href="/">خانه</a>
             <a href="#features">امکانات</a>
             <a href="#path">مسیر یادگیری</a>
+            {% if user.is_authenticated and user.student_profile %}
+            <a href="{% url 'placement-history' %}">تحلیل آزمون</a>
+            {% endif %}
             <a href="/login/">ورود دانش‌آموز</a>
         </nav>
         <a class="header-cta" href="/login/">ورود دانش‌آموز <span>←</span></a>
