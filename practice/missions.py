@@ -1,9 +1,11 @@
 from dataclasses import dataclass
-from datetime import date
 
-from django.db.models import Q
+from django.db import transaction
+from django.utils import timezone
 
-from .models import PracticeAttempt
+from students.models import StudentProfile
+
+from .models import DailyMissionCompletion, PracticeAttempt
 
 
 @dataclass(frozen=True)
@@ -25,7 +27,7 @@ MISSIONS = (
 
 def daily_mission_progress(student, mission, *, today=None):
     """Return today's progress for one mission without mutating the student."""
-    today = today or date.today()
+    today = today or timezone.localdate()
     attempts = PracticeAttempt.objects.filter(student=student, created_at__date=today)
 
     if mission.code == "answer_5":
@@ -52,4 +54,48 @@ def daily_mission_progress(student, mission, *, today=None):
 
 
 def daily_missions(student, *, today=None):
-    return [daily_mission_progress(student, mission, today=today) for mission in MISSIONS]
+    """Return today's missions including whether their reward was already claimed."""
+    today = today or timezone.localdate()
+    claimed_codes = set(
+        DailyMissionCompletion.objects.filter(
+            student=student,
+            mission_date=today,
+        ).values_list("mission_code", flat=True)
+    )
+
+    missions = []
+    for mission in MISSIONS:
+        progress = daily_mission_progress(student, mission, today=today)
+        progress["claimed"] = mission.code in claimed_codes
+        missions.append(progress)
+    return missions
+
+
+@transaction.atomic
+def claim_completed_missions(student, *, today=None):
+    """Claim newly completed daily missions and award their XP exactly once."""
+    today = today or timezone.localdate()
+    locked_student = StudentProfile.objects.select_for_update().get(pk=student.pk)
+    claimed = []
+
+    for mission in MISSIONS:
+        progress = daily_mission_progress(locked_student, mission, today=today)
+        if not progress["completed"]:
+            continue
+
+        completion, created = DailyMissionCompletion.objects.get_or_create(
+            student=locked_student,
+            mission_code=mission.code,
+            mission_date=today,
+            defaults={"reward_xp": mission.reward_xp},
+        )
+        if created:
+            claimed.append(mission)
+
+    reward_xp = sum(mission.reward_xp for mission in claimed)
+    if reward_xp:
+        locked_student.xp += reward_xp
+        locked_student.refresh_level()
+        locked_student.save(update_fields=["xp", "level", "updated_at"])
+
+    return claimed
