@@ -31,9 +31,6 @@ def _redirect_after_login(user):
 
 
 def login_view(request):
-    # Do not redirect an already-authenticated user from /login/.
-    # This is important when the browser still has an admin session:
-    # the user must be able to submit the teacher credentials and switch accounts.
     error = None
     if request.method == "POST":
         username = request.POST.get("username", "").strip()
@@ -195,7 +192,19 @@ def teacher_student_detail(request, student_id):
         subject_correct = subject_attempts.filter(is_correct=True).count()
         subject_rows.append({"name": name, "total": subject_total, "correct": subject_correct, "accuracy": round(subject_correct * 100 / subject_total) if subject_total else 0})
 
-    return render(request, "teacher/student_detail.html", {"student": student, "attempts": attempts[:12], "total_attempts": total, "correct_attempts": correct, "accuracy": accuracy, "subject_rows": subject_rows, "badges": earned_badges(student), "missions": daily_missions(student)})
+    latest_placement = PlacementAttempt.objects.filter(student=student).select_related("test", "approved_by").first()
+
+    return render(request, "teacher/student_detail.html", {
+        "student": student,
+        "attempts": attempts[:12],
+        "total_attempts": total,
+        "correct_attempts": correct,
+        "accuracy": accuracy,
+        "subject_rows": subject_rows,
+        "badges": earned_badges(student),
+        "missions": daily_missions(student),
+        "latest_placement": latest_placement,
+    })
 
 
 @login_required(login_url="login")
