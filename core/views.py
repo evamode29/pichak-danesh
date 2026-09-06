@@ -9,7 +9,7 @@ from practice.models import PracticeAttempt
 from practice.missions import daily_missions
 from students.badges import earned_badges
 from students.models import StudentProfile
-from subscriptions.models import Product, Subscription
+from subscriptions.models import Product, Subscription, SubscriptionPlan
 
 
 def home(request):
@@ -73,6 +73,7 @@ def dashboard(request):
     diagnostic_hint = None
     active_subscription = None
     subscription_products = []
+    subscription_plans = []
 
     if student:
         latest_attempt = PlacementAttempt.objects.filter(student=student).first()
@@ -84,6 +85,13 @@ def dashboard(request):
                 product_type=Product.ProductType.SUBSCRIPTION,
                 is_active=True,
             ).order_by("price", "id")[:3]
+        )
+        subscription_plans = list(
+            SubscriptionPlan.objects.filter(
+                is_active=True,
+                product__is_active=True,
+                product__product_type=Product.ProductType.SUBSCRIPTION,
+            ).select_related("product").order_by("price", "duration_days", "id")[:3]
         )
 
         subject_names = {
@@ -169,6 +177,7 @@ def dashboard(request):
         "diagnostic_hint": diagnostic_hint,
         "active_subscription": active_subscription,
         "subscription_products": subscription_products,
+        "subscription_plans": subscription_plans,
     })
 
 
