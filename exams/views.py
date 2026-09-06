@@ -35,7 +35,6 @@ def _diagnostic_analysis(questions, answers):
         subject = question.subject
         subject_data[subject]["total"] += 1
         subject_data[subject]["correct"] += int(is_correct)
-
         key = (question.subject, question.topic or "بدون مبحث", question.skill or "")
         topic_data[key]["subject"] = question.get_subject_display()
         topic_data[key]["topic"] = question.topic or "بدون مبحث"
@@ -50,30 +49,16 @@ def _diagnostic_analysis(questions, answers):
         data = subject_data.get(code, {"correct": 0, "total": 0})
         total = data["total"]
         percentage = round(data["correct"] * 100 / total) if total else 0
-        subjects.append({
-            "code": code,
-            "name": subject_names.get(code, code),
-            "correct": data["correct"],
-            "total": total,
-            "percentage": percentage,
-        })
+        subjects.append({"code": code, "name": subject_names.get(code, code), "correct": data["correct"], "total": total, "percentage": percentage})
 
     topics = []
     for item in topic_data.values():
         percentage = round(item["correct"] * 100 / item["total"]) if item["total"] else 0
         topics.append({**item, "percentage": percentage})
     topics.sort(key=lambda item: (item["percentage"], item["subject"], item["topic"]))
-
     strengths = [item for item in topics if item["percentage"] >= 80]
     weaknesses = [item for item in topics if item["percentage"] < 60]
-    recommendations = []
-    for item in weaknesses[:4]:
-        recommendations.append({
-            "subject": item["subject"],
-            "topic": item["topic"],
-            "skill": item["skill"],
-        })
-
+    recommendations = [{"subject": item["subject"], "topic": item["topic"], "skill": item["skill"]} for item in weaknesses[:4]]
     return subjects, topics, strengths, weaknesses, recommendations
 
 
@@ -85,12 +70,10 @@ def placement_start(request):
     test = PlacementTest.objects.filter(grade=student.grade, is_active=True).first()
     if not test:
         return render(request, "placement/not_ready.html")
-
     if request.method == "POST":
         request.session["placement_test_id"] = test.id
         request.session["placement_answers"] = {}
         return redirect("placement-question")
-
     return render(request, "placement/start.html", {"test": test, "question_count": test.questions.filter(is_active=True).count()})
 
 
@@ -110,27 +93,18 @@ def placement_question(request):
     index = max(0, min(index, len(questions) - 1))
     question = questions[index]
     answers = request.session.get("placement_answers", {})
-
     if request.method == "POST":
         selected = request.POST.get("answer", "").upper()
         if selected in {"A", "B", "C", "D"}:
             answers[str(question.id)] = selected
             request.session["placement_answers"] = answers
-
         navigation = request.POST.get("navigation", "next")
         if navigation == "back" and index > 0:
             return redirect(f"/placement/question/?q={index - 1}")
         if navigation == "next" and index + 1 < len(questions):
             return redirect(f"/placement/question/?q={index + 1}")
         return redirect("placement-result")
-
-    return render(request, "placement/question.html", {
-        "test": test,
-        "question": question,
-        "index": index,
-        "total": len(questions),
-        "selected": answers.get(str(question.id)),
-    })
+    return render(request, "placement/question.html", {"test": test, "question": question, "index": index, "total": len(questions), "selected": answers.get(str(question.id))})
 
 
 @login_required(login_url="login")
@@ -148,15 +122,7 @@ def placement_result(request):
     total = len(questions)
     score = round((correct / total) * 100) if total else 0
     level = _level_from_score(score)
-
-    attempt = PlacementAttempt.objects.create(
-        student=student,
-        test=test,
-        score=score,
-        correct_answers=correct,
-        total_questions=total,
-        level=level,
-    )
+    attempt = PlacementAttempt.objects.create(student=student, test=test, score=score, correct_answers=correct, total_questions=total, level=level)
 
     subjects, topics, strengths, weaknesses, recommendations = _diagnostic_analysis(questions, answers)
     PlacementDiagnosticResult.objects.bulk_create([
@@ -165,71 +131,30 @@ def placement_result(request):
             subject=question.subject,
             topic=question.topic or "بدون مبحث",
             skill=question.skill,
-            correct_answers=sum(
-                1 for q in questions
-                if q.subject == question.subject
-                and (q.topic or "بدون مبحث") == (question.topic or "بدون مبحث")
-                and (q.skill or "") == (question.skill or "")
-                and answers.get(str(q.id)) == q.correct_option
-            ),
-            total_questions=sum(
-                1 for q in questions
-                if q.subject == question.subject
-                and (q.topic or "بدون مبحث") == (question.topic or "بدون مبحث")
-                and (q.skill or "") == (question.skill or "")
-            ),
-            percentage=next(
-                item["percentage"] for item in topics
-                if item["subject"] == question.get_subject_display()
-                and item["topic"] == (question.topic or "بدون مبحث")
-                and item["skill"] == question.skill
-            ),
+            correct_answers=sum(1 for q in questions if q.subject == question.subject and (q.topic or "بدون مبحث") == (question.topic or "بدون مبحث") and (q.skill or "") == (question.skill or "") and answers.get(str(q.id)) == q.correct_option),
+            total_questions=sum(1 for q in questions if q.subject == question.subject and (q.topic or "بدون مبحث") == (question.topic or "بدون مبحث") and (q.skill or "") == (question.skill or "")),
+            percentage=next(item["percentage"] for item in topics if item["subject"] == question.get_subject_display() and item["topic"] == (question.topic or "بدون مبحث") and item["skill"] == question.skill),
         )
-        for question in {(
-            q.subject, q.topic or "بدون مبحث", q.skill
-        ): q for q in questions}.values()
+        for question in { (q.subject, q.topic or "بدون مبحث", q.skill): q for q in questions }.values()
     ])
-
     student.level = level
     student.points = max(student.points, score * 10)
     student.save(update_fields=["level", "points", "updated_at"])
     request.session.pop("placement_test_id", None)
     request.session.pop("placement_answers", None)
-    return render(request, "placement/result.html", {
-        "attempt": attempt,
-        "student": student,
-        "subjects": subjects,
-        "topics": topics,
-        "strengths": strengths,
-        "weaknesses": weaknesses,
-        "recommendations": recommendations,
-    })
+    return render(request, "placement/result.html", {"attempt": attempt, "student": student, "subjects": subjects, "topics": topics, "strengths": strengths, "weaknesses": weaknesses, "recommendations": recommendations})
 
 
 @login_required(login_url="login")
 def placement_answer_key(request, attempt_id):
-    """Show the answer key only after the assigned teacher has approved it."""
     student = getattr(request.user, "student_profile", None)
     if not student:
         return redirect("dashboard")
-
-    attempt = get_object_or_404(
-        PlacementAttempt.objects.select_related("test", "approved_by"),
-        pk=attempt_id,
-        student=student,
-    )
+    attempt = get_object_or_404(PlacementAttempt.objects.select_related("test", "approved_by"), pk=attempt_id, student=student)
     if not attempt.answer_key_published:
         return render(request, "placement/answer_key_locked.html", {"attempt": attempt})
-
     questions = list(attempt.test.questions.filter(is_active=True))
-    answers = request.session.get("placement_answers", {})
-    # The original answers are intentionally not stored on the attempt yet.
-    # Published keys therefore show the correct option and the student's saved answer when available.
-    return render(request, "placement/answer_key.html", {
-        "attempt": attempt,
-        "questions": questions,
-        "answers": answers,
-    })
+    return render(request, "placement/answer_key.html", {"attempt": attempt, "questions": questions})
 
 
 @login_required(login_url="login")
@@ -238,12 +163,7 @@ def teacher_approve_placement(request, attempt_id):
         return redirect("dashboard")
     if request.method != "POST":
         return redirect("teacher-dashboard")
-
-    attempt = get_object_or_404(
-        PlacementAttempt,
-        pk=attempt_id,
-        student__classroom__teacher=request.user,
-    )
+    attempt = get_object_or_404(PlacementAttempt, pk=attempt_id, student__classroom__teacher=request.user)
     attempt.answer_key_published = True
     attempt.approved_by = request.user
     attempt.approved_at = timezone.now()
