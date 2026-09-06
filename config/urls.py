@@ -2,22 +2,21 @@ from django.contrib import admin
 from django.urls import include, path
 
 from core.api import auth_login, auth_logout, auth_me, classrooms_api, students_api, teachers_api
-from core.views import (
-    dashboard,
-    home,
-    login_view,
-    logout_view,
-    teacher_class_detail,
-    teacher_dashboard,
-    teacher_student_detail,
-    teacher_students,
-)
-
+from core.public_views import about, contact, privacy, refund, terms
+from core.views import dashboard, home, login_view, logout_view, teacher_class_detail, teacher_dashboard, teacher_student_detail, teacher_students
+from core.otp_views import otp_request, otp_verify
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", home, name="home"),
+    path("about/", about, name="about"),
+    path("contact/", contact, name="contact"),
+    path("privacy/", privacy, name="privacy"),
+    path("terms/", terms, name="terms"),
+    path("refund/", refund, name="refund"),
     path("login/", login_view, name="login"),
+    path("otp/", otp_request, name="otp-request"),
+    path("otp/verify/", otp_verify, name="otp-verify"),
     path("logout/", logout_view, name="logout"),
     path("dashboard/", dashboard, name="dashboard"),
     path("teacher/", teacher_dashboard, name="teacher-dashboard"),
