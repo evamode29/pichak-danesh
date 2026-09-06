@@ -56,6 +56,7 @@ class Purchase(models.Model):
     amount = models.PositiveIntegerField(default=0, help_text="مبلغ به تومان")
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     reference = models.CharField(max_length=120, blank=True)
+    authority = models.CharField(max_length=120, blank=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     paid_at = models.DateTimeField(null=True, blank=True)
 
