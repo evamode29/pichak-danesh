@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 from core.api import auth_login, auth_logout, auth_me, classrooms_api, students_api, teachers_api
-from core.views import dashboard, home, login_view, logout_view
+from core.views import dashboard, home, login_view, logout_view, teacher_dashboard
 
 
 urlpatterns = [
@@ -11,6 +11,7 @@ urlpatterns = [
     path("login/", login_view, name="login"),
     path("logout/", logout_view, name="logout"),
     path("dashboard/", dashboard, name="dashboard"),
+    path("teacher/", teacher_dashboard, name="teacher-dashboard"),
     path("placement/", include("exams.urls")),
     path("practice/", include("practice.urls")),
     path("api/v1/auth/login/", auth_login, name="api-auth-login"),
