@@ -70,11 +70,26 @@ def placement_start(request):
     test = PlacementTest.objects.filter(grade=student.grade, is_active=True).first()
     if not test:
         return render(request, "placement/not_ready.html")
+
+    latest_attempt = PlacementAttempt.objects.filter(student=student, test=test).first()
+    repeat_pending = request.session.get("placement_repeat_pending", False)
+    repeat_approved = request.session.get("placement_repeat_approved", False)
+
+    if latest_attempt and not repeat_approved:
+        return render(request, "placement/repeat_locked.html", {
+            "test": test,
+            "attempt": latest_attempt,
+            "repeat_pending": repeat_pending,
+        })
+
     if request.method == "POST":
+        request.session.pop("placement_repeat_approved", None)
+        request.session.pop("placement_repeat_pending", None)
         request.session["placement_test_id"] = test.id
         request.session["placement_answers"] = {}
         return redirect("placement-question")
-    return render(request, "placement/start.html", {"test": test, "question_count": test.questions.filter(is_active=True).count()})
+
+    return render(request, "placement/start.html", {"test": test, "question_count": test.questions.filter(is_active=True).count(), "is_repeat": bool(latest_attempt)})
 
 
 @login_required(login_url="login")
@@ -168,4 +183,17 @@ def teacher_approve_placement(request, attempt_id):
     attempt.approved_by = request.user
     attempt.approved_at = timezone.now()
     attempt.save(update_fields=["answer_key_published", "approved_by", "approved_at"])
+    return redirect("teacher-student-detail", student_id=attempt.student_id)
+
+
+@login_required(login_url="login")
+def teacher_approve_placement_repeat(request, attempt_id):
+    if not is_teacher(request.user):
+        return redirect("dashboard")
+    if request.method != "POST":
+        return redirect("teacher-dashboard")
+    attempt = get_object_or_404(PlacementAttempt, pk=attempt_id, student__classroom__teacher=request.user)
+    attempt.repeat_approved_at = timezone.now()
+    attempt.repeat_approved_by = request.user
+    attempt.save(update_fields=["repeat_approved_at", "repeat_approved_by"])
     return redirect("teacher-student-detail", student_id=attempt.student_id)
