@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}آزمون تشخیصی شروع ششم | پیچک دانش{% endblock %}
+
+{% block content %}
+<style>
+  .diag-page{min-height:calc(100vh - 80px);background:linear-gradient(180deg,#f8f6f2,#fff);padding:40px 0 80px}
+  .diag-shell{max-width:920px;margin:auto}
+  .diag-card{background:#fff;border:1px solid #e9e3dc;border-radius:30px;padding:clamp(25px,5vw,55px);box-shadow:0 20px 70px rgba(35,29,24,.08);position:relative;overflow:hidden}
+  .diag-card:before{content:"";position:absolute;width:240px;height:240px;border-radius:50%;background:#f0e8df;left:-100px;top:-100px;opacity:.7}
+  .diag-content{position:relative;z-index:1}
+  .diag-kicker{display:inline-flex;padding:8px 12px;border-radius:999px;background:#f2ede7;color:#806b5a;font-size:12px;font-weight:700}
+  .diag-card h1{font-size:clamp(30px,5vw,50px);line-height:1.35;margin:18px 0 10px}.diag-card h1 em{font-style:normal;color:#8c7562}
+  .diag-lead{color:#716b65;line-height:2;font-size:15px;max-width:650px}
+  .diag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:28px 0}.diag-item{padding:17px;border:1px solid #eee8e1;border-radius:18px;background:#fcfbf9}.diag-item strong{display:block;font-size:21px;margin-bottom:5px}.diag-item span{font-size:12px;color:#8e8780}
+  .diag-note{padding:15px 17px;border-radius:17px;background:#f8f5f1;color:#756e67;font-size:12px;line-height:1.9}
+  .diag-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}.diag-button{border:0;cursor:pointer;font-family:inherit;font-size:14px;padding:14px 22px;border-radius:14px;background:#171513;color:#fff}.diag-back{display:inline-flex;align-items:center;padding:14px 20px;border-radius:14px;background:#fff;border:1px solid #e6e0d9;color:#38332f;text-decoration:none;font-size:14px}
+  @media(max-width:650px){.diag-page{padding:18px 0 50px}.diag-grid{grid-template-columns:1fr}.diag-card{border-radius:24px;padding:25px}.diag-card h1{font-size:32px}}
+</style>
+
+<section class="diag-page">
+  <div class="container diag-shell">
+    <div class="diag-card">
+      <div class="diag-content">
+        <span class="diag-kicker">ارزیابی ورودی پایه ششم</span>
+        <h1>آزمون تشخیصی <em>شروع ششم</em> 🎯</h1>
+        <p class="diag-lead">قبل از شروع مسیر یادگیری، چند سؤال از مباحث مهم پایه پنجم را حل کن تا پیچک دانش سطح فعلی‌ات را بهتر بشناسد و مسیر تمرین مناسب‌تری برایت بسازد.</p>
+
+        <div class="diag-grid">
+          <div class="diag-item"><strong>{{ question_count }}</strong><span>سؤال چهارگزینه‌ای</span></div>
+          <div class="diag-item"><strong>{{ test.duration_minutes }} دقیقه</strong><span>زمان پیشنهادی</span></div>
+          <div class="diag-item"><strong>۴ درس</strong><span>ریاضی، علوم، فارسی، مطالعات</span></div>
+        </div>
+
+        <div class="diag-note">💡 این آزمون نمره کلاسی نیست؛ هدفش شناخت نقطه شروع توست. با آرامش پاسخ بده و اگر جواب سؤال را نمی‌دانی، بهترین گزینه‌ای را که فکر می‌کنی انتخاب کن.</div>
+
+        <form method="post" class="diag-actions">
+          {% csrf_token %}
+          <button class="diag-button" type="submit">شروع آزمون <span>←</span></button>
+          <a class="diag-back" href="{% url 'dashboard' %}">فعلاً برگرد به داشبورد</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
