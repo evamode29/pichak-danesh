@@ -27,10 +27,6 @@ def catalog(request):
 
 @login_required(login_url="login")
 def my_subscription(request):
-    active_subscription = _active_subscription(request.user)
-    subscriptions = list(Subscription.objects.filter(user=request.user).select_related("plan").order_by("-ends_at"))
-    purchases = list(Purchase.objects.filter(user=request.user).select_related("product").order_by("-created_at")[:20])
-
     if request.method == "POST":
         code = request.POST.get("code", "").strip().upper()
         if not code:
@@ -60,6 +56,10 @@ def my_subscription(request):
         messages.success(request, f"اشتراک «{activation.plan.name}» با موفقیت فعال شد.")
         return redirect("my-subscription")
 
+    active_subscription = _active_subscription(request.user)
+    subscriptions = list(Subscription.objects.filter(user=request.user).select_related("plan").order_by("-ends_at"))
+    purchases = list(Purchase.objects.filter(user=request.user).select_related("product").order_by("-created_at")[:20])
+
     return render(request, "subscriptions/my_subscription.html", {
         "active_subscription": active_subscription,
         "subscriptions": subscriptions,
@@ -79,11 +79,26 @@ def content_detail(request, slug):
 
 @login_required(login_url="login")
 def request_purchase(request, product_id):
-    product = get_object_or_404(Product.objects.select_related("subscription_plan"), pk=product_id, is_active=True)
     if request.method != "POST":
         return redirect("subscription-catalog")
 
+    product = get_object_or_404(
+        Product.objects.select_related("subscription_plan"),
+        pk=product_id,
+        is_active=True,
+    )
+
+    # Prevent accidental duplicate free/gift orders for the same product.
     if product.is_free or product.price == 0:
+        already_owned = Purchase.objects.filter(
+            user=request.user,
+            product=product,
+            status__in=[Purchase.Status.PAID, Purchase.Status.GIFT],
+        ).exists()
+        if already_owned:
+            messages.info(request, "این محصول قبلاً برای حساب شما فعال شده است.")
+            return redirect("my-subscription")
+
         Purchase.objects.create(
             user=request.user,
             product=product,
@@ -94,12 +109,21 @@ def request_purchase(request, product_id):
         messages.success(request, "این محصول برای حساب شما فعال شد.")
         return redirect("my-subscription")
 
-    purchase = Purchase.objects.create(
+    # Do not create another pending order when the user already has one for
+    # the same product; this keeps the payment history clean and prevents
+    # accidental double-click orders.
+    pending = Purchase.objects.filter(
+        user=request.user,
+        product=product,
+        status=Purchase.Status.PENDING,
+    ).order_by("-created_at").first()
+    purchase = pending or Purchase.objects.create(
         user=request.user,
         product=product,
         amount=product.price,
         status=Purchase.Status.PENDING,
     )
+
     gateway = get_gateway()
     callback_url = request.build_absolute_uri(reverse("payment-callback"))
 
@@ -116,8 +140,7 @@ def request_purchase(request, product_id):
         messages.error(request, str(exc))
         return redirect("subscription-catalog")
 
-    # `authority` is retained for backward migration compatibility and is now
-    # treated as a provider-neutral gateway transaction reference.
+    # Kept for migration compatibility; treated as a generic gateway reference.
     purchase.authority = payment.reference
     purchase.save(update_fields=["authority"])
     return redirect(payment.payment_url)
