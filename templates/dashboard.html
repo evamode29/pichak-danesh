@@ -1,62 +1,141 @@
 {% extends 'base.html' %}
 
-{% block title %}داشبورد | پیچک دانش{% endblock %}
+{% block title %}داشبورد من | پیچک دانش{% endblock %}
 
 {% block content %}
-<section class="dashboard-page">
+<section class="dashboard-page student-dashboard">
     <div class="container">
-        <div class="dashboard-head">
-            <div>
-                <span class="section-kicker">داشبورد من</span>
-                <h1>سلام، <em>{% if student %}{{ student.user.first_name|default:student.user.username }}{% else %}{{ request.user.first_name|default:request.user.username }}{% endif %}</em> 👋</h1>
-                <p>امروز هم یک قدم برای بهتر شدن بردار.</p>
-            </div>
-            <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="logout-button" type="submit">خروج</button></form>
-        </div>
-
         {% if student %}
-        <div class="dashboard-stats">
-            <div class="dash-stat"><span>امتیاز</span><strong>{{ student.points }}</strong><small>امتیاز کل</small></div>
-            <div class="dash-stat"><span>سطح</span><strong>{{ student.level }}</strong><small>سطح فعلی</small></div>
-            <div class="dash-stat"><span>تداوم</span><strong>{{ student.streak }} 🔥</strong><small>روز متوالی</small></div>
-            <div class="dash-stat"><span>پایه</span><strong>{{ student.grade }}</strong><small>پایه تحصیلی</small></div>
+        <div class="student-hero">
+            <div>
+                <span class="section-kicker">مسیر یادگیری من</span>
+                <h1>سلام، <em>{{ student.user.first_name|default:student.user.username }}</em> 👋</h1>
+                <p>ببین امروز چه کاری بیشترین کمک را به پیشرفتت می‌کند.</p>
+            </div>
+            <div class="student-hero-actions">
+                <div class="streak-pill">🔥 {{ student.streak }} روز تداوم</div>
+                <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="logout-button" type="submit">خروج</button></form>
+            </div>
         </div>
 
-        <section class="xp-card" style="margin:24px 0;padding:24px;border-radius:24px;background:linear-gradient(135deg,#171717,#30271f);color:#fff;">
-            <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;"><div><span class="mini-label" style="color:#d7c4ad;">سیستم XP واقعی</span><h2 style="margin:6px 0 4px;">سطح {{ student.level }}</h2><p style="margin:0;opacity:.78;">{{ student.xp }} XP · {{ student.xp_to_next_level }} XP تا سطح بعدی</p></div><strong style="font-size:32px;">{{ student.level_progress_percent }}٪</strong></div>
-            <div style="height:10px;background:rgba(255,255,255,.14);border-radius:999px;overflow:hidden;margin-top:18px;"><div style="height:100%;width:{{ student.level_progress_percent }}%;background:#d7c4ad;border-radius:999px;"></div></div>
-            <small style="display:block;margin-top:10px;opacity:.7;">برای هر پاسخ درست، XP دریافت می‌کنی و با رسیدن به آستانه بعدی، سطح خودکار بالا می‌رود.</small>
+        <div class="student-stats">
+            <div class="student-stat main"><span>XP من</span><strong>{{ student.xp }}</strong><small>{{ student.xp_to_next_level }} XP تا سطح بعد</small></div>
+            <div class="student-stat"><span>سطح</span><strong>{{ student.level }}</strong><small>{{ student.level_progress_percent }}٪ پیشرفت سطح</small></div>
+            <div class="student-stat"><span>امتیاز</span><strong>{{ student.points }}</strong><small>امتیاز کل</small></div>
+            <div class="student-stat"><span>پایه</span><strong>{{ student.grade }}</strong><small>{% if student.classroom %}{{ student.classroom.name }}{% else %}پایه ششم{% endif %}</small></div>
+        </div>
+
+        <div class="xp-progress-card">
+            <div class="xp-progress-copy"><span class="mini-label">پیشرفت تا سطح بعد</span><strong>سطح {{ student.level }} ← سطح بعدی</strong></div>
+            <div class="xp-progress-value">{{ student.level_progress_percent }}٪</div>
+            <div class="xp-progress-track"><span style="width:{{ student.level_progress_percent }}%"></span></div>
+        </div>
+
+        <div class="dashboard-primary-grid">
+            <section class="today-card">
+                <div class="today-badge">🎯 پیشنهاد امروز</div>
+                {% if diagnostic_hint %}
+                    <h2>{{ diagnostic_hint }}</h2>
+                    <p>این پیشنهاد بر اساس آخرین آزمون تشخیصی تو ساخته شده تا تمرینت هدفمندتر باشد.</p>
+                {% elif missions %}
+                    <h2>ماموریت امروزت را کامل کن.</h2>
+                    <p>چند تمرین کوتاه انجام بده، XP بگیر و زنجیره تداومت را حفظ کن.</p>
+                {% elif latest_attempt %}
+                    <h2>وقت تمرین هدفمند است.</h2>
+                    <p>سطحت مشخص شده؛ حالا با تمرین منظم مهارت‌هایت را قوی‌تر کن.</p>
+                {% else %}
+                    <h2>اول سطح خودت را پیدا کنیم.</h2>
+                    <p>آزمون تشخیصی شروع ششم را انجام بده تا مسیر تمرین مناسب تو مشخص شود.</p>
+                {% endif %}
+                <div class="dash-actions">
+                    {% if latest_attempt %}<a class="button primary" href="{% url 'practice-start' %}">شروع تمرین <span>←</span></a>{% else %}<a class="button primary" href="{% url 'placement-start' %}">شروع آزمون تشخیصی <span>←</span></a>{% endif %}
+                    <a class="button secondary" href="{% url 'practice-start' %}">تمرین آزاد</a>
+                </div>
+            </section>
+
+            <aside class="diagnostic-card">
+                <div class="diagnostic-top"><span class="mini-label">آخرین ارزیابی</span><span class="diagnostic-status">{% if latest_attempt %}انجام شده ✓{% else %}انجام نشده{% endif %}</span></div>
+                {% if latest_attempt %}
+                    <div class="diagnostic-score"><strong>{{ latest_attempt.score }}٪</strong><span>نمره آزمون</span></div>
+                    <p>{{ latest_attempt.correct_answers }} پاسخ درست از {{ latest_attempt.total_questions }} سؤال · سطح {{ student.level }}</p>
+                    <a href="{% url 'placement-start' %}">مشاهده وضعیت آزمون ←</a>
+                {% else %}
+                    <div class="diagnostic-empty"><strong>هنوز شروع نکرده‌ای</strong><p>با یک آزمون کوتاه، نقاط قوت و نیاز به تمرینت را پیدا می‌کنیم.</p></div>
+                {% endif %}
+            </aside>
+        </div>
+
+        <section class="learning-section smart-path-section">
+            <div class="section-heading-row">
+                <div><span class="mini-label">مسیر یادگیری</span><h2>چه چیزهایی را بهتر کنی؟ 🧠</h2></div>
+                {% if latest_attempt %}<span class="section-note">بر اساس آخرین آزمون تشخیصی</span>{% endif %}
+            </div>
+            {% if weak_topics %}
+                <div class="weak-topic-list">
+                    {% for item in weak_topics %}
+                    <article class="weak-topic-card">
+                        <div class="topic-number">{{ forloop.counter }}</div>
+                        <div class="topic-copy"><span>{{ item.subject }}</span><h3>{{ item.topic }}</h3>{% if item.skill %}<p>{{ item.skill }}</p>{% endif %}</div>
+                        <div class="topic-score"><strong>{{ item.percentage }}٪</strong><small>{{ item.correct }} از {{ item.total }}</small></div>
+                    </article>
+                    {% endfor %}
+                </div>
+            {% elif latest_attempt and weakest_subject %}
+                <div class="learning-recommendation"><span>💡</span><div><strong>{{ weakest_subject.1 }} فرصت رشد توست.</strong><p>با چند تمرین بیشتر در این درس، می‌توانی نتیجه‌ات را بهتر کنی.</p></div><a class="button secondary" href="{% url 'practice-start' %}">شروع تمرین ←</a></div>
+            {% elif latest_attempt %}
+                <div class="learning-recommendation positive"><span>🌟</span><div><strong>شروع خیلی خوبی داری!</strong><p>نقطه ضعف مشخصی در ارزیابی دیده نشد؛ با تمرین منظم همین روند را ادامه بده.</p></div><a class="button secondary" href="{% url 'practice-start' %}">ادامه تمرین ←</a></div>
+            {% else %}
+                <div class="learning-recommendation"><span>🧭</span><div><strong>مسیر اختصاصی تو بعد از آزمون تشخیصی ساخته می‌شود.</strong><p>بعد از ارزیابی، درس‌ها و موضوعاتی که بیشتر به تمرین نیاز دارند اینجا نمایش داده می‌شوند.</p></div><a class="button secondary" href="{% url 'placement-start' %}">شروع ارزیابی ←</a></div>
+            {% endif %}
         </section>
 
-        <section class="learning-section" style="margin-bottom:24px;">
-            <div class="section-heading-row"><div><span class="mini-label">ماموریت‌های امروز</span><h2>امروز چه کاری انجام بدهی؟ 🎯</h2></div><strong style="font-size:14px;opacity:.65;">{% for mission in missions %}{% if mission.completed %}✓{% endif %}{% endfor %} / {{ missions|length }} تکمیل</strong></div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;">
-                {% for mission in missions %}
-                <article style="padding:20px;border:1px solid {% if mission.completed %}rgba(72,160,100,.35){% else %}rgba(0,0,0,.08){% endif %};border-radius:20px;background:{% if mission.completed %}linear-gradient(145deg,#f2fbf5,#fff){% else %}linear-gradient(145deg,#fff,#f7f3ee){% endif %};">
-                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;"><span style="font-size:32px;">{{ mission.icon }}</span>{% if mission.completed %}<span style="font-weight:700;">تکمیل شد ✓</span>{% else %}<strong>{{ mission.current }}/{{ mission.target }}</strong>{% endif %}</div>
-                    <h3 style="margin:14px 0 6px;">{{ mission.title }}</h3><p style="margin:0;opacity:.65;font-size:13px;line-height:1.8;">{{ mission.description }}</p>
-                    <div style="height:8px;background:rgba(0,0,0,.08);border-radius:999px;overflow:hidden;margin-top:15px;"><div style="height:100%;width:{{ mission.percent }}%;background:#171717;border-radius:999px;"></div></div>
-                    <small style="display:block;margin-top:9px;opacity:.65;">پاداش: {{ mission.reward_xp }} XP</small>
+        <section class="learning-section">
+            <div class="section-heading-row"><div><span class="mini-label">مهارت‌ها</span><h2>وضعیت درس‌ها 📚</h2></div><a class="button secondary" href="{% url 'practice-start' %}">ادامه تمرین</a></div>
+            <div class="subject-progress-grid">
+                {% for item in subject_progress %}
+                <article class="subject-progress-card">
+                    <div class="subject-progress-top"><div class="subject-icon">{{ item.icon }}</div><div><h3>{{ item.name }}</h3><small>{{ item.total }} پاسخ · {{ item.points }} امتیاز</small></div><strong>{{ item.accuracy }}٪</strong></div>
+                    <div class="progress-track"><div class="progress-fill" style="width:{{ item.accuracy }}%"></div></div>
+                    <p>{{ item.correct }} پاسخ درست از {{ item.total }}</p>
                 </article>
-                {% empty %}<div class="empty-panel">ماموریتی برای امروز تعریف نشده است.</div>{% endfor %}
+                {% endfor %}
             </div>
         </section>
 
-        <section class="learning-section" style="margin-bottom:24px;">
-            <div class="section-heading-row"><div><span class="mini-label">افتخارات من</span><h2>نشان‌هایی که به دست آورده‌ای 🏆</h2></div><strong style="font-size:14px;opacity:.65;">{{ badges|length }} نشان</strong></div>
-            {% if badges %}<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;">{% for badge in badges %}<article style="padding:20px;border:1px solid rgba(0,0,0,.08);border-radius:20px;background:linear-gradient(145deg,#fff,#f7f3ee);text-align:center;"><div style="font-size:38px;line-height:1;margin-bottom:12px;">{{ badge.icon }}</div><h3 style="margin:0 0 6px;">{{ badge.title }}</h3><p style="margin:0;opacity:.65;font-size:13px;line-height:1.8;">{{ badge.description }}</p></article>{% endfor %}</div>{% else %}<div class="empty-panel">هنوز نشانی به دست نیاورده‌ای. یک تمرین شروع کن و اولین افتخارت را بگیر 🚀</div>{% endif %}
-        </section>
+        <div class="dashboard-lower-grid">
+            <section class="dash-panel mission-panel">
+                <div class="section-heading-row"><div><span class="mini-label">امروز</span><h2>ماموریت‌های من 🎯</h2></div><strong class="panel-count">{% for mission in missions %}{% if mission.completed %}✓{% endif %}{% endfor %} / {{ missions|length }}</strong></div>
+                <div class="mission-list">
+                    {% for mission in missions %}
+                    <article class="mission-row {% if mission.completed %}completed{% endif %}"><span class="mission-icon">{{ mission.icon }}</span><div><strong>{{ mission.title }}</strong><p>{{ mission.description }}</p><div class="mini-progress"><span style="width:{{ mission.percent }}%"></span></div></div><b>{% if mission.completed %}✓{% else %}{{ mission.current }}/{{ mission.target }}{% endif %}</b></article>
+                    {% empty %}<div class="empty-panel">ماموریتی برای امروز تعریف نشده است.</div>{% endfor %}
+                </div>
+            </section>
 
-        <div class="dashboard-grid">
-            <article class="dash-main-card"><span class="mini-label">مسیر امروز</span>{% if latest_attempt %}<h2>سطح تو مشخص شده؛ وقت تمرین است.</h2><p>در آخرین تعیین سطح، <strong>{{ latest_attempt.score }}٪</strong> گرفتی و در سطح <strong>{{ student.level }}</strong> قرار گرفتی. تمرین‌های بعدی متناسب با همین سطح انتخاب می‌شوند.</p><div class="dash-actions"><a class="button primary" href="{% url 'practice-start' %}">شروع تمرین <span>←</span></a><a class="button secondary" href="{% url 'placement-start' %}">تعیین سطح دوباره</a></div>{% else %}<h2>اول سطح خودت را پیدا کنیم.</h2><p>با یک آزمون کوتاه، سطح فعلی‌ات را می‌سنجیم و بعد تمرین‌های مناسب خودت را پیشنهاد می‌کنیم.</p><div class="dash-actions"><a class="button primary" href="{% url 'placement-start' %}">شروع تعیین سطح <span>←</span></a><a class="button secondary" href="{% url 'practice-start' %}">تمرین</a></div>{% endif %}</article>
-            <article class="dash-side-card"><span class="mini-label">وضعیت یادگیری</span>{% if latest_attempt %}<h3>سطح {{ student.level }}</h3><p>آخرین نتیجه تعیین سطح: {{ latest_attempt.score }}٪ · {{ latest_attempt.correct_answers }} پاسخ درست از {{ latest_attempt.total_questions }}</p>{% else %}<h3>هنوز تعیین سطح نشده‌ای</h3><p>تعیین سطح را انجام بده تا مسیر تمرین اختصاصی تو فعال شود.</p>{% endif %}</article>
-            <article class="dash-side-card"><span class="mini-label">کلاس من</span><h3>{% if student.classroom %}{{ student.classroom.name }}{% else %}هنوز کلاسی ثبت نشده{% endif %}</h3>{% if student.classroom %}<p>پایه {{ student.classroom.grade }}{% if student.classroom.academic_year %} · {{ student.classroom.academic_year }}{% endif %}</p>{% else %}<p>کلاس شما بعداً توسط مدیر یا معلم ثبت می‌شود.</p>{% endif %}</article>
+            <section class="dash-panel leaderboard-panel">
+                <div class="section-heading-row"><div><span class="mini-label">رقابت دوستانه</span><h2>رتبه پایه {{ student.grade }} 🏆</h2></div></div>
+                <div class="leaderboard-list">{% for item in leaderboard %}<div class="leaderboard-item {% if item.is_me %}is-me{% endif %}"><span class="rank">{{ item.rank }}</span><div class="leader-name">{{ item.user.first_name|default:item.user.username }}{% if item.is_me %}<small>شما</small>{% endif %}</div><strong>{{ item.points }}</strong></div>{% empty %}<div class="empty-panel">هنوز رتبه‌بندی شکل نگرفته است.</div>{% endfor %}</div>
+            </section>
         </div>
 
-        <section class="learning-section"><div class="section-heading-row"><div><span class="mini-label">پیشرفت واقعی</span><h2>وضعیت درس‌ها</h2></div><a class="button secondary" href="{% url 'practice-start' %}">ادامه تمرین</a></div><div class="subject-progress-grid">{% for item in subject_progress %}<article class="subject-progress-card"><div class="subject-progress-top"><div class="subject-icon">{{ item.icon }}</div><div><h3>{{ item.name }}</h3><small>{{ item.total }} پاسخ · {{ item.points }} امتیاز</small></div><strong>{{ item.accuracy }}٪</strong></div><div class="progress-track"><div class="progress-fill" style="width: {{ item.accuracy }}%"></div></div><p>{{ item.correct }} پاسخ درست از {{ item.total }}</p></article>{% endfor %}</div></section>
+        <section class="learning-section achievements-section">
+            <div class="section-heading-row"><div><span class="mini-label">دستاوردها</span><h2>افتخارات من 🏅</h2></div><strong class="panel-count">{{ badges|length }} نشان</strong></div>
+            {% if badges %}<div class="badge-grid">{% for badge in badges %}<article class="badge-card"><div>{{ badge.icon }}</div><h3>{{ badge.title }}</h3><p>{{ badge.description }}</p></article>{% endfor %}</div>{% else %}<div class="empty-panel">هنوز نشانی نگرفته‌ای؛ اولین تمرینت می‌تواند شروع مجموعه افتخاراتت باشد 🚀</div>{% endif %}
+        </section>
 
-        <div class="dashboard-lower-grid"><section class="dash-panel"><div class="section-heading-row"><div><span class="mini-label">آخرین فعالیت</span><h2>تمرین‌های اخیر</h2></div></div>{% if recent_practice %}<div class="activity-list">{% for attempt in recent_practice %}<div class="activity-item"><div><strong>{{ attempt.question.get_subject_display }}</strong><p>{{ attempt.question.text|truncatechars:70 }}</p></div>{% if attempt.is_correct %}<span class="activity-result success">+{{ attempt.points_earned }} ✓</span>{% else %}<span class="activity-result">۰ امتیاز</span>{% endif %}</div>{% endfor %}</div>{% else %}<div class="empty-panel">هنوز تمرینی ثبت نشده. اولین تمرینت را شروع کن 🚀</div>{% endif %}</section><section class="dash-panel"><div class="section-heading-row"><div><span class="mini-label">رقابت دوستانه</span><h2>رتبه‌بندی پایه {{ student.grade }}</h2></div></div><div class="leaderboard-list">{% for item in leaderboard %}<div class="leaderboard-item {% if item.is_me %}is-me{% endif %}"><span class="rank">{{ item.rank }}</span><div class="leader-name">{{ item.user.first_name|default:item.user.username }}{% if item.is_me %} <small>شما</small>{% endif %}</div><strong>{{ item.points }}</strong></div>{% empty %}<div class="empty-panel">هنوز دانش‌آموزی برای رتبه‌بندی ثبت نشده است.</div>{% endfor %}</div></section></div>
-        {% else %}<div class="empty-dashboard"><div class="auth-icon">پ</div><h2>حساب آموزشی شما آماده است</h2><p>این حساب هنوز به پروفایل دانش‌آموزی متصل نشده است.</p></div>{% endif %}
+        <div class="student-footer-grid">
+            <article class="class-card"><span class="mini-label">کلاس من</span><h3>{% if student.classroom %}{{ student.classroom.name }}{% else %}کلاس هنوز ثبت نشده{% endif %}</h3><p>{% if student.classroom %}پایه {{ student.classroom.grade }}{% if student.classroom.academic_year %} · {{ student.classroom.academic_year }}{% endif %}{% else %}کلاس شما توسط معلم ثبت می‌شود.{% endif %}</p></article>
+            <article class="motivation-card"><span>✨</span><div><strong>هر روز کمی بهتر</strong><p>قرار نیست یک‌شبه عالی شوی؛ کافی است امروز یک قدم جلوتر از دیروز باشی.</p></div></article>
+        </div>
+        {% else %}
+        <div class="empty-dashboard"><div class="auth-icon">پ</div><h2>حساب آموزشی شما آماده است</h2><p>این حساب هنوز به پروفایل دانش‌آموزی متصل نشده است.</p></div>
+        {% endif %}
     </div>
 </section>
+
+<style>
+.student-dashboard{padding-top:52px}.student-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:25px;margin-bottom:25px}.student-hero h1{margin:7px 0 3px;font-size:clamp(1.9rem,4vw,3rem)}.student-hero p{margin:0;color:var(--muted);font-size:.86rem}.student-hero-actions{display:flex;align-items:center;gap:9px}.streak-pill{padding:9px 13px;border-radius:12px;background:#fff8df;color:#9a7200;border:1px solid #f0dfaa;font-size:.74rem;font-weight:800}.student-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.student-stat{padding:19px 20px;border:1px solid var(--line);border-radius:19px;background:#fff;box-shadow:0 10px 32px rgba(16,42,67,.04)}.student-stat span,.student-stat small{display:block;color:var(--muted);font-size:.7rem}.student-stat strong{display:block;margin:2px 0;font-size:1.45rem;color:var(--navy)}.student-stat.main strong{color:var(--green)}.student-stat small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.xp-progress-card{position:relative;margin:13px 0 20px;padding:18px 20px;border-radius:20px;background:linear-gradient(135deg,#102a43,#173c4d);color:#fff}.xp-progress-copy{display:flex;justify-content:space-between;gap:15px;align-items:center;padding-left:55px}.xp-progress-copy .mini-label{color:#aebdca}.xp-progress-copy strong{font-size:.8rem}.xp-progress-value{position:absolute;left:20px;top:18px;color:#7be0b8;font-size:.78rem;font-weight:900}.xp-progress-track{height:8px;margin-top:13px;border-radius:999px;background:rgba(255,255,255,.13);overflow:hidden}.xp-progress-track span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green-2),#8bdcbd)}.dashboard-primary-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:16px}.today-card,.diagnostic-card{padding:27px;border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 12px 38px rgba(16,42,67,.05)}.today-card{background:linear-gradient(145deg,#f1fbf7,#fff)}.today-badge{display:inline-flex;padding:6px 10px;border-radius:999px;background:#e1f6ee;color:var(--green);font-size:.7rem;font-weight:900}.today-card h2{margin:13px 0 5px;font-size:1.35rem;letter-spacing:-.02em}.today-card p{margin:0;color:var(--muted);font-size:.8rem;max-width:650px}.diagnostic-top{display:flex;justify-content:space-between;gap:12px}.diagnostic-status{font-size:.65rem;font-weight:800;padding:5px 8px;border-radius:999px;background:#eef8f4;color:var(--green)}.diagnostic-score{display:flex;align-items:end;gap:10px;margin-top:16px}.diagnostic-score strong{font-size:2.25rem;color:var(--navy);line-height:1}.diagnostic-score span{font-size:.7rem;color:var(--muted)}.diagnostic-card p,.diagnostic-empty p{font-size:.76rem;color:var(--muted);margin:9px 0 13px}.diagnostic-card>a{font-size:.73rem;color:var(--green);font-weight:900}.diagnostic-empty strong{display:block;margin-top:24px}.learning-section{margin-top:18px;padding:25px;border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 10px 32px rgba(16,42,67,.035)}.section-heading-row{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:17px}.section-heading-row h2{margin:5px 0 0;font-size:1.18rem}.section-note{font-size:.68rem;color:var(--muted)}.weak-topic-list{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.weak-topic-card{display:flex;align-items:center;gap:12px;padding:16px;border:1px solid #eee5de;border-radius:18px;background:linear-gradient(145deg,#fffaf6,#fff)}.topic-number{display:grid;place-items:center;min-width:34px;height:34px;border-radius:11px;background:#fff0e6;color:#b96527;font-weight:900;font-size:.78rem}.topic-copy{min-width:0;flex:1}.topic-copy span,.topic-copy p{display:block;color:var(--muted);font-size:.63rem}.topic-copy h3{margin:2px 0;font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.topic-copy p{margin:0}.topic-score{text-align:left}.topic-score strong{display:block;color:#b35c24;font-size:.9rem}.topic-score small{font-size:.58rem;color:var(--muted)}.learning-recommendation{display:flex;align-items:center;gap:15px;padding:17px;border-radius:18px;background:#f7faf9;border:1px solid #e2eee9}.learning-recommendation>span{font-size:28px}.learning-recommendation>div{flex:1}.learning-recommendation strong{font-size:.84rem}.learning-recommendation p{margin:2px 0 0;color:var(--muted);font-size:.7rem}.learning-recommendation.positive{background:#f4fbf7;border-color:#d9eee4}.subject-progress-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.subject-progress-card{padding:16px;border:1px solid var(--line);border-radius:18px;background:#fbfcfc}.subject-progress-top{display:flex;align-items:center;gap:9px}.subject-progress-top>div:nth-child(2){min-width:0;flex:1}.subject-progress-top h3{margin:0;font-size:.82rem}.subject-progress-top small{color:var(--muted);font-size:.58rem}.subject-progress-top>strong{font-size:.85rem;color:var(--green)}.subject-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:#e8f6f1;color:var(--green);font-weight:900}.progress-track{height:7px;margin:12px 0 7px;background:#e9eef0;border-radius:999px;overflow:hidden}.progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--green-2))}.subject-progress-card p{margin:0;color:var(--muted);font-size:.6rem}.dashboard-lower-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-top:18px}.dash-panel{padding:25px;border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 10px 32px rgba(16,42,67,.035)}.panel-count{font-size:.68rem;color:var(--muted)}.mission-list{display:grid;gap:8px}.mission-row{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:11px;border:1px solid #edf0f2;border-radius:15px}.mission-row.completed{background:#f4fbf7;border-color:#dceee6}.mission-icon{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:#f2f6f5;font-size:19px}.mission-row strong{font-size:.75rem}.mission-row p{margin:1px 0 5px;color:var(--muted);font-size:.61rem}.mission-row>b{font-size:.68rem;color:var(--green)}.mini-progress{height:5px;background:#e9eef0;border-radius:999px;overflow:hidden}.mini-progress span{display:block;height:100%;border-radius:999px;background:var(--green)}.leaderboard-list{display:grid;gap:6px}.leaderboard-item{display:grid;grid-template-columns:27px 1fr auto;align-items:center;gap:8px;padding:9px 10px;border-radius:12px}.leaderboard-item.is-me{background:#eaf8f2;border:1px solid #d5eee4}.rank{font-weight:900;color:#8793a0;font-size:.7rem}.leader-name{font-size:.72rem;font-weight:700}.leader-name small{margin-right:5px;color:var(--green);font-size:.58rem}.leaderboard-item>strong{font-size:.68rem;color:var(--navy)}.badge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.badge-card{padding:18px 12px;text-align:center;border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#fff,#fbf8f2)}.badge-card>div{font-size:30px;line-height:1;margin-bottom:9px}.badge-card h3{margin:0 0 3px;font-size:.76rem}.badge-card p{margin:0;color:var(--muted);font-size:.6rem;line-height:1.7}.student-footer-grid{display:grid;grid-template-columns:.7fr 1.3fr;gap:15px;margin-top:18px}.class-card,.motivation-card{padding:21px;border:1px solid var(--line);border-radius:20px;background:#fff}.class-card h3{margin:7px 0 2px;font-size:1rem}.class-card p,.motivation-card p{margin:0;color:var(--muted);font-size:.7rem}.motivation-card{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#fffaf0,#fff)}.motivation-card>span{font-size:28px}.motivation-card strong{font-size:.82rem}.empty-panel{padding:17px;border:1px dashed #dce2e6;border-radius:15px;color:var(--muted);font-size:.7rem;text-align:center}.dash-actions{display:flex;gap:9px;margin-top:20px;flex-wrap:wrap}.dash-actions .button{min-height:42px}.logout-button{border:1px solid #e1e6eb;background:#fff;color:#6b7788;border-radius:11px;padding:9px 15px;font:inherit;font-size:.76rem;font-weight:800;cursor:pointer}
+@media(max-width:900px){.student-stats{grid-template-columns:repeat(2,1fr)}.dashboard-primary-grid,.dashboard-lower-grid,.student-footer-grid{grid-template-columns:1fr}.weak-topic-list{grid-template-columns:1fr 1fr}.subject-progress-grid{grid-template-columns:repeat(2,1fr)}.badge-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.student-dashboard{padding-top:35px}.student-hero{align-items:flex-start;flex-direction:column}.student-hero-actions{width:100%;justify-content:space-between}.student-stats{gap:9px}.student-stat{padding:15px}.student-stat strong{font-size:1.25rem}.xp-progress-copy{padding-left:0;display:block}.xp-progress-copy strong{display:block;margin-top:3px}.xp-progress-value{top:17px}.weak-topic-list,.subject-progress-grid{grid-template-columns:1fr}.learning-section,.dash-panel{padding:18px}.section-heading-row{align-items:flex-start}.learning-recommendation{align-items:flex-start;flex-wrap:wrap}.learning-recommendation .button{margin-right:auto}.today-card,.diagnostic-card{padding:21px}.badge-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
 {% endblock %}
