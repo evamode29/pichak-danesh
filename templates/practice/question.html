@@ -1,75 +1,23 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block title %}تمرین {{ index|add:1 }} | پیچک دانش{% endblock %}
-
 {% block content %}
 <section class="placement-page practice-question-page">
   <div class="container placement-shell">
-    <div class="placement-top">
-      <div>
-        <span class="section-kicker">تمرین هدفمند</span>
-        <h1>یک سؤال، یک قدم جلوتر</h1>
-        <p>با دقت انتخاب کن؛ پاسخ تو در پیشرفتت ثبت می‌شود.</p>
-      </div>
-      <div class="placement-counter"><strong>{{ index|add:1 }}</strong><span>از {{ total }}</span></div>
-    </div>
-
-    <div class="placement-progress">
-      <div><span style="width: {% widthratio index|add:1 total 100 %}%"></span></div>
-      <small>سطح {{ student.level }} · {{ question.get_subject_display }}</small>
-    </div>
-
+    <div class="placement-top"><div><span class="section-kicker">تمرین هوشمند</span><h1>هر سؤال، یک قدم جلوتر 🌱</h1><p>{% if weak_subject %}این تمرین‌ها برای تقویت {{ weak_subject }} اولویت‌بندی شده‌اند.{% else %}سؤال‌ها متناسب با سطح فعلی تو انتخاب شده‌اند.{% endif %}</p></div><div class="placement-counter"><strong>{{ index|add:1 }}</strong><span>از {{ total }}</span></div></div>
+    <div class="placement-progress"><div><span style="width: {% widthratio index|add:1 total 100 %}%"></span></div><small>سطح {{ student.level }} · {{ question.get_subject_display }} · ۹۰ ثانیه</small></div>
     <form method="post" class="question-card" id="practice-form">
-      {% csrf_token %}
-      <div class="question-meta">
-        <span class="question-number">سؤال {{ index|add:1 }} از {{ total }}</span>
-        <span class="question-subject">{{ question.get_subject_display }}</span>
-      </div>
-
-      <div class="question-timer" aria-live="polite">
-        <span>⏱</span> <strong id="timer">01:00</strong>
-      </div>
-
+      {% csrf_token %}<input type="hidden" name="timeout" id="timeout-field" value="0">
+      <div class="question-meta"><span class="question-number">سؤال {{ index|add:1 }} از {{ total }}</span><span class="question-subject">{{ question.get_subject_display }}</span></div>
+      <div class="question-timer" aria-live="polite"><span>⏱</span> <strong id="timer">01:30</strong></div>
       <h2>{{ question.text }}</h2>
-
-      <div class="answer-options">
-        {% for key,text in question_options %}
-        <label class="answer-option{% if selected == key %} selected{% endif %}">
-          <input type="radio" name="answer" value="{{ key }}"{% if selected == key %} checked{% endif %} required>
-          <span class="answer-letter">{{ key }}</span>
-          <span class="answer-text">{{ text }}</span>
-        </label>
-        {% endfor %}
-      </div>
-
-      <button class="button primary placement-next" type="submit">
-        {% if index|add:1 == total %}پایان تمرین{% else %}سؤال بعدی{% endif %} <span>←</span>
-      </button>
+      <div class="answer-options">{% for key,text in question_options %}<label class="answer-option{% if selected == key %} selected{% endif %}"><input type="radio" name="answer" value="{{ key }}"{% if selected == key %} checked{% endif %} required><span class="answer-letter">{{ key }}</span><span class="answer-text">{{ text }}</span></label>{% endfor %}</div>
+      <button class="button primary placement-next" type="submit">{% if index|add:1 == total %}پایان تمرین{% else %}سؤال بعدی{% endif %} <span>←</span></button>
       <a class="placement-exit" href="{% url 'dashboard' %}">خروج از تمرین</a>
     </form>
   </div>
 </section>
-
 <script>
-(function () {
-  const form = document.getElementById("practice-form");
-  const timer = document.getElementById("timer");
-  if (!form || !timer) return;
-
-  let seconds = 60;
-  const tick = () => {
-    const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");
-    const remaining = String(seconds % 60).padStart(2, "0");
-    timer.textContent = `${minutes}:${remaining}`;
-    if (seconds <= 0) {
-      form.submit();
-      return;
-    }
-    seconds -= 1;
-    window.setTimeout(tick, 1000);
-  };
-  tick();
-})();
+(function(){const f=document.getElementById('practice-form'),t=document.getElementById('timer'),x=document.getElementById('timeout-field');if(!f||!t||!x)return;let s=90;const tick=()=>{t.textContent=`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;if(s<=0){x.value='1';f.querySelectorAll('input[name=answer]').forEach(e=>e.required=false);f.submit();return;}s--;setTimeout(tick,1000)};tick()})();
 </script>
 {% endblock %}
