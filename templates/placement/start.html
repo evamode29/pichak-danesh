@@ -4,42 +4,58 @@
 
 {% block content %}
 <style>
-  .diag-page{min-height:calc(100vh - 80px);background:linear-gradient(180deg,#f8f6f2,#fff);padding:40px 0 80px}
-  .diag-shell{max-width:920px;margin:auto}
-  .diag-card{background:#fff;border:1px solid #e9e3dc;border-radius:30px;padding:clamp(25px,5vw,55px);box-shadow:0 20px 70px rgba(35,29,24,.08);position:relative;overflow:hidden}
-  .diag-card:before{content:"";position:absolute;width:240px;height:240px;border-radius:50%;background:#f0e8df;left:-100px;top:-100px;opacity:.7}
-  .diag-content{position:relative;z-index:1}
-  .diag-kicker{display:inline-flex;padding:8px 12px;border-radius:999px;background:#f2ede7;color:#806b5a;font-size:12px;font-weight:700}
-  .diag-card h1{font-size:clamp(30px,5vw,50px);line-height:1.35;margin:18px 0 10px}.diag-card h1 em{font-style:normal;color:#8c7562}
-  .diag-lead{color:#716b65;line-height:2;font-size:15px;max-width:650px}
-  .diag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:28px 0}.diag-item{padding:17px;border:1px solid #eee8e1;border-radius:18px;background:#fcfbf9}.diag-item strong{display:block;font-size:21px;margin-bottom:5px}.diag-item span{font-size:12px;color:#8e8780}
-  .diag-note{padding:15px 17px;border-radius:17px;background:#f8f5f1;color:#756e67;font-size:12px;line-height:1.9}
-  .diag-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}.diag-button{border:0;cursor:pointer;font-family:inherit;font-size:14px;padding:14px 22px;border-radius:14px;background:#171513;color:#fff}.diag-back{display:inline-flex;align-items:center;padding:14px 20px;border-radius:14px;background:#fff;border:1px solid #e6e0d9;color:#38332f;text-decoration:none;font-size:14px}
-  @media(max-width:650px){.diag-page{padding:18px 0 50px}.diag-grid{grid-template-columns:1fr}.diag-card{border-radius:24px;padding:25px}.diag-card h1{font-size:32px}}
+  .diag-hero{min-height:calc(100vh - 78px);padding:34px 0 70px;background:radial-gradient(circle at 15% 10%,#efe6dc 0,transparent 30%),linear-gradient(145deg,#fbfaf8 0%,#f4f0eb 100%)}
+  .diag-shell{max-width:1120px;margin:auto}
+  .diag-card{position:relative;overflow:hidden;border:1px solid #e7e0d8;border-radius:34px;background:rgba(255,255,255,.94);box-shadow:0 30px 90px rgba(48,39,32,.12);display:grid;grid-template-columns:1.08fr .92fr;min-height:600px}
+  .diag-main{padding:clamp(30px,5vw,68px);display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+  .diag-side{background:linear-gradient(160deg,#201d1a,#39322c);color:#fff;padding:42px;display:flex;align-items:center;position:relative;overflow:hidden}
+  .diag-side:before,.diag-side:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.12);border-radius:50%}.diag-side:before{width:390px;height:390px;left:-190px;top:-100px}.diag-side:after{width:280px;height:280px;right:-120px;bottom:-100px}
+  .diag-kicker{display:inline-flex;width:max-content;align-items:center;gap:7px;padding:8px 13px;border-radius:999px;background:#f2ece5;color:#806b59;font-size:12px;font-weight:800}
+  .diag-kicker:before{content:"";width:7px;height:7px;border-radius:50%;background:#9b8068}
+  .diag-main h1{font-size:clamp(34px,5vw,58px);line-height:1.25;letter-spacing:-1.5px;margin:18px 0 14px;color:#24201d}.diag-main h1 em{font-style:normal;color:#967c66}
+  .diag-lead{max-width:650px;color:#706a64;line-height:2.05;font-size:15px;margin:0}
+  .diag-points{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:30px 0 18px}.diag-point{border:1px solid #ebe5de;background:#fcfbf9;border-radius:18px;padding:17px}.diag-point strong{display:block;font-size:20px;color:#292521}.diag-point span{display:block;color:#8a837c;font-size:11px;margin-top:5px;line-height:1.7}
+  .diag-note{display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border-radius:16px;background:#faf6f1;color:#746d66;font-size:12px;line-height:1.9;border:1px solid #eee7df}.diag-note b{color:#8b715b}
+  .diag-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:24px}.diag-button{border:0;cursor:pointer;font-family:inherit;font-size:14px;font-weight:800;padding:15px 25px;border-radius:15px;background:#24201d;color:#fff;box-shadow:0 10px 24px rgba(36,32,29,.18);transition:.2s}.diag-button:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(36,32,29,.22)}.diag-back{display:inline-flex;align-items:center;padding:14px 18px;border-radius:15px;color:#625b55;text-decoration:none;font-size:13px}
+  .diag-side-content{position:relative;z-index:2;width:100%}.diag-side-label{font-size:12px;color:#c9bdb1}.diag-side h2{font-size:34px;line-height:1.45;margin:10px 0 26px}.diag-roadmap{display:grid;gap:10px}.diag-roadmap div{display:flex;align-items:center;gap:12px;padding:13px;border-radius:15px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08)}.diag-roadmap i{font-style:normal;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#a98e77;color:#fff;font-size:12px;font-weight:800}.diag-roadmap span{font-size:13px;color:#eee8e2}.diag-foot{margin-top:25px;color:#b7aaa0;font-size:11px;line-height:1.9}
+  @media(max-width:800px){.diag-card{grid-template-columns:1fr}.diag-side{min-height:340px}.diag-main{padding:28px}.diag-points{grid-template-columns:1fr}.diag-main h1{font-size:35px}.diag-hero{padding:16px 0 45px}}
 </style>
 
-<section class="diag-page">
+<section class="diag-hero">
   <div class="container diag-shell">
     <div class="diag-card">
-      <div class="diag-content">
-        <span class="diag-kicker">ارزیابی ورودی پایه ششم</span>
-        <h1>آزمون تشخیصی <em>شروع ششم</em> 🎯</h1>
-        <p class="diag-lead">قبل از شروع مسیر یادگیری، چند سؤال از مباحث مهم پایه پنجم را حل کن تا پیچک دانش سطح فعلی‌ات را بهتر بشناسد و مسیر تمرین مناسب‌تری برایت بسازد.</p>
+      <div class="diag-main">
+        <span class="diag-kicker">ارزیابی هوشمند ورودی پایه ششم</span>
+        <h1>شروع ششم را<br><em>با شناخت خودت</em> آغاز کن.</h1>
+        <p class="diag-lead">این آزمون از مهم‌ترین آموخته‌های پایه پنجم استفاده می‌کند تا پیچک دانش بفهمد دقیقاً از کجا باید یادگیری پایه ششم را شروع کنی؛ نه برای نمره، برای ساختن مسیر درست.</p>
 
-        <div class="diag-grid">
-          <div class="diag-item"><strong>{{ question_count }}</strong><span>سؤال چهارگزینه‌ای</span></div>
-          <div class="diag-item"><strong>{{ test.duration_minutes }} دقیقه</strong><span>زمان پیشنهادی</span></div>
-          <div class="diag-item"><strong>۴ درس</strong><span>ریاضی، علوم، فارسی، مطالعات</span></div>
+        <div class="diag-points">
+          <div class="diag-point"><strong>{{ question_count }}</strong><span>سؤال استاندارد<br>چهارگزینه‌ای</span></div>
+          <div class="diag-point"><strong>{{ test.duration_minutes }} دقیقه</strong><span>زمان کافی برای<br>پاسخ‌گویی با آرامش</span></div>
+          <div class="diag-point"><strong>۴ درس</strong><span>ریاضی، علوم، فارسی<br>و مطالعات اجتماعی</span></div>
         </div>
 
-        <div class="diag-note">💡 این آزمون نمره کلاسی نیست؛ هدفش شناخت نقطه شروع توست. با آرامش پاسخ بده و اگر جواب سؤال را نمی‌دانی، بهترین گزینه‌ای را که فکر می‌کنی انتخاب کن.</div>
+        <div class="diag-note"><span>💡</span><div><b>یک نکته مهم:</b> نتیجه آزمون نمره کلاسی نیست. اگر چیزی را بلد نیستی، نگران نباش؛ همین موضوع به ما کمک می‌کند تمرین مناسب تو را پیدا کنیم.</div></div>
 
         <form method="post" class="diag-actions">
           {% csrf_token %}
           <button class="diag-button" type="submit">شروع آزمون <span>←</span></button>
-          <a class="diag-back" href="{% url 'dashboard' %}">فعلاً برگرد به داشبورد</a>
+          <a class="diag-back" href="{% url 'dashboard' %}">بازگشت به داشبورد</a>
         </form>
       </div>
+
+      <aside class="diag-side">
+        <div class="diag-side-content">
+          <span class="diag-side-label">بعد از آزمون چه اتفاقی می‌افتد؟</span>
+          <h2>نتیجه تو فقط<br>یک عدد نیست.</h2>
+          <div class="diag-roadmap">
+            <div><i>۱</i><span>سطح کلی یادگیریت مشخص می‌شود.</span></div>
+            <div><i>۲</i><span>قوت‌ها و مباحث نیازمند تقویت پیدا می‌شوند.</span></div>
+            <div><i>۳</i><span>برای ادامه مسیر، پیشنهاد آموزشی می‌گیری.</span></div>
+          </div>
+          <p class="diag-foot">پیچک دانش قرار نیست همه را با یک مسیر جلو ببرد؛ مسیر یادگیری هر دانش‌آموز می‌تواند متفاوت باشد.</p>
+        </div>
+      </aside>
     </div>
   </div>
 </section>
