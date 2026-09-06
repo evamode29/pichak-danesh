@@ -30,9 +30,13 @@ def placement_start(request):
     test = PlacementTest.objects.filter(grade=student.grade, is_active=True).first()
     if not test:
         return render(request, "placement/not_ready.html")
-    request.session["placement_test_id"] = test.id
-    request.session["placement_answers"] = {}
-    return redirect("placement-question")
+
+    if request.method == "POST":
+        request.session["placement_test_id"] = test.id
+        request.session["placement_answers"] = {}
+        return redirect("placement-question")
+
+    return render(request, "placement/start.html", {"test": test, "question_count": test.questions.filter(is_active=True).count()})
 
 
 @login_required(login_url="login")
