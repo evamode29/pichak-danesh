@@ -56,23 +56,18 @@ class PlacementQuestion(models.Model):
 
 
 class PlacementAttempt(models.Model):
-    student = models.ForeignKey(
-        "students.StudentProfile", on_delete=models.CASCADE, related_name="placement_attempts"
-    )
+    student = models.ForeignKey("students.StudentProfile", on_delete=models.CASCADE, related_name="placement_attempts")
     test = models.ForeignKey(PlacementTest, on_delete=models.CASCADE, related_name="attempts")
     score = models.PositiveSmallIntegerField(default=0)
     correct_answers = models.PositiveSmallIntegerField(default=0)
     total_questions = models.PositiveSmallIntegerField(default=0)
     level = models.PositiveSmallIntegerField(default=1)
     answer_key_published = models.BooleanField(default=False)
-    approved_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="approved_placement_attempts",
-    )
+    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="approved_placement_attempts")
     approved_at = models.DateTimeField(null=True, blank=True)
+    repeat_requested = models.BooleanField(default=False)
+    repeat_approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="approved_placement_repeats")
+    repeat_approved_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -80,6 +75,7 @@ class PlacementAttempt(models.Model):
         indexes = [
             models.Index(fields=["student", "-completed_at"]),
             models.Index(fields=["answer_key_published", "-completed_at"]),
+            models.Index(fields=["student", "repeat_requested", "-completed_at"]),
         ]
 
     def __str__(self):
@@ -97,10 +93,7 @@ class PlacementDiagnosticResult(models.Model):
 
     class Meta:
         ordering = ["subject", "topic", "skill", "id"]
-        indexes = [
-            models.Index(fields=["attempt", "subject"]),
-            models.Index(fields=["subject", "topic", "skill"]),
-        ]
+        indexes = [models.Index(fields=["attempt", "subject"]), models.Index(fields=["subject", "topic", "skill"])]
 
     def __str__(self):
         return f"{self.attempt} - {self.get_subject_display()} - {self.topic}"
