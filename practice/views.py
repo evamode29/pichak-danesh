@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
+from .missions import claim_completed_missions
 from .models import PracticeAttempt, PracticeQuestion
 
 
@@ -116,6 +117,9 @@ def practice_result(request):
     student.save(update_fields=["points", "xp", "level", "updated_at"])
     level_up = student.level > old_level
 
+    mission_rewards = claim_completed_missions(student)
+    mission_reward_xp = sum(mission.reward_xp for mission in mission_rewards)
+
     request.session.pop("practice_question_ids", None)
     request.session.pop("practice_index", None)
     request.session.pop("practice_answers", None)
@@ -129,6 +133,8 @@ def practice_result(request):
             "total": total,
             "percent": percent,
             "earned": earned,
+            "mission_rewards": mission_rewards,
+            "mission_reward_xp": mission_reward_xp,
             "level_up": level_up,
             "old_level": old_level,
         },
