@@ -5,6 +5,7 @@ from django.shortcuts import redirect, render
 from core.permissions import current_role
 from exams.models import PlacementAttempt
 from practice.models import PracticeAttempt
+from practice.missions import daily_missions
 from students.badges import earned_badges
 from students.models import StudentProfile
 
@@ -46,10 +47,12 @@ def dashboard(request):
     recent_practice = []
     leaderboard = []
     badges = []
+    missions = []
 
     if student:
         latest_attempt = PlacementAttempt.objects.filter(student=student).first()
         badges = earned_badges(student)
+        missions = daily_missions(student)
 
         subject_names = {
             "math": "ریاضی",
@@ -77,40 +80,13 @@ def dashboard(request):
         for code, name in subject_names.items():
             data = grouped.get(code, {"total": 0, "correct": 0, "points": 0})
             accuracy = round((data["correct"] / data["total"]) * 100) if data["total"] else 0
-            subject_progress.append(
-                {
-                    "code": code,
-                    "name": name,
-                    "icon": subject_icons[code],
-                    "total": data["total"],
-                    "correct": data["correct"],
-                    "points": data["points"],
-                    "accuracy": accuracy,
-                }
-            )
+            subject_progress.append({"code": code, "name": name, "icon": subject_icons[code], "total": data["total"], "correct": data["correct"], "points": data["points"], "accuracy": accuracy})
 
         recent_practice = attempts[:5]
 
-        leaderboard = list(
-            StudentProfile.objects.select_related("user")
-            .filter(grade=student.grade)
-            .order_by("-points", "id")[:10]
-        )
+        leaderboard = list(StudentProfile.objects.select_related("user").filter(grade=student.grade).order_by("-points", "id")[:10])
         for index, item in enumerate(leaderboard, start=1):
             item.rank = index
             item.is_me = item.pk == student.pk
 
-    return render(
-        request,
-        "dashboard.html",
-        {
-            "role": role,
-            "student": student,
-            "profile": profile,
-            "latest_attempt": latest_attempt,
-            "subject_progress": subject_progress,
-            "recent_practice": recent_practice,
-            "leaderboard": leaderboard,
-            "badges": badges,
-        },
-    )
+    return render(request, "dashboard.html", {"role": role, "student": student, "profile": profile, "latest_attempt": latest_attempt, "subject_progress": subject_progress, "recent_practice": recent_practice, "leaderboard": leaderboard, "badges": badges, "missions": missions})
