@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from core.models import ClassRoom, UserProfile
 from core.permissions import current_role, is_teacher
@@ -113,6 +113,10 @@ def dashboard(request):
     return render(request, "dashboard.html", {"role": role, "student": student, "profile": profile, "latest_attempt": latest_attempt, "subject_progress": subject_progress, "recent_practice": recent_practice, "leaderboard": leaderboard, "badges": badges, "missions": missions})
 
 
+def _teacher_student_queryset(user):
+    return StudentProfile.objects.filter(classroom__teacher=user).select_related("user", "classroom")
+
+
 @login_required(login_url="login")
 def teacher_dashboard(request):
     if not is_teacher(request.user):
@@ -122,9 +126,7 @@ def teacher_dashboard(request):
         ClassRoom.objects.filter(teacher=request.user, is_active=True).order_by("grade", "name")
     )
     students = list(
-        StudentProfile.objects.filter(classroom__teacher=request.user)
-        .select_related("user", "classroom")
-        .order_by("classroom__grade", "classroom__name", "user__first_name", "user__last_name")
+        _teacher_student_queryset(request.user).order_by("classroom__grade", "classroom__name", "user__first_name", "user__last_name")
     )
 
     total_points = sum(student.points for student in students)
@@ -149,17 +151,63 @@ def teacher_dashboard(request):
     if student_rows:
         average_accuracy = round(average_accuracy / len(student_rows))
 
-    return render(
-        request,
-        "teacher/dashboard.html",
-        {
-            "role": current_role(request.user),
-            "classrooms": classrooms,
-            "students": student_rows,
-            "total_students": len(students),
-            "active_students": active_students,
-            "total_points": total_points,
-            "total_xp": total_xp,
-            "average_accuracy": average_accuracy,
-        },
-    )
+    return render(request, "teacher/dashboard.html", {"role": current_role(request.user), "classrooms": classrooms, "students": student_rows, "total_students": len(students), "active_students": active_students, "total_points": total_points, "total_xp": total_xp, "average_accuracy": average_accuracy})
+
+
+@login_required(login_url="login")
+def teacher_students(request):
+    if not is_teacher(request.user):
+        return redirect("dashboard")
+
+    classroom_id = request.GET.get("classroom")
+    students = _teacher_student_queryset(request.user)
+    classrooms = ClassRoom.objects.filter(teacher=request.user, is_active=True).order_by("grade", "name")
+    selected_classroom = None
+    if classroom_id:
+        selected_classroom = get_object_or_404(classrooms, pk=classroom_id)
+        students = students.filter(classroom=selected_classroom)
+
+    rows = []
+    for student in students.order_by("classroom__grade", "classroom__name", "user__first_name", "user__last_name"):
+        attempts = PracticeAttempt.objects.filter(student=student)
+        total = attempts.count()
+        correct = attempts.filter(is_correct=True).count()
+        rows.append({"student": student, "attempts": total, "correct": correct, "accuracy": round(correct * 100 / total) if total else 0})
+
+    return render(request, "teacher/students.html", {"students": rows, "classrooms": classrooms, "selected_classroom": selected_classroom})
+
+
+@login_required(login_url="login")
+def teacher_student_detail(request, student_id):
+    if not is_teacher(request.user):
+        return redirect("dashboard")
+
+    student = get_object_or_404(_teacher_student_queryset(request.user), pk=student_id)
+    attempts = PracticeAttempt.objects.filter(student=student).select_related("question").order_by("-id")
+    total = attempts.count()
+    correct = attempts.filter(is_correct=True).count()
+    accuracy = round(correct * 100 / total) if total else 0
+    subject_names = {"math": "ریاضی", "science": "علوم", "persian": "فارسی", "social": "مطالعات اجتماعی"}
+    subject_rows = []
+    for code, name in subject_names.items():
+        subject_attempts = attempts.filter(question__subject=code)
+        subject_total = subject_attempts.count()
+        subject_correct = subject_attempts.filter(is_correct=True).count()
+        subject_rows.append({"name": name, "total": subject_total, "correct": subject_correct, "accuracy": round(subject_correct * 100 / subject_total) if subject_total else 0})
+
+    return render(request, "teacher/student_detail.html", {"student": student, "attempts": attempts[:12], "total_attempts": total, "correct_attempts": correct, "accuracy": accuracy, "subject_rows": subject_rows, "badges": earned_badges(student), "missions": daily_missions(student)})
+
+
+@login_required(login_url="login")
+def teacher_class_detail(request, classroom_id):
+    if not is_teacher(request.user):
+        return redirect("dashboard")
+    classroom = get_object_or_404(ClassRoom, pk=classroom_id, teacher=request.user, is_active=True)
+    students = _teacher_student_queryset(request.user).filter(classroom=classroom)
+    rows = []
+    for student in students.order_by("user__first_name", "user__last_name"):
+        attempts = PracticeAttempt.objects.filter(student=student)
+        total = attempts.count()
+        correct = attempts.filter(is_correct=True).count()
+        rows.append({"student": student, "attempts": total, "accuracy": round(correct * 100 / total) if total else 0})
+    return render(request, "teacher/class_detail.html", {"classroom": classroom, "rows": rows})
