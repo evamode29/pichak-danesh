@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:620px;margin:48px auto;padding:32px;border:1px solid #e7e2da;border-radius:24px;background:#fff;text-align:center;direction:rtl">
+    <div style="font-size:48px;margin-bottom:12px">🧪</div>
+    <h1 style="margin:0 0 10px">درگاه آزمایشی پیچک دانش</h1>
+    <p style="color:#6b665f;line-height:1.9">این صفحه فقط برای تست مسیر خرید است و فعلاً هیچ پرداخت واقعی انجام نمی‌شود.</p>
+
+    <div style="margin:24px 0;padding:20px;border-radius:18px;background:#f8f6f2;text-align:right">
+        <div style="font-weight:700;font-size:18px">{{ purchase.product.title }}</div>
+        <div style="margin-top:8px;color:#6b665f">مبلغ: {{ purchase.amount|floatformat:0 }} تومان</div>
+        <div style="margin-top:6px;color:#8a847c;font-size:13px">شناسه آزمایشی: {{ reference }}</div>
+    </div>
+
+    <form method="post" action="{% url 'test-payment-complete' %}?ref={{ reference|urlencode }}">
+        {% csrf_token %}
+        <button type="submit" style="width:100%;border:0;border-radius:14px;padding:14px 18px;background:#25221f;color:#fff;font-weight:700;cursor:pointer">
+            پرداخت موفق آزمایشی
+        </button>
+    </form>
+
+    <a href="{% url 'subscription-catalog' %}" style="display:inline-block;margin-top:16px;color:#6b665f;text-decoration:none">انصراف</a>
+</div>
+{% endblock %}
