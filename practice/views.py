@@ -109,8 +109,12 @@ def practice_result(request):
 
     total = len(question_ids)
     percent = round((correct / total) * 100) if total else 0
+    old_level = student.level
     student.points += earned
-    student.save(update_fields=["points", "updated_at"])
+    student.xp += earned
+    student.refresh_level()
+    student.save(update_fields=["points", "xp", "level", "updated_at"])
+    level_up = student.level > old_level
 
     request.session.pop("practice_question_ids", None)
     request.session.pop("practice_index", None)
@@ -125,5 +129,7 @@ def practice_result(request):
             "total": total,
             "percent": percent,
             "earned": earned,
+            "level_up": level_up,
+            "old_level": old_level,
         },
     )
