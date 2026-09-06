@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}نتیجه پرداخت | پیچک دانش{% endblock %}
+{% block content %}
+<div style="max-width:700px;margin:70px auto;padding:0 20px">
+  <section style="background:#fff;border:1px solid #e6ebf1;border-radius:26px;padding:42px 28px;text-align:center;box-shadow:0 24px 70px rgba(16,42,67,.10)">
+    <div style="font-size:54px;margin-bottom:12px">{% if success %}🎉{% else %}⚠️{% endif %}</div>
+    <h1 style="margin:0 0 12px;color:#102a43">{{ title }}</h1>
+    <p style="color:#68768a;line-height:2;margin:0 auto 22px">{{ message }}</p>
+    {% if reference %}<div style="display:inline-block;background:#f7faf9;border-radius:12px;padding:10px 16px;color:#162235;margin-bottom:22px">شماره پیگیری: <strong>{{ reference }}</strong></div>{% endif %}
+    <div><a href="{% url 'my-subscription' %}" style="display:inline-block;background:#102a43;color:#fff;text-decoration:none;border-radius:13px;padding:12px 22px;font-weight:800">مشاهده اشتراک من</a></div>
+  </section>
+</div>
+{% endblock %}
