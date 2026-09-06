@@ -9,6 +9,7 @@ from practice.models import PracticeAttempt
 from practice.missions import daily_missions
 from students.badges import earned_badges
 from students.models import StudentProfile
+from subscriptions.models import Product, Subscription
 
 
 def home(request):
@@ -70,11 +71,20 @@ def dashboard(request):
     weak_topics = []
     weakest_subject = None
     diagnostic_hint = None
+    active_subscription = None
+    subscription_products = []
 
     if student:
         latest_attempt = PlacementAttempt.objects.filter(student=student).first()
         badges = earned_badges(student)
         missions = daily_missions(student)
+        active_subscription = Subscription.active_for(request.user)
+        subscription_products = list(
+            Product.objects.filter(
+                product_type=Product.ProductType.SUBSCRIPTION,
+                is_active=True,
+            ).order_by("price", "id")[:3]
+        )
 
         subject_names = {
             "math": "ریاضی",
@@ -157,6 +167,8 @@ def dashboard(request):
         "weak_topics": weak_topics,
         "weakest_subject": weakest_subject,
         "diagnostic_hint": diagnostic_hint,
+        "active_subscription": active_subscription,
+        "subscription_products": subscription_products,
     })
 
 
@@ -262,11 +274,11 @@ def teacher_class_detail(request, classroom_id):
     if not is_teacher(request.user):
         return redirect("dashboard")
     classroom = get_object_or_404(ClassRoom, pk=classroom_id, teacher=request.user, is_active=True)
-    students = _teacher_student_queryset(request.user).filter(classroom=classroom)
+    students = list(_teacher_student_queryset(request.user).filter(classroom=classroom).order_by("user__first_name", "user__last_name"))
     rows = []
-    for student in students.order_by("user__first_name", "user__last_name"):
+    for student in students:
         attempts = PracticeAttempt.objects.filter(student=student)
         total = attempts.count()
         correct = attempts.filter(is_correct=True).count()
-        rows.append({"student": student, "attempts": total, "accuracy": round(correct * 100 / total) if total else 0})
-    return render(request, "teacher/class_detail.html", {"classroom": classroom, "rows": rows})
+        rows.append({"student": student, "attempts": total, "correct": correct, "accuracy": round(correct * 100 / total) if total else 0})
+    return render(request, "teacher/class_detail.html", {"classroom": classroom, "students": rows})
