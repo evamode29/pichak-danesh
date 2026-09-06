@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
-from core.models import ClassRoom
+from core.models import ClassRoom, UserProfile
 from core.permissions import current_role, is_teacher
 from exams.models import PlacementAttempt
 from practice.models import PracticeAttempt
@@ -15,14 +15,24 @@ def home(request):
     return render(request, "home.html")
 
 
+def _redirect_after_login(user):
+    """Send each account to its application area, never based only on is_staff."""
+    profile = UserProfile.objects.filter(user=user).first()
+    role = profile.role if profile else None
+
+    if role == UserProfile.Role.ADMIN or (profile is None and (user.is_superuser or user.is_staff)):
+        return redirect("admin:index")
+    if role == UserProfile.Role.TEACHER:
+        return redirect("teacher-dashboard")
+    if role == UserProfile.Role.STUDENT or hasattr(user, "student_profile"):
+        return redirect("dashboard")
+
+    return redirect("dashboard")
+
+
 def login_view(request):
     if request.user.is_authenticated:
-        role = current_role(request.user)
-        if role == "admin":
-            return redirect("admin:index")
-        if role == "teacher":
-            return redirect("teacher-dashboard")
-        return redirect("dashboard")
+        return _redirect_after_login(request.user)
 
     error = None
     if request.method == "POST":
@@ -31,12 +41,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            role = current_role(user)
-            if role == "admin":
-                return redirect("admin:index")
-            if role == "teacher":
-                return redirect("teacher-dashboard")
-            return redirect("dashboard")
+            return _redirect_after_login(user)
         error = "نام کاربری یا رمز عبور نادرست است."
 
     return render(request, "login.html", {"error": error})
