@@ -1,9 +1,7 @@
 import secrets
-from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth import get_user_model, login
-from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.utils import timezone
@@ -28,21 +26,18 @@ def otp_request(request):
                 error = "لطفاً چند ثانیه صبر کنید و دوباره تلاش کنید."
             else:
                 code = f"{secrets.randbelow(1_000_000):06d}"
-                send_sms(mobile, f"کد ورود پیچک دانش: {code}\nاعتبار: {OTP_TTL_SECONDS // 60} دقیقه")
+                try:
+                    send_sms(mobile, f"کد ورود پیچک دانش: {code}\nاعتبار: {OTP_TTL_SECONDS // 60} دقیقه")
+                except SmsError:
+                    if not settings.DEBUG:
+                        raise
+                    code = "123456"
                 request.session["otp_mobile"] = mobile
                 request.session["otp_code"] = code
                 request.session["otp_sent_at"] = now.timestamp()
                 request.session["otp_attempts"] = 0
                 return redirect("otp-verify")
         except SmsError as exc:
-            if settings.DEBUG and request.POST.get("allow_dev") == "1":
-                mobile = normalize_mobile(request.POST.get("mobile"))
-                code = "123456"
-                request.session["otp_mobile"] = mobile
-                request.session["otp_code"] = code
-                request.session["otp_sent_at"] = timezone.now().timestamp()
-                request.session["otp_attempts"] = 0
-                return redirect("otp-verify")
             error = str(exc)
 
     return render(request, "otp/request.html", {"error": error})
@@ -69,21 +64,22 @@ def otp_verify(request):
             request.session["otp_attempts"] = attempts + 1
             if secrets.compare_digest(code, str(request.session.get("otp_code", ""))):
                 with transaction.atomic():
-                    profile = UserProfile.objects.filter(mobile=mobile).select_related("user").first()
+                    profile = UserProfile.objects.filter(mobile=mobile, role=UserProfile.Role.STUDENT).select_related("user").first()
                     if profile:
                         user = profile.user
                     else:
                         student_profile = StudentProfile.objects.filter(mobile=mobile).select_related("user").first()
                         if student_profile:
                             user = student_profile.user
-                            profile, _ = UserProfile.objects.get_or_create(user=user, defaults={"mobile": mobile})
+                            profile, _ = UserProfile.objects.get_or_create(user=user, defaults={"mobile": mobile, "role": UserProfile.Role.STUDENT})
                             if not profile.mobile:
                                 profile.mobile = mobile
-                                profile.save(update_fields=["mobile"])
+                                profile.role = UserProfile.Role.STUDENT
+                                profile.save(update_fields=["mobile", "role"])
                         else:
                             username = f"student_{mobile[1:]}"
                             user = User.objects.create_user(username=username)
-                            profile = UserProfile.objects.create(user=user, role=UserProfile.Role.STUDENT, mobile=mobile, display_name="دانش‌آموز پیچک دانش")
+                            UserProfile.objects.create(user=user, role=UserProfile.Role.STUDENT, mobile=mobile, display_name="دانش‌آموز پیچک دانش")
                             StudentProfile.objects.create(user=user, mobile=mobile, grade=6)
                 login(request, user)
                 for key in ("otp_mobile", "otp_code", "otp_sent_at", "otp_attempts"):
