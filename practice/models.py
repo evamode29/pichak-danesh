@@ -57,3 +57,30 @@ class PracticeAttempt(models.Model):
 
     def __str__(self):
         return f"{self.student} - {self.question_id} - {self.points_earned} امتیاز"
+
+
+class DailyMissionCompletion(models.Model):
+    student = models.ForeignKey(
+        "students.StudentProfile",
+        on_delete=models.CASCADE,
+        related_name="daily_mission_completions",
+    )
+    mission_code = models.CharField(max_length=50)
+    mission_date = models.DateField()
+    reward_xp = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-mission_date", "-created_at", "-id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["student", "mission_code", "mission_date"],
+                name="unique_student_daily_mission",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["student", "mission_date"]),
+        ]
+
+    def __str__(self):
+        return f"{self.student} - {self.mission_code} - {self.mission_date}"
