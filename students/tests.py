@@ -42,3 +42,54 @@ class StudentApiTests(TestCase):
         response = self.client.get(reverse("api-students"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()["results"]), 1)
+
+
+class StudentXPLevelTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="xp_student",
+            password="secret123",
+        )
+        self.student = StudentProfile.objects.create(
+            user=self.user,
+            mobile="09120000010",
+        )
+
+    def test_xp_level_boundaries(self):
+        cases = [
+            (0, 1),
+            (99, 1),
+            (100, 2),
+            (299, 2),
+            (300, 3),
+            (599, 3),
+            (600, 4),
+            (1000, 5),
+        ]
+
+        for xp, expected_level in cases:
+            with self.subTest(xp=xp):
+                self.student.xp = xp
+                self.student.refresh_level()
+                self.assertEqual(self.student.level, expected_level)
+
+    def test_xp_progress_properties(self):
+        self.student.xp = 150
+        self.student.refresh_level()
+
+        self.assertEqual(self.student.level, 2)
+        self.assertEqual(self.student.level_start_xp, 100)
+        self.assertEqual(self.student.next_level_xp, 300)
+        self.assertEqual(self.student.xp_to_next_level, 150)
+        self.assertEqual(self.student.level_progress_percent, 25)
+
+    def test_level_up_from_xp(self):
+        self.student.xp = 99
+        self.student.refresh_level()
+        self.assertEqual(self.student.level, 1)
+
+        self.student.xp += 1
+        self.student.refresh_level()
+
+        self.assertEqual(self.student.xp, 100)
+        self.assertEqual(self.student.level, 2)
