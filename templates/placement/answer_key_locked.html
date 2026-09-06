@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}پاسخ‌نامه منتشر نشده | پیچک دانش{% endblock %}
+{% block content %}
+<section style="min-height:calc(100vh - 80px);background:#f7f5f2;padding:55px 15px;display:grid;place-items:center">
+  <div style="max-width:620px;width:100%;background:#fff;border:1px solid #e7e1da;border-radius:28px;padding:38px;text-align:center;box-shadow:0 20px 60px rgba(45,36,29,.08)">
+    <div style="width:70px;height:70px;border-radius:22px;background:#f3ebe3;display:grid;place-items:center;margin:0 auto 18px;font-size:30px">🔒</div>
+    <span style="font-size:11px;color:#927963;font-weight:800">پاسخ‌نامه آزمون تشخیصی</span>
+    <h1 style="font-size:27px;color:#2d2925;margin:10px 0">پاسخ‌نامه هنوز منتشر نشده است</h1>
+    <p style="color:#77706a;line-height:2;font-size:13px">نتیجه آزمونت ثبت شده است. پاسخ‌نامه پس از بررسی و تأیید معلم برایت منتشر خواهد شد.</p>
+    <div style="margin:22px 0;padding:14px 16px;border-radius:15px;background:#faf7f3;color:#6e655e;font-size:12px">وضعیت: <strong style="color:#9a684d">در انتظار تأیید معلم</strong></div>
+    <a href="{% url 'dashboard' %}" style="display:inline-block;padding:13px 22px;border-radius:14px;background:#28231f;color:#fff;text-decoration:none;font-size:12px;font-weight:800">بازگشت به داشبورد</a>
+  </div>
+</section>
+{% endblock %}
