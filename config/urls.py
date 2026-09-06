@@ -26,6 +26,7 @@ urlpatterns = [
     path("teacher/classes/<int:classroom_id>/", teacher_class_detail, name="teacher-class-detail"),
     path("placement/", include("exams.urls")),
     path("practice/", include("practice.urls")),
+    path("subscriptions/", include("subscriptions.urls")),
     path("api/v1/auth/login/", auth_login, name="api-auth-login"),
     path("api/v1/auth/me/", auth_me, name="api-auth-me"),
     path("api/v1/auth/logout/", auth_logout, name="api-auth-logout"),
