@@ -59,6 +59,83 @@
                 {% if student.classroom %}<p>پایه {{ student.classroom.grade }}{% if student.classroom.academic_year %} · {{ student.classroom.academic_year }}{% endif %}</p>{% else %}<p>کلاس شما بعداً توسط مدیر یا معلم ثبت می‌شود.</p>{% endif %}
             </article>
         </div>
+
+        <section class="learning-section">
+            <div class="section-heading-row">
+                <div>
+                    <span class="mini-label">پیشرفت واقعی</span>
+                    <h2>وضعیت درس‌ها</h2>
+                </div>
+                <a class="button secondary" href="{% url 'practice-start' %}">ادامه تمرین</a>
+            </div>
+
+            <div class="subject-progress-grid">
+                {% for item in subject_progress %}
+                <article class="subject-progress-card">
+                    <div class="subject-progress-top">
+                        <div class="subject-icon">{{ item.icon }}</div>
+                        <div>
+                            <h3>{{ item.name }}</h3>
+                            <small>{{ item.total }} پاسخ · {{ item.points }} امتیاز</small>
+                        </div>
+                        <strong>{{ item.accuracy }}٪</strong>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill" style="width: {{ item.accuracy }}%"></div></div>
+                    <p>{{ item.correct }} پاسخ درست از {{ item.total }}</p>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <div class="dashboard-lower-grid">
+            <section class="dash-panel">
+                <div class="section-heading-row">
+                    <div>
+                        <span class="mini-label">آخرین فعالیت</span>
+                        <h2>تمرین‌های اخیر</h2>
+                    </div>
+                </div>
+                {% if recent_practice %}
+                <div class="activity-list">
+                    {% for attempt in recent_practice %}
+                    <div class="activity-item">
+                        <div>
+                            <strong>{{ attempt.question.get_subject_display }}</strong>
+                            <p>{{ attempt.question.text|truncatechars:70 }}</p>
+                        </div>
+                        {% if attempt.is_correct %}
+                        <span class="activity-result success">+{{ attempt.points_earned }} ✓</span>
+                        {% else %}
+                        <span class="activity-result">۰ امتیاز</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-panel">هنوز تمرینی ثبت نشده. اولین تمرینت را شروع کن 🚀</div>
+                {% endif %}
+            </section>
+
+            <section class="dash-panel">
+                <div class="section-heading-row">
+                    <div>
+                        <span class="mini-label">رقابت دوستانه</span>
+                        <h2>رتبه‌بندی پایه {{ student.grade }}</h2>
+                    </div>
+                </div>
+                <div class="leaderboard-list">
+                    {% for item in leaderboard %}
+                    <div class="leaderboard-item {% if item.is_me %}is-me{% endif %}">
+                        <span class="rank">{{ item.rank }}</span>
+                        <div class="leader-name">{{ item.user.first_name|default:item.user.username }}{% if item.is_me %} <small>شما</small>{% endif %}</div>
+                        <strong>{{ item.points }}</strong>
+                    </div>
+                    {% empty %}
+                    <div class="empty-panel">هنوز دانش‌آموزی برای رتبه‌بندی ثبت نشده است.</div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
         {% else %}
         <div class="empty-dashboard"><div class="auth-icon">پ</div><h2>حساب آموزشی شما آماده است</h2><p>این حساب هنوز به پروفایل دانش‌آموزی متصل نشده است.</p></div>
         {% endif %}
