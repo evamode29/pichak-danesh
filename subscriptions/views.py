@@ -4,7 +4,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
-from .models import ActivationCode, Content, Purchase, Product, Subscription
+from .models import ActivationCode, Content, Purchase, Product, Subscription, SubscriptionPlan
 
 
 def _active_subscription(user):
@@ -13,18 +13,19 @@ def _active_subscription(user):
 
 def catalog(request):
     products = Product.objects.filter(is_active=True).prefetch_related("contents")
-    plans = Subscription.objects.none()
-    from .models import SubscriptionPlan
     plans = SubscriptionPlan.objects.filter(is_active=True).select_related("product")
-    active_subscription = _active_subscription(request.user)
-    return render(request, "subscriptions/catalog.html", {"products": products, "plans": plans, "active_subscription": active_subscription})
+    return render(request, "subscriptions/catalog.html", {
+        "products": products,
+        "plans": plans,
+        "active_subscription": _active_subscription(request.user),
+    })
 
 
 @login_required(login_url="login")
 def my_subscription(request):
     active_subscription = _active_subscription(request.user)
     subscriptions = list(Subscription.objects.filter(user=request.user).select_related("plan").order_by("-ends_at"))
-    purchases = list(__import__("subscriptions.models", fromlist=["Purchase"]).Purchase.objects.filter(user=request.user).select_related("product").order_by("-created_at")[:20])
+    purchases = list(Purchase.objects.filter(user=request.user).select_related("product").order_by("-created_at")[:20])
 
     if request.method == "POST":
         code = request.POST.get("code", "").strip().upper()
@@ -49,19 +50,25 @@ def my_subscription(request):
         messages.success(request, f"اشتراک «{activation.plan.name}» با موفقیت فعال شد.")
         return redirect("my-subscription")
 
-    return render(request, "subscriptions/my_subscription.html", {"active_subscription": active_subscription, "subscriptions": subscriptions, "purchases": purchases})
+    return render(request, "subscriptions/my_subscription.html", {
+        "active_subscription": active_subscription,
+        "subscriptions": subscriptions,
+        "purchases": purchases,
+    })
 
 
 @login_required(login_url="login")
 def content_detail(request, slug):
     content = get_object_or_404(Content.objects.select_related("product"), slug=slug, is_published=True)
-    has_access = content.has_access(request.user)
-    return render(request, "subscriptions/content_detail.html", {"content": content, "has_access": has_access, "active_subscription": _active_subscription(request.user)})
+    return render(request, "subscriptions/content_detail.html", {
+        "content": content,
+        "has_access": content.has_access(request.user),
+        "active_subscription": _active_subscription(request.user),
+    })
 
 
 @login_required(login_url="login")
 def request_purchase(request, product_id):
-    from .models import Purchase
     product = get_object_or_404(Product, pk=product_id, is_active=True)
     if request.method != "POST":
         return redirect("subscription-catalog")
