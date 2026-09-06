@@ -5,6 +5,7 @@ from django.shortcuts import redirect, render
 from core.permissions import current_role
 from exams.models import PlacementAttempt
 from practice.models import PracticeAttempt
+from students.badges import earned_badges
 from students.models import StudentProfile
 
 
@@ -44,9 +45,11 @@ def dashboard(request):
     subject_progress = []
     recent_practice = []
     leaderboard = []
+    badges = []
 
     if student:
         latest_attempt = PlacementAttempt.objects.filter(student=student).first()
+        badges = earned_badges(student)
 
         subject_names = {
             "math": "ریاضی",
@@ -108,5 +111,6 @@ def dashboard(request):
             "subject_progress": subject_progress,
             "recent_practice": recent_practice,
             "leaderboard": leaderboard,
+            "badges": badges,
         },
     )
