@@ -206,23 +206,9 @@ def payment_callback(request):
         purchase.reference = result["reference"]
         purchase.paid_at = timezone.now()
         purchase.save(update_fields=["status", "reference", "paid_at"])
-
-        plan = getattr(purchase.product, "subscription_plan", None)
-        if plan:
-            current = Subscription.active_for(purchase.user)
-            if current:
-                current.ends_at = max(current.ends_at, timezone.now()) + timedelta(days=plan.duration_days)
-                current.save(update_fields=["ends_at"])
-            else:
-                now = timezone.now()
-                Subscription.objects.create(
-                    user=purchase.user,
-                    plan=plan,
-                    starts_at=now,
-                    ends_at=now + timedelta(days=plan.duration_days),
-                    source=Subscription.Source.PURCHASE,
-                    purchase=purchase,
-                )
+        # Subscription activation is owned by subscriptions.signals. The
+        # post_save handler runs atomically with this save, so keeping the
+        # activation logic in one place prevents double extension on payment.
 
     return render(request, "subscriptions/payment_result.html", {
         "success": True,
