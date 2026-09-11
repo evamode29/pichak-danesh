@@ -44,6 +44,7 @@ def reverse_topics(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
+        ("exams", "0003_add_diagnostic_topics"),
         ("exams", "0003_placementdiagnosticresult"),
     ]
 
