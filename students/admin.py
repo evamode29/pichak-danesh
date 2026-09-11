@@ -1,32 +1,6 @@
 from django.contrib import admin
-from django.utils import timezone
 
 from .models import ParentProfile, StudentProfile
-from subscriptions.models import Purchase, Subscription
-
-
-class SubscriptionInline(admin.TabularInline):
-    model = Subscription
-    extra = 0
-    fields = ("plan", "starts_at", "ends_at", "source", "is_active", "active_now_display")
-    readonly_fields = ("active_now_display",)
-    autocomplete_fields = ("plan",)
-    ordering = ("-ends_at", "-id")
-    classes = ("collapse",)
-
-    @admin.display(description="فعال اکنون", boolean=True)
-    def active_now_display(self, obj):
-        return obj.active_now
-
-
-class PurchaseInline(admin.TabularInline):
-    model = Purchase
-    extra = 0
-    fields = ("product", "amount", "status", "reference", "created_at", "paid_at")
-    readonly_fields = ("created_at", "paid_at", "reference")
-    autocomplete_fields = ("product",)
-    ordering = ("-created_at", "-id")
-    classes = ("collapse",)
 
 
 @admin.register(StudentProfile)
@@ -36,7 +10,6 @@ class StudentProfileAdmin(admin.ModelAdmin):
         "mobile",
         "grade",
         "classroom",
-        "subscription_status",
         "points",
         "xp",
         "level",
@@ -56,7 +29,6 @@ class StudentProfileAdmin(admin.ModelAdmin):
     save_on_top = True
     empty_value_display = "—"
     autocomplete_fields = ("user", "classroom")
-    inlines = (SubscriptionInline, PurchaseInline)
 
     fieldsets = (
         (
@@ -82,7 +54,7 @@ class StudentProfileAdmin(admin.ModelAdmin):
             "دسترسی",
             {
                 "fields": ("is_free",),
-                "description": "فعال بودن این گزینه به معنی رایگان بودن حساب دانش‌آموز است؛ اشتراک‌های خریداری‌شده در بخش اشتراک‌ها مدیریت می‌شوند.",
+                "description": "فعال بودن این گزینه به معنی رایگان بودن حساب دانش‌آموز است؛ اشتراک‌ها و خریدها از بخش مربوط به خودشان مدیریت می‌شوند.",
             },
         ),
         (
@@ -98,14 +70,6 @@ class StudentProfileAdmin(admin.ModelAdmin):
     @admin.display(description="دانش‌آموز", ordering="user__first_name")
     def student_name(self, obj):
         return obj.user.get_full_name() or obj.user.username
-
-    @admin.display(description="اشتراک")
-    def subscription_status(self, obj):
-        subscription = Subscription.active_for(obj.user)
-        if not subscription:
-            return "بدون اشتراک فعال"
-        remaining = max(0, (subscription.ends_at - timezone.now()).days)
-        return f"{subscription.plan.name} · {remaining} روز باقی‌مانده"
 
 
 @admin.register(ParentProfile)
