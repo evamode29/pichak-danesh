@@ -1,31 +1,156 @@
-/* Pichak Danesh — final visual polish layer */
+/* =========================================================
+   PICHAK DANESH — NEW VISUAL IDENTITY
+   Design System v2 | Green / Growth / Achievement
+   ========================================================= */
 :root{
-  --pichak-radius:18px;
+  --brand-primary:#2E7D32;
+  --brand-primary-dark:#185E20;
+  --brand-primary-active:#124918;
+  --brand-primary-light:#66B66A;
+  --brand-primary-pale:#E8F5E9;
+  --brand-fresh:#8BC34A;
+  --brand-fresh-dark:#689F38;
+  --brand-bg:#FAFCF8;
+  --brand-surface:#FFFFFF;
+  --brand-text:#26332A;
+  --brand-muted:#66736A;
+  --brand-border:#DCE8DE;
+  --brand-gold:#F4C95D;
+  --brand-gold-dark:#C99A19;
+  --brand-gold-pale:#FFF7D6;
+  --brand-danger:#B42318;
+  --brand-danger-bg:#FFF0F0;
+  --brand-info:#1769AA;
+  --brand-info-bg:#EAF4FF;
+  --brand-shadow:0 12px 34px rgba(46,125,50,.08);
+  --brand-shadow-lg:0 24px 70px rgba(46,125,50,.13);
+  --pichak-radius:16px;
   --pichak-radius-lg:24px;
-  --pichak-focus:0 0 0 4px rgba(21,150,109,.12);
+  --pichak-focus:0 0 0 4px #E8F5E9;
 }
 
-/* The old decorative ivy experiment stays dormant until the user's SVG identity is ready. */
-.ivy-frame{display:none!important}
+html{scroll-behavior:smooth}
+body{background:var(--brand-bg);color:var(--brand-text)}
+a{color:inherit}
 
+/* Header */
+.site-header{
+  background:rgba(255,255,255,.94)!important;
+  border-bottom:1px solid var(--brand-border)!important;
+  box-shadow:0 4px 24px rgba(46,125,50,.045)!important;
+}
+.brand-mark{
+  background:linear-gradient(145deg,var(--brand-primary-dark),var(--brand-primary),var(--brand-fresh))!important;
+  box-shadow:0 9px 24px rgba(46,125,50,.22)!important;
+}
+.brand strong,.main-nav a:hover,.main-nav a.active,.header-cta{color:var(--brand-primary)!important}
+.main-nav a.active:after{background:var(--brand-primary)!important}
+.header-cta{
+  border-color:#A5D6A7!important;
+  background:var(--brand-primary-pale)!important;
+  box-shadow:none!important;
+}
+.header-cta:hover{background:#D5EED7!important;color:var(--brand-primary-dark)!important}
+
+/* Buttons */
+.button,.header-cta,.logout-button{border-radius:12px}
+.button.primary,.auth-submit{
+  background:linear-gradient(135deg,var(--brand-primary),var(--brand-primary-dark))!important;
+  color:#fff!important;
+  box-shadow:0 12px 28px rgba(46,125,50,.20)!important;
+}
+.button.primary:hover,.auth-submit:hover{background:var(--brand-primary-dark)!important}
+.button.secondary{
+  background:var(--brand-primary-pale)!important;
+  border:1px solid #A5D6A7!important;
+  color:var(--brand-primary)!important;
+}
+.button.secondary:hover{background:#D5EED7!important}
+
+/* Hero */
+.hero{
+  background:
+    radial-gradient(circle at 10% 15%,rgba(139,195,74,.16) 0,transparent 30%),
+    radial-gradient(circle at 90% 85%,rgba(102,182,106,.12) 0,transparent 32%),
+    linear-gradient(135deg,#fff 0%,#F3FAF3 100%)!important;
+}
+.hero h1 em,.hero h2 em{color:var(--brand-primary)!important}
+.eyebrow{background:var(--brand-primary-pale)!important;color:var(--brand-primary)!important}
+.eyebrow-dot{background:var(--brand-primary)!important}
+.hero-trust b{color:var(--brand-primary)!important}
+.glow{background:rgba(139,195,74,.14)!important}
+.dashboard-card{
+  background:linear-gradient(145deg,var(--brand-primary-dark),var(--brand-primary))!important;
+  box-shadow:var(--brand-shadow-lg)!important;
+}
+.progress-track{background:rgba(255,255,255,.18)!important}
+.progress-track span{background:linear-gradient(90deg,var(--brand-primary-light),var(--brand-fresh))!important}
+.progress-head strong{color:#BDE8A0!important}
+.status-pill{background:rgba(139,195,74,.18)!important;color:#D7F3BD!important}
+.rank-card{background:var(--brand-gold-pale)!important}
+.rank-icon{background:#FFE9A8!important}
+.rank-card b{color:var(--brand-primary)!important}
+.badge-two{background:#F8FFF1!important;border-color:#CDE5B7!important}
+
+/* Sections / cards */
+.features-section{background:var(--brand-surface)!important}
+.section-kicker{color:var(--brand-primary)!important}
+.feature-card{
+  border-color:var(--brand-border)!important;
+  border-radius:var(--pichak-radius-lg)!important;
+  box-shadow:var(--brand-shadow)!important;
+}
+.feature-card:hover{border-color:#A5D6A7!important;box-shadow:0 20px 45px rgba(46,125,50,.11)!important}
+.feature-card.featured{background:linear-gradient(145deg,#F1FAF1,#fff)!important;border-color:#A5D6A7!important}
+.feature-icon{background:var(--brand-primary-pale)!important}
+.feature-card:nth-child(2) .feature-icon{background:#F0F8E8!important}
+.feature-card:nth-child(3) .feature-icon{background:var(--brand-gold-pale)!important}
+.feature-card a{color:var(--brand-primary)!important}
+.path-section{background:linear-gradient(135deg,var(--brand-primary-dark),var(--brand-primary))!important}
+.path-section .section-kicker{color:#BDE8A0!important}
+.steps b{background:linear-gradient(135deg,var(--brand-primary-light),var(--brand-fresh))!important;color:var(--brand-primary-dark)!important}
+
+/* Auth */
+.auth-card,.dash-main-card,.dash-side-card,.dash-stat{
+  border-color:var(--brand-border)!important;
+  box-shadow:var(--brand-shadow)!important;
+}
+.auth-icon{background:linear-gradient(145deg,var(--brand-primary-dark),var(--brand-primary),var(--brand-fresh))!important}
+.auth-form input:focus{border-color:var(--brand-primary-light)!important;box-shadow:var(--pichak-focus)!important}
+.form-error{background:var(--brand-danger-bg)!important;color:var(--brand-danger)!important}
+
+/* Dashboard */
+.dashboard-head h1{color:var(--brand-text)}
+.dash-stat:nth-child(1) strong{color:var(--brand-primary)!important}
+.dash-stat:nth-child(3) strong{color:var(--brand-gold-dark)!important}
+.dash-main-card{background:linear-gradient(145deg,#F1FAF1,#fff)!important}
+.logout-button:hover{border-color:#A5D6A7!important;color:var(--brand-primary)!important;background:var(--brand-primary-pale)!important}
+
+/* Forms and common controls */
 :where(button,a,input,select,textarea):focus-visible{
-  outline:3px solid rgba(37,99,235,.18);
+  outline:3px solid rgba(46,125,50,.18)!important;
   outline-offset:2px;
 }
+input,select,textarea{border-color:var(--brand-border)}
+input:focus,select:focus,textarea:focus{border-color:var(--brand-primary)!important;box-shadow:var(--pichak-focus)!important;outline:none}
 
-.button,.header-cta,.logout-button,.auth-submit{min-height:46px}
-.button.primary,.button.secondary,.header-cta,.logout-button{cursor:pointer}
-
-.site-header{box-shadow:0 4px 24px rgba(16,42,67,.035)}
-.header-inner{position:relative}
-
-/* Keep dense educational tables readable on narrow screens. */
-.table-wrap,.students-table-wrap,.responsive-table{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-
-/* Shared feedback states used by forms and dashboard cards. */
+/* Badges / alerts */
+.badge,.status-badge{border-radius:999px}
 .alert,.message,.form-error{border-radius:14px}
+.alert-success,.message.success{background:var(--brand-primary-pale);color:var(--brand-primary-dark);border-color:#A5D6A7}
+.alert-info,.message.info{background:var(--brand-info-bg);color:var(--brand-info)}
+.alert-warning,.message.warning{background:var(--brand-gold-pale);color:#8A6A00}
+.alert-error,.message.error{background:var(--brand-danger-bg);color:var(--brand-danger)}
 
-/* Touch targets and spacing for phones. */
+/* Achievement language */
+.rank-icon,.achievement-icon,.medal-icon{background:var(--brand-gold-pale)!important;color:var(--brand-gold-dark)!important}
+.progress-fill,.progress-bar-fill{background:linear-gradient(90deg,var(--brand-primary),var(--brand-primary-light),var(--brand-fresh))!important}
+
+/* Decorative ivy is deliberately subtle */
+.ivy-frame{display:none!important}
+
+/* Responsive */
+.table-wrap,.students-table-wrap,.responsive-table{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 @media(max-width:700px){
   .container{width:min(100% - 24px,1160px)}
   .header-inner{min-height:68px}
@@ -43,7 +168,6 @@
   .actions .button,.dash-actions .button{flex:1 1 150px}
   .feature-card p{min-height:0}
 }
-
 @media(max-width:480px){
   .hero{padding:48px 0 56px}
   h1{font-size:2rem;letter-spacing:-.035em}
@@ -60,7 +184,4 @@
   .site-footer{padding:22px 0}
   .footer-inner{align-items:flex-start}
 }
-
-@media(prefers-reduced-motion:reduce){
-  .button,.feature-card{transition:none!important}
-}
+@media(prefers-reduced-motion:reduce){.button,.feature-card{transition:none!important}}
