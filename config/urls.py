@@ -4,6 +4,7 @@ from django.urls import include, path
 from core.api import auth_login, auth_logout, auth_me, classrooms_api, students_api, teachers_api
 from core.public_views import about, contact, privacy, refund, terms
 from core.views import dashboard, home, login_view, logout_view, teacher_class_detail, teacher_dashboard, teacher_student_detail, teacher_students
+from core.teacher_class import teacher_class_manage
 from core.otp_views import otp_request, otp_verify
 
 urlpatterns = [
@@ -20,6 +21,7 @@ urlpatterns = [
     path("logout/", logout_view, name="logout"),
     path("dashboard/", dashboard, name="dashboard"),
     path("teacher/", teacher_dashboard, name="teacher-dashboard"),
+    path("teacher/class-manage/", teacher_class_manage, name="teacher-class-manage"),
     path("teacher/students/", teacher_students, name="teacher-students"),
     path("teacher/students/<int:student_id>/", teacher_student_detail, name="teacher-student-detail"),
     path("teacher/classes/<int:classroom_id>/", teacher_class_detail, name="teacher-class-detail"),
