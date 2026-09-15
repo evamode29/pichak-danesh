@@ -1,0 +1,47 @@
+/* Pichak Danesh — homepage experience inspired by modern educational platforms */
+.home-hero{padding-top:84px!important;padding-bottom:84px!important}
+.home-hero .hero-copy{max-width:620px}
+.home-hero .hero-lead{max-width:590px}
+.home-tools{padding-top:88px!important;padding-bottom:88px!important}
+.home-tools .feature-card{min-height:310px;display:flex;flex-direction:column}
+.home-tools .feature-card a{margin-top:auto;padding-top:22px}
+.home-stats-section{padding:26px 0;background:#fff;border-top:1px solid var(--brand-border);border-bottom:1px solid var(--brand-border)}
+.home-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.home-stats-grid>div{padding:12px 24px;text-align:center;border-left:1px solid var(--brand-border)}
+.home-stats-grid>div:last-child{border-left:0}
+.home-stats-grid strong{display:block;color:var(--brand-primary-dark);font-size:1.75rem;font-weight:900;line-height:1.2}
+.home-stats-grid span{display:block;margin-top:6px;color:var(--brand-muted);font-size:.82rem;font-weight:700}
+.home-path{padding-top:88px!important;padding-bottom:88px!important}
+.home-path .path-grid{align-items:center}
+.home-path .path-button{margin-top:24px;background:rgba(255,255,255,.96)!important;border-color:rgba(255,255,255,.7)!important;color:var(--brand-primary-dark)!important}
+.home-path .path-button:hover{background:#fff!important}
+.home-path .steps{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.home-path .steps div{min-height:150px;padding:22px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:8px}
+.home-path .steps b{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;font-size:1rem}
+.home-path .steps span{font-size:1rem;font-weight:900}
+.home-path .steps small{color:#CFE1D1;font-size:.76rem}
+.home-final-cta{padding:82px 0;background:var(--brand-bg)}
+.home-final-card{position:relative;overflow:hidden;text-align:center;padding:62px 24px;border:1px solid var(--brand-border);border-radius:28px;background:linear-gradient(135deg,#F1F9F1,#fff 58%,#F7FBF4);box-shadow:var(--brand-shadow-lg)}
+.home-final-card:after{content:"";position:absolute;width:230px;height:230px;border-radius:50%;left:-90px;bottom:-145px;background:rgba(139,195,74,.12)}
+.home-final-card h2{position:relative;z-index:1;margin:10px 0 12px;font-size:clamp(2rem,4vw,3rem);font-weight:900}
+.home-final-card p{position:relative;z-index:1;margin:0 0 24px;color:var(--brand-muted);font-weight:600}
+.home-final-card .button{position:relative;z-index:1;display:inline-flex}
+@media(max-width:800px){
+  .home-hero{padding-top:64px!important}
+  .home-stats-grid{grid-template-columns:1fr 1fr}
+  .home-stats-grid>div{border-bottom:1px solid var(--brand-border)}
+  .home-stats-grid>div:nth-child(2){border-left:0}
+  .home-stats-grid>div:nth-child(3){border-bottom:0}
+  .home-stats-grid>div:nth-child(4){border-left:0;border-bottom:0}
+}
+@media(max-width:700px){
+  .home-tools,.home-path{padding-top:64px!important;padding-bottom:64px!important}
+  .home-path .steps{grid-template-columns:1fr}
+  .home-path .steps div{min-height:120px}
+  .home-final-cta{padding:60px 0}
+}
+@media(max-width:480px){
+  .home-stats-grid>div{padding:12px 10px}
+  .home-stats-grid strong{font-size:1.45rem}
+  .home-final-card{padding:48px 18px}
+}
