@@ -16,7 +16,7 @@ class StudentProfile(models.Model):
         blank=True,
         related_name="students",
     )
-    mobile = models.CharField(max_length=15, unique=True)
+    mobile = models.CharField(max_length=15, unique=True, null=True, blank=True)
     grade = models.PositiveSmallIntegerField(default=6)
     is_free = models.BooleanField(default=True)
     points = models.PositiveIntegerField(default=0)
