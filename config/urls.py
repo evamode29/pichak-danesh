@@ -5,6 +5,8 @@ from core.api import auth_login, auth_logout, auth_me, classrooms_api, students_
 from core.public_views import about, contact, privacy, refund, terms
 from core.views import dashboard, home, login_view, logout_view, teacher_class_detail, teacher_dashboard, teacher_student_detail, teacher_students
 from core.teacher_class import teacher_class_manage
+from core.teacher_homework import teacher_homework
+from core.student_homework import student_homework
 from core.otp_views import otp_request, otp_verify
 
 urlpatterns = [
@@ -22,9 +24,11 @@ urlpatterns = [
     path("dashboard/", dashboard, name="dashboard"),
     path("teacher/", teacher_dashboard, name="teacher-dashboard"),
     path("teacher/class-manage/", teacher_class_manage, name="teacher-class-manage"),
+    path("teacher/homework/", teacher_homework, name="teacher-homework"),
     path("teacher/students/", teacher_students, name="teacher-students"),
     path("teacher/students/<int:student_id>/", teacher_student_detail, name="teacher-student-detail"),
     path("teacher/classes/<int:classroom_id>/", teacher_class_detail, name="teacher-class-detail"),
+    path("student/homework/", student_homework, name="student-homework"),
     path("placement/", include("exams.urls")),
     path("practice/", include("practice.urls")),
     path("subscriptions/", include("subscriptions.urls")),
