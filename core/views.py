@@ -219,7 +219,70 @@ def teacher_dashboard(request):
     if student_rows:
         average_accuracy = round(average_accuracy / len(student_rows))
 
-    return render(request, "teacher/dashboard.html", {"role": current_role(request.user), "classrooms": classrooms, "students": student_rows, "total_students": len(students), "active_students": active_students, "total_points": total_points, "total_xp": total_xp, "average_accuracy": average_accuracy})
+    # The teacher's fixed 30-seat roster: 27 named students + 3 reserved seats.
+    roster_names = [
+        ("ایمان", "ابراهیمی عمارت", "iman01"),
+        ("محمدپارسا", "اکبری فرخانی", "mparsa02"),
+        ("سجاد", "الیاسی یوسف‌آباد", "sajad03"),
+        ("امیرمحمد", "ایزی", "amir04"),
+        ("کارن", "بابایی", "karen05"),
+        ("مهیار", "بابایی فیروزآباد", "mahyar06"),
+        ("امیرعلی", "بیگ‌زاده", "amirali07"),
+        ("محمدمهدی", "جعفری تیکانلو", "mmahdi08"),
+        ("امیرعباس", "چوپانی", "amirabbas09"),
+        ("سجاد", "حسن‌زاده خواجه‌ها", "sajad10"),
+        ("محمدرضا", "خان‌زاده", "mreza11"),
+        ("سینا", "دام‌آفرین", "sina12"),
+        ("سینا یار", "رفیعی کهنه‌رود", "sinayar13"),
+        ("امیرمحمد", "رهنمازوباران", "amirm14"),
+        ("علی", "زارعی", "ali15"),
+        ("افشین", "سهرابی‌فر", "afshin16"),
+        ("محمدامین", "شاکری", "mamin17"),
+        ("متین", "شریفی", "matin18"),
+        ("آرش", "صاحب‌الزمانی", "arsh19"),
+        ("محمد", "صبوری‌پور", "mohammad20"),
+        ("پرهام", "صفی‌پور", "parham21"),
+        ("سیدامیرمحمد", "قربانی موسوی", "samir22"),
+        ("امیرعباس", "گودرزی", "amirabbas23"),
+        ("محمدمهدی", "محمدی‌زاده", "mmahdi24"),
+        ("طاها", "نامی", "taha25"),
+        ("محمدصالحا", "نظری", "msaleha26"),
+        ("فرمان", "نوحه‌خوان قوچان عتیق", "farman27"),
+    ]
+    by_username = {row["student"].user.username: row for row in student_rows}
+    roster = []
+    for index, (first_name, last_name, username) in enumerate(roster_names, start=1):
+        row = by_username.get(username)
+        roster.append({
+            "number": index,
+            "name": f"{first_name} {last_name}",
+            "username": username,
+            "row": row,
+            "status": "active" if row else "ready",
+        })
+    for index in range(28, 31):
+        roster.append({
+            "number": index,
+            "name": f"ظرفیت خالی {index - 27}",
+            "username": "",
+            "row": None,
+            "status": "empty",
+        })
+
+    return render(request, "teacher/dashboard.html", {
+        "role": current_role(request.user),
+        "classrooms": classrooms,
+        "students": student_rows,
+        "roster": roster,
+        "total_students": len(students),
+        "roster_total": 30,
+        "named_students": 27,
+        "empty_slots": 3,
+        "active_students": active_students,
+        "total_points": total_points,
+        "total_xp": total_xp,
+        "average_accuracy": average_accuracy,
+    })
 
 
 @login_required(login_url="login")
