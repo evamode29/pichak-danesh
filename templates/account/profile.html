@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}حساب من | پیچک دانش{% endblock %}
+{% block content %}
+<section class="auth-page">
+<div class="container auth-grid">
+<div class="auth-copy">
+<span class="eyebrow"><span class="eyebrow-dot"></span> حساب کاربری</span>
+<h1>همه‌چیز درباره <em>حساب تو</em>، یکجا.</h1>
+<p>نام، نام کاربری و شماره موبایلت را مدیریت کن. نام کاربری و رمز ثابت برای ورود سریع همیشه در دسترس تو هستند.</p>
+<div class="auth-points">
+<span>✓ نام کاربری قابل استفاده برای ورود</span>
+<span>✓ شماره موبایل برای ورود پیامکی</span>
+<span>✓ مدیریت رمز ثابت</span>
+</div>
+<div class="pd-actions" style="margin-top:24px">
+<a class="pd-small-btn pd-small-main" href="{% url 'dashboard' %}">بازگشت به داشبورد ←</a>
+<a class="pd-small-btn pd-small-soft" href="{% url 'fixed-password' %}">مدیریت رمز ثابت</a>
+</div>
+</div>
+<div class="auth-card">
+<div class="auth-icon">👤</div>
+<h2>اطلاعات حساب</h2>
+{% if error %}<div class="form-error">{{ error }}</div>{% endif %}
+{% if success %}<div class="active-box" style="background:#ecfdf5;color:#166534"><strong>{{ success }}</strong></div>{% endif %}
+<form method="post" class="auth-form">
+{% csrf_token %}
+<label>نام<input name="first_name" type="text" value="{{ request.user.first_name }}" required autocomplete="given-name"></label>
+<label>نام خانوادگی<input name="last_name" type="text" value="{{ request.user.last_name }}" autocomplete="family-name"></label>
+<label>نام کاربری<input name="username" type="text" value="{{ request.user.username }}" minlength="4" maxlength="30" required autocomplete="username"></label>
+<p class="auth-muted" style="margin:-5px 0 5px">با همین نام کاربری می‌توانی در صفحه ورود وارد شوی.</p>
+<label>شماره موبایل<input name="mobile" type="tel" inputmode="tel" value="{{ profile.mobile|default:student.mobile }}" required autocomplete="tel"></label>
+<button class="button primary auth-submit" type="submit">ذخیره تغییرات <span>←</span></button>
+</form>
+<div class="active-box" style="margin-top:14px">
+<strong>وضعیت حساب</strong>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;font-size:13px">
+<span>پایه: {{ student.grade }}</span>
+<span>سطح: {{ student.level }}</span>
+<span>XP: {{ student.xp }}</span>
+<span>امتیاز: {{ student.points }}</span>
+</div>
+</div>
+<a class="auth-back" href="{% url 'dashboard' %}">بازگشت به داشبورد</a>
+</div>
+</div>
+</section>
+{% endblock %}
