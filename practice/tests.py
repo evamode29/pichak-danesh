@@ -5,6 +5,7 @@ from django.urls import reverse
 from core.models import UserProfile
 from students.models import StudentProfile
 
+from .adaptive import recommended_subject
 from .models import PracticeAttempt, PracticeQuestion
 
 
@@ -73,4 +74,54 @@ class PracticeFlowTests(TestCase):
             response,
             reverse("practice-start"),
             target_status_code=302,
+        )
+
+
+    def test_adaptive_practice_focuses_on_recent_weak_subject(self):
+        science_questions = []
+        for index in range(2):
+            science_questions.append(
+                PracticeQuestion.objects.create(
+                    subject=PracticeQuestion.Subject.SCIENCE,
+                    text=f"سؤال علوم {index + 1}",
+                    option_a="گزینه الف",
+                    option_b="گزینه ب",
+                    option_c="گزینه ج",
+                    option_d="گزینه د",
+                    correct_option="A",
+                    level=3,
+                    difficulty=2,
+                    points=10,
+                )
+            )
+            PracticeAttempt.objects.create(
+                student=self.student,
+                question=science_questions[-1],
+                selected_option="B",
+                is_correct=False,
+                points_earned=0,
+            )
+
+        self.assertEqual(recommended_subject(self.student), "science")
+        response = self.client.get(reverse("practice-start"))
+        self.assertRedirects(response, reverse("practice-question"))
+        question_ids = self.client.session["practice_question_ids"]
+        self.assertEqual(question_ids[:2], [q.id for q in science_questions])
+        self.assertEqual(self.client.session["practice_weak_subject"], "science")
+
+    def test_practice_allows_review_when_no_unseen_questions_remain(self):
+        for question in self.questions:
+            PracticeAttempt.objects.create(
+                student=self.student,
+                question=question,
+                selected_option="A",
+                is_correct=True,
+                points_earned=question.points,
+            )
+
+        response = self.client.get(reverse("practice-start"))
+        self.assertRedirects(response, reverse("practice-question"))
+        self.assertEqual(
+            len(self.client.session["practice_question_ids"]),
+            5,
         )
