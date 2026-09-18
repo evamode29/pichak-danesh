@@ -5,11 +5,11 @@ from django.shortcuts import get_object_or_404, redirect, render
 from core.models import ClassRoom, UserProfile
 from core.permissions import current_role, is_teacher
 from exams.models import PlacementAttempt
-from practice.models import PracticeAttempt
+from practice.models import PracticeAttempt, PracticeQuestion
 from practice.missions import daily_missions
 from students.badges import earned_badges
 from students.models import StudentProfile
-from subscriptions.models import Product, Subscription, SubscriptionPlan
+from subscriptions.models import Content, Product, Purchase, Subscription, SubscriptionPlan
 
 
 def home(request):
@@ -25,6 +25,8 @@ def _redirect_after_login(user):
         return redirect("admin:index")
     if role == UserProfile.Role.TEACHER:
         return redirect("teacher-dashboard")
+    if role == UserProfile.Role.CONTENT_MANAGER:
+        return redirect("content-dashboard")
     if role == UserProfile.Role.STUDENT or hasattr(user, "student_profile"):
         return redirect("dashboard")
 
