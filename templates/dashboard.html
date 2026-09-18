@@ -23,7 +23,7 @@
 <div class="pd-wrap">
 {% if student %}
 <section class="pd-hero">
-  <div class="pd-nav"><div class="pd-brand">🌿 پیچک دانش</div><div class="pd-nav-actions"><span class="pd-chip">🔥 {{ student.streak }} روز تداوم</span><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="pd-logout" type="submit">خروج</button></form></div></div>
+  <div class="pd-nav"><div class="pd-brand">🌿 پیچک دانش</div><div class="pd-nav-actions"><span class="pd-chip">🔥 {{ student.streak }} روز تداوم</span><a class="pd-chip" href="{% url "fixed-password" %}">🔐 رمز ثابت</a><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="pd-logout" type="submit">خروج</button></form></div></div>
   <div class="pd-hero-main"><div><span class="pd-kicker">مرکز فرماندهی مسیر یادگیری تو</span><h1 class="pd-title">سلام، <em>{{ student.user.first_name|default:student.user.username }}</em> 👋</h1><p class="pd-sub">هر روز کمی بهتر؛ تمرین کن، XP بگیر، مهارت‌هایت را قوی کن و به سطح بعدی برس.</p><div class="pd-hero-buttons"><a class="pd-btn pd-btn-main" href="{% if latest_attempt %}{% url 'practice-start' %}{% else %}{% url 'placement-start' %}{% endif %}">{% if latest_attempt %}ادامه یادگیری ←{% else %}شروع آزمون تشخیصی ←{% endif %}</a><a class="pd-btn pd-btn-ghost" href="{% url 'practice-start' %}">تمرین آزاد</a></div></div></div>
 </section>
 
