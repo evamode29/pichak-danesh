@@ -3,7 +3,7 @@ from django.urls import include, path
 
 from core.api import auth_login, auth_logout, auth_me, classrooms_api, students_api, teachers_api
 from core.public_views import about, contact, privacy, refund, terms
-from core.views import dashboard, home, login_view, logout_view, teacher_class_detail, teacher_dashboard, teacher_student_detail, teacher_students
+from core.views import content_dashboard, dashboard, home, login_view, logout_view, teacher_class_detail, teacher_dashboard, teacher_student_detail, teacher_students
 from core.teacher_class import teacher_class_manage
 from core.teacher_homework import teacher_homework
 from core.student_homework import student_homework
@@ -23,6 +23,7 @@ urlpatterns = [
     path("logout/", logout_view, name="logout"),
     path("dashboard/", dashboard, name="dashboard"),
     path("teacher/", teacher_dashboard, name="teacher-dashboard"),
+    path("content/", content_dashboard, name="content-dashboard"),
     path("teacher/class-manage/", teacher_class_manage, name="teacher-class-manage"),
     path("teacher/homework/", teacher_homework, name="teacher-homework"),
     path("teacher/students/", teacher_students, name="teacher-students"),
