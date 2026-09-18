@@ -1,5 +1,25 @@
 {% extends 'base.html' %}
 {% block title %}ورود | پیچک دانش{% endblock %}
 {% block content %}
-<section class="auth-page"><div class="container auth-grid"><div class="auth-copy"><span class="eyebrow"><span class="eyebrow-dot"></span> ورود به مسیر رشد</span><h1>دوباره به <em>پیچک دانش</em> برگرد.</h1><p>دانش‌آموزان با شماره همراه و کد یک‌بارمصرف وارد می‌شوند؛ حساب معلم و مدیر با نام کاربری ادامه پیدا می‌کند.</p><div class="auth-points"><span>✓ پیشرفتت ذخیره می‌شود</span><span>✓ تمرین و تحلیل همیشه در دسترس است</span><span>✓ امتیاز و سطح خودت را ببین</span></div></div><div class="auth-card"><div class="auth-icon">پ</div><h2>ورود معلم یا مدیر</h2><p class="auth-muted">نام کاربری و رمز عبور را وارد کنید.</p>{% if error %}<div class="form-error">{{ error }}</div>{% endif %}<form method="post" class="auth-form">{% csrf_token %}<label>نام کاربری<input name="username" type="text" autocomplete="username" required placeholder="نام کاربری"></label><label>رمز عبور<input name="password" type="password" autocomplete="current-password" required placeholder="رمز عبور"></label><button class="button primary auth-submit" type="submit">ورود <span>←</span></button></form><a class="button secondary" href="{% url 'otp-request' %}" style="display:block;text-align:center;text-decoration:none;margin-top:12px">ورود دانش‌آموز با پیامک</a><a class="auth-back" href="/">بازگشت به صفحه اصلی</a></div></div></section>
+<section class="auth-page"><div class="container auth-grid">
+<div class="auth-copy">
+<span class="eyebrow"><span class="eyebrow-dot"></span> ورود یکپارچه</span>
+<h1>همه از یک در وارد <em>پیچک دانش</em> می‌شوند.</h1>
+<p>شماره موبایل یا نام کاربری را وارد کن و با رمز ثابت وارد شو. اگر بخواهی، می‌توانی با کد پیامکی هم وارد شوی.</p>
+<div class="auth-points"><span>✓ یک ورود برای همه</span><span>✓ تشخیص خودکار نقش</span><span>✓ رمز ثابت یا کد پیامکی</span></div>
+</div>
+<div class="auth-card">
+<div class="auth-icon">پ</div><h2>ورود به پیچک دانش</h2><p class="auth-muted">برای دانش‌آموز شماره موبایل و برای حساب‌های مدیریتی نام کاربری را وارد کنید.</p>
+{% if error %}<div class="form-error">{{ error }}</div>{% endif %}
+<form method="post" class="auth-form">{% csrf_token %}
+<label>شماره موبایل یا نام کاربری<input name="identifier" type="text" autocomplete="username" required placeholder="مثلاً 09123456789"></label>
+<label>رمز ثابت<input name="password" type="password" autocomplete="current-password" required placeholder="رمز ثابت"></label>
+<button class="button primary auth-submit" type="submit">ورود به پیچک دانش <span>←</span></button>
+</form>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+<a class="button secondary" href="{% url 'otp-request' %}" style="flex:1;text-align:center;text-decoration:none">ورود با کد پیامکی</a>
+<a class="button secondary" href="{% url 'register' %}" style="flex:1;text-align:center;text-decoration:none">ثبت‌نام</a>
+</div>
+<a class="auth-back" href="/">بازگشت به صفحه اصلی</a>
+</div></div></section>
 {% endblock %}
