@@ -156,6 +156,59 @@ def generate_fixed_password(request):
     return redirect("fixed-password")
 
 
+@login_required(login_url="login")
+def account_view(request):
+    if not hasattr(request.user, "student_profile"):
+        return redirect("dashboard")
+
+    student = request.user.student_profile
+    profile = getattr(request.user, "profile", None)
+    error = None
+    success = None
+
+    if request.method == "POST":
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
+        username = request.POST.get("username", "").strip()
+        mobile = request.POST.get("mobile", "").strip()
+
+        if not first_name:
+            error = "نام را وارد کنید."
+        elif not username:
+            error = "نام کاربری را وارد کنید."
+        elif len(username) < 4 or len(username) > 30 or not username.replace("_", "").replace("-", "").isalnum():
+            error = "نام کاربری باید ۴ تا ۳۰ کاراکتر و فقط شامل حروف انگلیسی، عدد، _ یا - باشد."
+        elif User.objects.filter(username__iexact=username).exclude(pk=request.user.pk).exists():
+            error = "این نام کاربری قبلاً استفاده شده است."
+        elif not mobile:
+            error = "شماره موبایل را وارد کنید."
+        elif (
+            UserProfile.objects.filter(mobile=mobile).exclude(user=request.user).exists()
+            or StudentProfile.objects.filter(mobile=mobile).exclude(user=request.user).exists()
+        ):
+            error = "این شماره موبایل قبلاً برای حساب دیگری ثبت شده است."
+        else:
+            request.user.first_name = first_name
+            request.user.last_name = last_name
+            request.user.username = username
+            request.user.save(update_fields=["first_name", "last_name", "username"])
+
+            profile.mobile = mobile
+            profile.display_name = f"{first_name} {last_name}".strip()
+            profile.save(update_fields=["mobile", "display_name", "updated_at"])
+
+            student.mobile = mobile
+            student.save(update_fields=["mobile", "updated_at"])
+            success = "اطلاعات حساب با موفقیت ذخیره شد."
+
+    return render(request, "account/profile.html", {
+        "student": student,
+        "profile": profile,
+        "error": error,
+        "success": success,
+    })
+
+
 def logout_view(request):
     if request.method == "POST":
         logout(request)
