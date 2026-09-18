@@ -18,7 +18,10 @@ def create_teacher(apps, schema_editor):
         },
     )
 
-    if created or not user.has_usable_password():
+    # Historical migration models do not expose all runtime User methods.
+    # Check the stored password value directly instead of calling
+    # user.has_usable_password().
+    if created or not user.password or user.password.startswith("!"):
         user.password = TEACHER_PASSWORD_HASH
         user.save(update_fields=["password"])
 
