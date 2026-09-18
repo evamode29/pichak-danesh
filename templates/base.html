@@ -2,38 +2,27 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#15966d">
-    <meta name="description" content="پیچک دانش؛ مسیر هوشمند یادگیری، تمرین، آزمون و رقابت برای دانش‌آموزان.">
-    <title>{% block title %}پیچک دانش{% endblock %}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/site.css' %}">
-    <link rel="stylesheet" href="{% static 'css/placement.css' %}">
-    <link rel="stylesheet" href="{% static 'css/polish.css' %}">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#15966d"><meta name="description" content="پیچک دانش؛ مسیر هوشمند یادگیری، تمرین، آزمون و رقابت برای دانش‌آموزان.">
+<title>{% block title %}پیچک دانش{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/site.css' %}"><link rel="stylesheet" href="{% static 'css/placement.css' %}"><link rel="stylesheet" href="{% static 'css/polish.css' %}">
 </head>
 <body>
-<header class="site-header">
-    <div class="container header-inner">
-        <a class="brand" href="/" aria-label="پیچک دانش"><span class="brand-mark">پ</span><span>پیچک <strong>دانش</strong></span></a>
-        <nav class="main-nav" aria-label="منوی اصلی">
-            <a href="/">خانه</a><a href="{% url 'about' %}">درباره ما</a><a href="#features">امکانات</a><a href="#path">مسیر یادگیری</a>
-            {% if user.is_authenticated and user.student_profile %}<a href="{% url 'placement-history' %}">تحلیل آزمون</a>{% endif %}
-            <a href="{% url 'subscription-catalog' %}">اشتراک و بسته‌ها</a>
-            {% if user.is_authenticated %}<a href="{% url 'dashboard' %}">داشبورد</a>{% else %}<a href="{% url 'otp-request' %}">ورود دانش‌آموز</a>{% endif %}
-        </nav>
-        {% if user.is_authenticated %}<a class="header-cta" href="{% url 'my-subscription' %}">اشتراک من <span>←</span></a>{% else %}<a class="header-cta" href="{% url 'otp-request' %}">شروع یادگیری <span>←</span></a>{% endif %}
-    </div>
-</header>
+<header class="site-header"><div class="container header-inner">
+<a class="brand" href="/" aria-label="پیچک دانش"><span class="brand-mark">پ</span><span>پیچک <strong>دانش</strong></span></a>
+<nav class="main-nav" aria-label="منوی اصلی">
+<a href="/">خانه</a><a href="{% url 'about' %}">درباره ما</a><a href="#features">امکانات</a><a href="#path">مسیر یادگیری</a>
+{% if user.is_authenticated and user.student_profile %}<a href="{% url 'placement-history' %}">تحلیل آزمون</a>{% endif %}
+<a href="{% url 'subscription-catalog' %}">اشتراک و بسته‌ها</a>
+{% if user.is_authenticated %}<a href="{% url 'dashboard' %}">داشبورد</a>{% else %}<a href="{% url 'login' %}">ورود</a>{% endif %}
+</nav>
+{% if user.is_authenticated %}<a class="header-cta" href="{% url 'dashboard' %}">داشبورد من <span>←</span></a>{% else %}<a class="header-cta" href="{% url 'login' %}">ورود به پیچک <span>←</span></a>{% endif %}
+</div></header>
 <main>{% block content %}{% endblock %}</main>
-<footer class="site-footer">
-    <div class="container footer-inner">
-        <div><strong>پیچک دانش</strong><span>یادگیری، تمرین و رشد؛ قدم‌به‌قدم.</span></div>
-        <div><a href="{% url 'about' %}">درباره ما</a> · <a href="{% url 'contact' %}">تماس</a> · <a href="{% url 'privacy' %}">حریم خصوصی</a> · <a href="{% url 'terms' %}">قوانین</a> · <a href="{% url 'refund' %}">شرایط خرید</a></div>
-        <span>© {% now "Y" %} پیچک دانش</span>
-    </div>
-</footer>
-</body>
-</html>
+<footer class="site-footer"><div class="container footer-inner">
+<div><strong>پیچک دانش</strong><span>یادگیری، تمرین و رشد؛ قدم‌به‌قدم.</span></div>
+<div><a href="{% url 'about' %}">درباره ما</a> · <a href="{% url 'contact' %}">تماس</a> · <a href="{% url 'privacy' %}">حریم خصوصی</a> · <a href="{% url 'terms' %}">قوانین</a> · <a href="{% url 'refund' %}">شرایط خرید</a></div>
+<span>© {% now "Y" %} پیچک دانش</span></div></footer>
+</body></html>
