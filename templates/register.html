@@ -4,7 +4,7 @@
 <section class="auth-page"><div class="container auth-grid">
 <div class="auth-copy"><span class="eyebrow"><span class="eyebrow-dot"></span> شروع ساده</span>
 <h1>حساب خودت را در <em>پیچک دانش</em> بساز.</h1>
-<p>فقط نام و شماره موبایل را وارد کن. بعد از ثبت‌نام، مستقیم وارد داشبورد می‌شوی و می‌توانی رمز ثابت خودت را فعال کنی.</p>
+<p>نام، شماره موبایل و در صورت تمایل نام کاربری خودت را وارد کن. بعد از ثبت‌نام، مستقیم وارد داشبورد می‌شوی.</p>
 <div class="auth-points"><span>✓ بدون انتخاب نقش</span><span>✓ ورود سریع با پیامک</span><span>✓ رمز ثابت قابل تغییر</span></div></div>
 <div class="auth-card"><div class="auth-icon">پ</div><h2>ثبت‌نام دانش‌آموز</h2>
 {% if error %}<div class="form-error">{{ error }}</div>{% endif %}
@@ -12,6 +12,8 @@
 <label>نام<input name="first_name" type="text" autocomplete="given-name" required placeholder="نام"></label>
 <label>نام خانوادگی<input name="last_name" type="text" autocomplete="family-name" placeholder="نام خانوادگی"></label>
 <label>شماره موبایل<input name="mobile" type="tel" inputmode="tel" autocomplete="tel" required placeholder="09123456789"></label>
+<label>نام کاربری <span style="font-weight:400;color:#7b8190">(اختیاری)</span><input name="username" type="text" autocomplete="username" minlength="4" maxlength="30" placeholder="مثلاً ali123"></label>
+<p class="auth-muted" style="margin:-4px 0 4px">اگر نام کاربری انتخاب نکنی، یک نام کاربری خودکار برایت ساخته می‌شود. بعداً همین نام کاربری را می‌توانی برای ورود استفاده کنی.</p>
 <button class="button primary auth-submit" type="submit">ساخت حساب و ورود <span>←</span></button>
 </form>
 <a class="auth-back" href="{% url 'login' %}">قبلاً حساب دارم؛ ورود</a>
