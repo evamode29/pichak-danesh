@@ -6,6 +6,7 @@ from core.models import ClassRoom, UserProfile
 from core.permissions import current_role, is_teacher
 from exams.models import PlacementAttempt, PlacementQuestion
 from practice.models import PracticeAttempt, PracticeQuestion
+from practice.adaptive import SUBJECT_NAMES, practice_subject_scores, recommended_subject, subject_label
 from practice.missions import daily_missions
 from students.badges import earned_badges
 from students.models import StudentProfile
@@ -130,6 +131,19 @@ def dashboard(request):
                 diagnostic_hint = f"پیشنهاد امروز: مرور {first['topic']} در {first['subject']}"
             elif weakest_subject:
                 diagnostic_hint = f"پیشنهاد امروز: چند تمرین بیشتر در {weakest_subject[1]}"
+
+        practice_scores = practice_subject_scores(student)
+        placement_focus = weakest_subject[0] if weakest_subject else None
+        adaptive_focus = recommended_subject(student, placement_focus)
+        if adaptive_focus:
+            focus_score = practice_scores.get(adaptive_focus)
+            if focus_score:
+                diagnostic_hint = (
+                    f"پیشنهاد هوشمند امروز: تمرین {subject_label(adaptive_focus)} "
+                    f"با دقت فعلی {focus_score['accuracy']}٪"
+                )
+            elif not diagnostic_hint:
+                diagnostic_hint = f"پیشنهاد هوشمند امروز: تمرین {subject_label(adaptive_focus)}"
 
         recent_practice = attempts[:5]
         leaderboard = list(StudentProfile.objects.select_related("user").filter(
