@@ -2,80 +2,45 @@
 {% block title %}پنل مدیر محتوا | پیچک دانش{% endblock %}
 {% block content %}
 <style>
-.content-shell{min-height:calc(100vh - 78px);background:#f6f8fb;padding:30px 0 80px}
-.content-layout{display:grid;grid-template-columns:245px minmax(0,1fr);gap:22px;align-items:start}
-.content-side{position:sticky;top:95px;background:#102a43;color:#fff;border-radius:24px;padding:18px;box-shadow:0 18px 50px rgba(16,42,67,.14)}
-.content-logo{padding:10px 10px 20px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:12px}
-.content-logo small{display:block;color:#aebdcc;font-size:11px}.content-logo strong{display:block;margin-top:4px;font-size:20px}
-.content-nav{display:grid;gap:5px}.content-nav a{padding:12px;border-radius:13px;color:#dce6ef;font-size:13px;text-decoration:none}.content-nav a:hover,.content-nav a.active{background:rgba(255,255,255,.09);color:#fff}
-.content-user{margin-top:16px;padding:12px;border-radius:14px;background:rgba(255,255,255,.07);font-size:12px}
-.content-main{min-width:0}.content-head{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:22px}
-.content-head h1{margin:5px 0;font-size:clamp(28px,4vw,42px);letter-spacing:-.03em}.content-head p{margin:0;color:#718094;font-size:13px}
-.logout{border:1px solid #dfe5eb;background:#fff;border-radius:12px;padding:10px 15px;color:#5f6e80;font:inherit;font-size:12px;font-weight:800;cursor:pointer}
-.content-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.cstat{padding:20px;border:1px solid #e3e8ee;border-radius:20px;background:#fff;box-shadow:0 8px 30px rgba(16,42,67,.04)}.cstat small{display:block;color:#7b8797;font-size:11px}.cstat strong{display:block;margin:5px 0;color:#102a43;font-size:27px}.cstat span{font-size:11px;color:#15966d}
-.content-grid{display:grid;grid-template-columns:1.4fr .6fr;gap:16px;margin-top:16px}.box{background:#fff;border:1px solid #e3e8ee;border-radius:22px;padding:22px}.box h2{margin:0;font-size:18px}.box-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.link{color:#15966d;font-size:12px;font-weight:800}
-.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.quick{padding:17px;border:1px solid #e6ebf0;border-radius:16px;text-decoration:none;background:#fbfcfd}.quick b{display:block;color:#102a43}.quick span{display:block;margin-top:4px;color:#778496;font-size:11px}
-.content-table{width:100%;border-collapse:collapse}.content-table th,.content-table td{text-align:right;padding:12px 8px;border-bottom:1px solid #edf0f3;font-size:12px}.content-table th{color:#8490a0;font-size:10px}.tag{padding:4px 8px;border-radius:8px;background:#e8f6f0;color:#167a59;font-size:10px;font-weight:800}
-.checks{display:grid;gap:11px}.check{display:flex;justify-content:space-between;gap:10px;padding:12px;border-radius:13px;background:#f7f9fb;font-size:12px}.check strong{color:#26374a}.check span{color:#15966d;font-weight:900}
-@media(max-width:900px){.content-layout{grid-template-columns:1fr}.content-side{position:static}.content-nav{grid-template-columns:repeat(2,1fr)}.content-stats{grid-template-columns:repeat(2,1fr)}.content-grid{grid-template-columns:1fr}}
-@media(max-width:520px){.content-shell{padding-top:20px}.content-stats{grid-template-columns:1fr 1fr}.cstat{padding:15px}.cstat strong{font-size:22px}.content-nav{grid-template-columns:1fr 1fr}.box{padding:17px}.quick-grid{grid-template-columns:1fr}.content-table{min-width:560px}.box{overflow:auto}}
+.cms{min-height:calc(100vh - 78px);background:linear-gradient(180deg,#f5f8fb,#fafbfd);padding:24px 0 70px}
+.cms-layout{display:grid;grid-template-columns:235px minmax(0,1fr);gap:20px;align-items:start}.cms-side{position:sticky;top:90px;background:linear-gradient(160deg,#0e2740,#163f61);color:#fff;border-radius:24px;padding:16px;box-shadow:0 20px 55px rgba(14,39,64,.14)}
+.cms-brand{padding:9px 10px 17px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:10px}.cms-brand small{display:block;color:#b9c9d8;font-size:10px}.cms-brand strong{display:block;font-size:20px;margin-top:3px}.cms-nav{display:grid;gap:5px}.cms-nav a{display:flex;gap:8px;padding:11px 12px;border-radius:12px;color:#dbe7f0;text-decoration:none;font-size:12px}.cms-nav a:hover,.cms-nav a.active{background:rgba(255,255,255,.11);color:#fff}.cms-user{margin-top:14px;padding:12px;border-radius:13px;background:rgba(255,255,255,.07);font-size:10px;color:#d9e6ef}
+.cms-main{min-width:0}.cms-head{display:flex;justify-content:space-between;align-items:end;gap:18px;flex-wrap:wrap;margin-bottom:17px}.cms-head h1{margin:4px 0;font-size:clamp(28px,4vw,42px);letter-spacing:-.04em;color:#17324a}.cms-head p{margin:0;color:#748497;font-size:13px}.cms-action{border:1px solid #dfe6ed;background:#fff;border-radius:12px;padding:10px 14px;font:inherit;font-size:12px;font-weight:800;cursor:pointer;color:#23415a}
+.cms-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}.cms-stat{background:#fff;border:1px solid #e0e7ee;border-radius:18px;padding:18px;box-shadow:0 8px 28px rgba(20,50,75,.04)}.cms-stat small{display:block;color:#7c8a99;font-size:10px}.cms-stat strong{display:block;color:#17324a;font-size:27px;margin:4px 0}.cms-stat span{font-size:10px;color:#16845f}
+.cms-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:14px;margin-top:14px}.cms-card{background:#fff;border:1px solid #e0e7ee;border-radius:21px;padding:19px;box-shadow:0 8px 28px rgba(20,50,75,.035)}.cms-card h2{margin:0;color:#1e3549;font-size:18px}.cms-headline{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:13px}.cms-link{color:#16845f;text-decoration:none;font-size:11px;font-weight:900}.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.quick{padding:14px;border:1px solid #e5ebf0;border-radius:14px;background:#fbfcfd;text-decoration:none;color:inherit}.quick b{display:block;color:#17324a;font-size:11px}.quick span{display:block;color:#7c8a99;font-size:10px;margin-top:4px;line-height:1.7}.system{display:grid;gap:8px}.system-row{display:flex;justify-content:space-between;align-items:center;padding:11px 12px;background:#f6f8fa;border-radius:12px;font-size:11px}.system-row span{color:#16845f;font-weight:900}.cms-table{width:100%;border-collapse:collapse;min-width:580px}.cms-table th,.cms-table td{text-align:right;padding:11px 8px;border-bottom:1px solid #edf1f4;font-size:11px}.cms-table th{color:#8794a2;font-size:9px}.tag{padding:4px 7px;border-radius:8px;background:#e7f6ef;color:#167a59;font-size:9px;font-weight:900}.tag.draft{background:#f0f2f5;color:#697586}.empty{padding:25px;text-align:center;color:#82909d;font-size:12px}
+@media(max-width:950px){.cms-layout{grid-template-columns:1fr}.cms-side{position:static}.cms-nav{grid-template-columns:repeat(2,1fr)}.cms-stats{grid-template-columns:repeat(2,1fr)}.cms-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.cms{padding-top:16px}.cms-stats{gap:8px}.cms-stat{padding:14px}.cms-stat strong{font-size:23px}.quick-grid{grid-template-columns:1fr}.cms-card{padding:15px}}
 </style>
-<section class="content-shell">
-<div class="container content-layout">
-<aside class="content-side">
-  <div class="content-logo"><small>پیچک دانش</small><strong>مدیریت محتوا</strong></div>
-  <nav class="content-nav">
-    <a class="active" href="{% url 'content-dashboard' %}">🏠 داشبورد</a>
-    <a href="{% url 'admin:index' %}">⚙️ مدیریت Django</a>
-    <a href="{% url 'teacher-dashboard' %}">👨‍🏫 پنل معلم</a>
-    <a href="{% url 'dashboard' %}">🎓 نمای دانش‌آموز</a>
-  </nav>
-  <div class="content-user">حساب مدیر محتوا<br><strong>{{ request.user.get_full_name|default:request.user.username }}</strong></div>
+<section class="cms"><div class="container cms-layout">
+<aside class="cms-side">
+ <div class="cms-brand"><small>پیچک دانش · مرکز محتوا</small><strong>مدیر محتوا</strong></div>
+ <nav class="cms-nav">
+  <a class="active" href="{% url 'content-dashboard' %}">🏠 داشبورد</a>
+  <a href="{% url 'dashboard' %}">🎓 نمای دانش‌آموز</a>
+  <a href="{% url 'teacher-dashboard' %}">👨‍🏫 پنل معلم</a>
+  {% if request.user.is_staff %}<a href="{% url 'admin:index' %}">⚙️ مدیریت Django</a>{% endif %}
+ </nav>
+ <div class="cms-user">حساب مدیر محتوا<br><strong>{{ request.user.get_full_name|default:request.user.username }}</strong></div>
 </aside>
-
-<main class="content-main">
-<header class="content-head">
-  <div><span style="color:#15966d;font-size:11px;font-weight:900">مرکز محتوای آموزشی</span><h1>داشبورد مدیر محتوا</h1><p>از اینجا وضعیت سوال‌ها، آزمون‌ها و محتوای منتشرشده را کنترل کن.</p></div>
-  <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="logout">خروج از حساب</button></form>
-</header>
-
-<section class="content-stats">
-  <article class="cstat"><small>کل سوالات تمرینی</small><strong>{{ question_count }}</strong><span>{{ active_questions }} فعال</span></article>
-  <article class="cstat"><small>سوالات تعیین‌سطح</small><strong>{{ placement_questions }}</strong><span>بانک آزمون</span></article>
-  <article class="cstat"><small>محتوای آموزشی</small><strong>{{ total_content }}</strong><span>{{ published_content }} منتشر شده</span></article>
-  <article class="cstat"><small>بسته‌های فعال</small><strong>{{ active_products }}</strong><span>{{ subscription_plans }} پلن اشتراک</span></article>
+<main class="cms-main">
+<header class="cms-head"><div><span style="color:#16845f;font-size:11px;font-weight:900">مرکز فرمان محتوای آموزشی</span><h1>داشبورد محتوا</h1><p>سؤال‌ها، آزمون تشخیصی، محتوای آموزشی و بسته‌های فعال را از یکجا کنترل کن.</p></div>
+<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="cms-action" type="submit">خروج از حساب</button></form></header>
+<section class="cms-stats">
+ <article class="cms-stat"><small>سوالات تمرینی</small><strong>{{ question_count }}</strong><span>{{ active_questions }} فعال</span></article>
+ <article class="cms-stat"><small>سوالات تعیین‌سطح</small><strong>{{ placement_questions }}</strong><span>بانک آزمون ورودی</span></article>
+ <article class="cms-stat"><small>محتوای آموزشی</small><strong>{{ total_content }}</strong><span>{{ published_content }} منتشر شده</span></article>
+ <article class="cms-stat"><small>محصولات فعال</small><strong>{{ active_products }}</strong><span>{{ subscription_plans }} پلن فعال</span></article>
 </section>
-
-<div class="content-grid">
-<section class="box">
-  <div class="box-head"><h2>دسترسی سریع</h2><span class="link">مدیریت محتوا</span></div>
-  <div class="quick-grid">
-    <a class="quick" href="{% url 'admin:practice_practicequestion_changelist' %}"><b>❓ بانک سوالات</b><span>ایجاد، ویرایش و فعال‌سازی سوال‌ها</span></a>
-    <a class="quick" href="{% url 'admin:exams_placementquestion_changelist' %}"><b>📝 سوالات تعیین‌سطح</b><span>کنترل سوالات آزمون ورودی</span></a>
-    <a class="quick" href="{% url 'admin:subscriptions_content_changelist' %}"><b>📚 محتوای آموزشی</b><span>انتشار و مدیریت محتوای درسی</span></a>
-    <a class="quick" href="{% url 'admin:subscriptions_product_changelist' %}"><b>📦 بسته‌ها</b><span>محصولات و بسته‌های آموزشی</span></a>
-  </div>
-</section>
-
-<aside class="box">
-  <div class="box-head"><h2>وضعیت سیستم</h2></div>
-  <div class="checks">
-    <div class="check"><strong>سوال تمرینی فعال</strong><span>{{ active_questions }}</span></div>
-    <div class="check"><strong>محتوای منتشرشده</strong><span>{{ published_content }}</span></div>
-    <div class="check"><strong>بسته فعال</strong><span>{{ active_products }}</span></div>
-  </div>
-</aside>
+<div class="cms-grid">
+<section class="cms-card"><div class="cms-headline"><h2>دسترسی سریع</h2><span class="cms-link">مدیریت آموزشی</span></div><div class="quick-grid">
+ {% if request.user.is_staff %}<a class="quick" href="{% url 'admin:practice_practicequestion_changelist' %}"><b>❓ بانک سوالات</b><span>ایجاد، ویرایش و فعال‌سازی سوال‌های تمرینی</span></a><a class="quick" href="{% url 'admin:exams_placementquestion_changelist' %}"><b>📝 تعیین‌سطح</b><span>کنترل سوالات آزمون ورودی</span></a><a class="quick" href="{% url 'admin:subscriptions_content_changelist' %}"><b>📚 محتوای آموزشی</b><span>مدیریت و انتشار محتوای درسی</span></a><a class="quick" href="{% url 'admin:subscriptions_product_changelist' %}"><b>📦 بسته‌ها</b><span>محصولات و بسته‌های آموزشی</span></a>{% else %}<div class="quick"><b>🔒 دسترسی مدیریت محتوا</b><span>این حساب آمار و وضعیت محتوا را می‌بیند. دسترسی نوشتن را می‌توانیم در مرحله بعد با Permissionهای Django دقیقاً محدود کنیم.</span></div>{% endif %}
+</div></section>
+<aside class="cms-card"><div class="cms-headline"><h2>وضعیت سیستم</h2></div><div class="system">
+ <div class="system-row"><strong>سوال تمرینی فعال</strong><span>{{ active_questions }}</span></div><div class="system-row"><strong>محتوای منتشرشده</strong><span>{{ published_content }}</span></div><div class="system-row"><strong>محصول فعال</strong><span>{{ active_products }}</span></div><div class="system-row"><strong>پلن اشتراک فعال</strong><span>{{ subscription_plans }}</span></div>
+</div></aside>
 </div>
-
-<section class="box" style="margin-top:16px">
-  <div class="box-head"><h2>آخرین محتوا</h2><a class="link" href="{% url 'admin:subscriptions_content_changelist' %}">مشاهده همه ←</a></div>
-  {% if recent_content %}
-  <div style="overflow:auto"><table class="content-table"><thead><tr><th>عنوان</th><th>بسته</th><th>وضعیت</th><th>تاریخ</th></tr></thead><tbody>
-  {% for item in recent_content %}<tr><td><strong>{{ item.title }}</strong></td><td>{{ item.product.title }}</td><td>{% if item.is_published %}<span class="tag">منتشر</span>{% else %}<span class="tag" style="background:#f3f4f6;color:#697586">پیش‌نویس</span>{% endif %}</td><td>{{ item.created_at|date:"Y/m/d" }}</td></tr>{% endfor %}
-  </tbody></table></div>
-  {% else %}<p style="color:#7b8797;font-size:12px;margin:20px 0 0">هنوز محتوایی ثبت نشده است.</p>{% endif %}
+<section class="cms-card" style="margin-top:14px"><div class="cms-headline"><h2>آخرین محتوا</h2>{% if request.user.is_staff %}<a class="cms-link" href="{% url 'admin:subscriptions_content_changelist' %}">مشاهده همه ←</a>{% endif %}</div>
+{% if recent_content %}<div style="overflow:auto"><table class="cms-table"><thead><tr><th>عنوان</th><th>بسته</th><th>وضعیت</th><th>تاریخ</th></tr></thead><tbody>{% for item in recent_content %}<tr><td><strong>{{ item.title }}</strong></td><td>{{ item.product.title }}</td><td>{% if item.is_published %}<span class="tag">منتشر</span>{% else %}<span class="tag draft">پیش‌نویس</span>{% endif %}</td><td>{{ item.created_at|date:"Y/m/d" }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty">هنوز محتوایی ثبت نشده است.</div>{% endif %}
 </section>
-</main>
-</div>
-</section>
+</main></div></section>
 {% endblock %}
