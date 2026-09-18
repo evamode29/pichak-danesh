@@ -1,6 +1,9 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.crypto import get_random_string
 
 from core.models import ClassRoom, UserProfile
 from core.permissions import current_role, is_teacher
@@ -11,6 +14,9 @@ from practice.missions import daily_missions
 from students.badges import earned_badges
 from students.models import StudentProfile
 from subscriptions.models import Content, Product, Purchase, Subscription, SubscriptionPlan
+
+
+User = get_user_model()
 
 
 def home(request):
@@ -32,17 +38,113 @@ def _redirect_after_login(user):
     return redirect("dashboard")
 
 
+def _user_for_identifier(identifier):
+    identifier = identifier.strip()
+    profile = UserProfile.objects.filter(mobile=identifier).select_related("user").first()
+    if profile:
+        return profile.user
+    student = StudentProfile.objects.filter(mobile=identifier).select_related("user").first()
+    if student:
+        return student.user
+    return User.objects.filter(username=identifier).first()
+
+
 def login_view(request):
     error = None
     if request.method == "POST":
-        username = request.POST.get("username", "").strip()
+        identifier = request.POST.get("identifier", "").strip()
         password = request.POST.get("password", "")
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return _redirect_after_login(user)
-        error = "نام کاربری یا رمز عبور نادرست است."
+        user = _user_for_identifier(identifier)
+        authenticated = authenticate(request, username=user.username, password=password) if user else None
+        if authenticated is not None:
+            login(request, authenticated)
+            return _redirect_after_login(authenticated)
+        error = "شماره موبایل یا نام کاربری، یا رمز ثابت نادرست است."
     return render(request, "login.html", {"error": error})
+
+
+def register_view(request):
+    error = None
+    if request.method == "POST":
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
+        mobile = request.POST.get("mobile", "").strip()
+        if not first_name or not mobile:
+            error = "نام و شماره موبایل را وارد کنید."
+        elif UserProfile.objects.filter(mobile=mobile).exists() or StudentProfile.objects.filter(mobile=mobile).exists():
+            error = "این شماره موبایل قبلاً ثبت شده است. از گزینه ورود استفاده کنید."
+        else:
+            username = f"student_{mobile.lstrip('+').replace(' ', '').replace('-', '')}"
+            if User.objects.filter(username=username).exists():
+                username = f"student_{mobile[-8:]}"
+            if User.objects.filter(username=username).exists():
+                error = "این حساب از قبل وجود دارد. از گزینه ورود استفاده کنید."
+            else:
+                user = User.objects.create_user(
+                    username=username,
+                    first_name=first_name,
+                    last_name=last_name,
+                )
+                UserProfile.objects.create(
+                    user=user,
+                    role=UserProfile.Role.STUDENT,
+                    mobile=mobile,
+                    display_name=f"{first_name} {last_name}".strip(),
+                )
+                StudentProfile.objects.create(
+                    user=user,
+                    mobile=mobile,
+                    grade=6,
+                )
+                login(request, user)
+                return redirect("dashboard")
+    return render(request, "register.html", {"error": error})
+
+
+@login_required(login_url="login")
+def fixed_password(request):
+    if not hasattr(request.user, "student_profile"):
+        return redirect("dashboard")
+
+    error = None
+    generated = request.session.pop("new_fixed_password", None)
+
+    if request.method == "POST":
+        password = request.POST.get("password", "").strip()
+        password2 = request.POST.get("password2", "").strip()
+        if password != password2:
+            error = "دو رمز عبور یکسان نیستند."
+        else:
+            try:
+                validate_password(password, request.user)
+            except ValidationError as exc:
+                error = " ".join(exc.messages)
+            else:
+                request.user.set_password(password)
+                request.user.save(update_fields=["password"])
+                login(request, request.user)
+                return redirect("dashboard")
+
+    return render(request, "account/fixed_password.html", {
+        "error": error,
+        "generated": generated,
+        "has_password": request.user.has_usable_password(),
+    })
+
+
+@login_required(login_url="login")
+def generate_fixed_password(request):
+    if not hasattr(request.user, "student_profile"):
+        return redirect("dashboard")
+    if request.method != "POST":
+        return redirect("fixed-password")
+
+    password = get_random_string(10, allowed_chars="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789")
+    request.user.set_password(password)
+    request.user.save(update_fields=["password"])
+    request.session["new_fixed_password"] = password
+    login(request, request.user)
+    return redirect("fixed-password")
 
 
 def logout_view(request):
@@ -104,19 +206,27 @@ def dashboard(request):
         for code, name in subject_names.items():
             data = grouped.get(code, {"total": 0, "correct": 0, "points": 0})
             accuracy = round((data["correct"] / data["total"]) * 100) if data["total"] else 0
-            subject_progress.append({"code": code, "name": name, "icon": subject_icons[code],
-                "total": data["total"], "correct": data["correct"], "points": data["points"], "accuracy": accuracy})
+            subject_progress.append({
+                "code": code, "name": name, "icon": subject_icons[code],
+                "total": data["total"], "correct": data["correct"],
+                "points": data["points"], "accuracy": accuracy
+            })
 
         if latest_attempt:
             diagnostic_results = list(latest_attempt.diagnostic_results.all())
             topic_rows = []
             for result in diagnostic_results:
                 if result.topic:
-                    topic_rows.append({"subject": subject_names.get(result.subject, result.subject),
-                        "topic": result.topic, "skill": result.skill, "percentage": result.percentage,
-                        "correct": result.correct_answers, "total": result.total_questions})
-            weak_topics = sorted([row for row in topic_rows if row["total"] and row["percentage"] < 70],
-                key=lambda row: (row["percentage"], -row["total"]))[:3]
+                    topic_rows.append({
+                        "subject": subject_names.get(result.subject, result.subject),
+                        "topic": result.topic, "skill": result.skill,
+                        "percentage": result.percentage,
+                        "correct": result.correct_answers, "total": result.total_questions
+                    })
+            weak_topics = sorted(
+                [row for row in topic_rows if row["total"] and row["percentage"] < 70],
+                key=lambda row: (row["percentage"], -row["total"])
+            )[:3]
             subject_scores = []
             for code, name in subject_names.items():
                 rows = [r for r in diagnostic_results if r.subject == code]
@@ -170,12 +280,9 @@ def _teacher_student_queryset(user):
 def teacher_dashboard(request):
     if not is_teacher(request.user):
         return redirect("dashboard")
-
-    classrooms = list(ClassRoom.objects.filter(
-        teacher=request.user, is_active=True).order_by("grade", "name"))
+    classrooms = list(ClassRoom.objects.filter(teacher=request.user, is_active=True).order_by("grade", "name"))
     students = list(_teacher_student_queryset(request.user).order_by(
         "classroom__grade", "classroom__name", "user__first_name", "user__last_name"))
-
     total_points = sum(student.points for student in students)
     total_xp = sum(student.xp for student in students)
     active_students = sum(1 for student in students if student.points > 0 or student.xp > 0)
@@ -189,7 +296,6 @@ def teacher_dashboard(request):
         accuracy_total += accuracy
         student_rows.append({"student": student, "attempts": total, "correct": correct, "accuracy": accuracy})
     average_accuracy = round(accuracy_total / len(student_rows)) if student_rows else 0
-
     roster_names = [
         ("ایمان", "ابراهیمی عمارت", "iman01"), ("محمدپارسا", "اکبری فرخانی", "mparsa02"),
         ("سجاد", "الیاسی یوسف‌آباد", "sajad03"), ("امیرمحمد", "ایزی", "amir04"),
@@ -215,7 +321,6 @@ def teacher_dashboard(request):
     for index in range(28, 31):
         roster.append({"number": index, "name": f"ظرفیت خالی {index - 27}", "username": "",
             "row": None, "status": "empty"})
-
     return render(request, "teacher/dashboard.html", {
         "role": current_role(request.user), "classrooms": classrooms, "students": student_rows,
         "roster": roster, "total_students": len(students), "roster_total": 30,
@@ -292,24 +397,17 @@ def teacher_class_detail(request, classroom_id):
 def content_dashboard(request):
     if current_role(request.user) != UserProfile.Role.CONTENT_MANAGER:
         return redirect("dashboard")
-
     question_count = PracticeQuestion.objects.count()
     active_questions = PracticeQuestion.objects.filter(is_active=True).count()
     placement_questions = PlacementQuestion.objects.count()
     total_content = Content.objects.count()
     published_content = Content.objects.filter(is_published=True).count()
     active_products = Product.objects.filter(is_active=True).count()
-    subscription_plans = SubscriptionPlan.objects.filter(
-        is_active=True, product__is_active=True).count()
+    subscription_plans = SubscriptionPlan.objects.filter(is_active=True, product__is_active=True).count()
     recent_content = list(Content.objects.select_related("product").order_by("-created_at", "-id")[:8])
-
     return render(request, "content/dashboard.html", {
-        "question_count": question_count,
-        "active_questions": active_questions,
-        "placement_questions": placement_questions,
-        "total_content": total_content,
-        "published_content": published_content,
-        "active_products": active_products,
-        "subscription_plans": subscription_plans,
-        "recent_content": recent_content,
+        "question_count": question_count, "active_questions": active_questions,
+        "placement_questions": placement_questions, "total_content": total_content,
+        "published_content": published_content, "active_products": active_products,
+        "subscription_plans": subscription_plans, "recent_content": recent_content,
     })
