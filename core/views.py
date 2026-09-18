@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from core.models import ClassRoom, UserProfile
 from core.permissions import current_role, is_teacher
-from exams.models import PlacementAttempt
+from exams.models import PlacementAttempt, PlacementQuestion
 from practice.models import PracticeAttempt, PracticeQuestion
 from practice.missions import daily_missions
 from students.badges import earned_badges
