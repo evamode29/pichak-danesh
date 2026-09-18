@@ -1,21 +1,13 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from exams.models import PlacementAttempt
+from .adaptive import SUBJECT_NAMES, recommended_subject
 from .missions import claim_completed_missions
 from .models import PracticeAttempt, PracticeQuestion
 
 
-SUBJECT_NAMES = {
-    "math": "ریاضی",
-    "science": "علوم",
-    "persian": "فارسی",
-    "social": "مطالعات اجتماعی",
-}
-
-
-def _weak_subject(student):
+def _placement_weak_subject(student):
     attempt = PlacementAttempt.objects.filter(student=student).prefetch_related("diagnostic_results").first()
     if not attempt:
         return None
@@ -28,25 +20,56 @@ def _weak_subject(student):
     return min(valid, key=lambda item: item[1])[0] if valid else None
 
 
+def _practice_questions(student, focus_subject, limit=5):
+    """Pick unseen questions first, then allow spaced review when needed."""
+    level_min = max(1, student.level - 1)
+    level_max = student.level + 1
+    available = PracticeQuestion.objects.filter(
+        is_active=True,
+        level__gte=level_min,
+        level__lte=level_max,
+    )
+    answered_ids = set(
+        PracticeAttempt.objects.filter(student=student).values_list("question_id", flat=True)
+    )
+
+    def pick(queryset, selected):
+        rows = list(queryset.exclude(id__in=selected).order_by("difficulty", "id"))
+        unseen = [question for question in rows if question.id not in answered_ids]
+        seen = [question for question in rows if question.id in answered_ids]
+        return unseen + seen
+
+    selected = []
+    if focus_subject:
+        selected.extend(pick(available.filter(subject=focus_subject), set())[:limit])
+
+    if len(selected) < limit:
+        selected_ids = {question.id for question in selected}
+        selected.extend(
+            pick(available.exclude(id__in=selected_ids), selected_ids)[: limit - len(selected)]
+        )
+
+    if len(selected) < limit:
+        selected_ids = {question.id for question in selected}
+        fallback = PracticeQuestion.objects.filter(is_active=True)
+        if focus_subject:
+            fallback = fallback.filter(subject=focus_subject)
+        selected.extend(
+            pick(fallback, selected_ids)[: limit - len(selected)]
+        )
+
+    return selected
+
+
 @login_required(login_url="login")
 def practice_start(request):
     student = getattr(request.user, "student_profile", None)
     if not student:
         return redirect("dashboard")
 
-    weak_subject = _weak_subject(student)
-    answered_ids = PracticeAttempt.objects.filter(student=student).values_list("question_id", flat=True)
-    base = PracticeQuestion.objects.filter(is_active=True, level__lte=student.level + 1, level__gte=max(1, student.level - 1)).exclude(id__in=answered_ids)
-
-    questions = []
-    if weak_subject:
-        questions = list(base.filter(subject=weak_subject).order_by("difficulty", "id")[:5])
-    if len(questions) < 5:
-        extra = list(base.exclude(id__in=[q.id for q in questions]).order_by("difficulty", "subject", "id")[: 5 - len(questions)])
-        questions.extend(extra)
-    if len(questions) < 5:
-        fallback = PracticeQuestion.objects.filter(is_active=True).order_by("difficulty", "subject", "id")
-        questions.extend(list(fallback.exclude(id__in=[q.id for q in questions])[: 5 - len(questions)]))
+    placement_subject = _placement_weak_subject(student)
+    focus_subject = recommended_subject(student, placement_subject)
+    questions = _practice_questions(student, focus_subject)
 
     if not questions:
         return render(request, "practice/not_ready.html", {"student": student})
@@ -54,7 +77,10 @@ def practice_start(request):
     request.session["practice_question_ids"] = [q.id for q in questions]
     request.session["practice_index"] = 0
     request.session["practice_answers"] = {}
-    request.session["practice_weak_subject"] = weak_subject
+    request.session["practice_weak_subject"] = focus_subject
+    request.session["practice_focus_source"] = (
+        "practice" if focus_subject and focus_subject != placement_subject else "diagnostic"
+    )
     return redirect("practice-question")
 
 
@@ -95,7 +121,12 @@ def practice_question(request):
             "selected": answers.get(str(question.id)),
             "student": student,
             "weak_subject": request.session.get("practice_weak_subject"),
-            "question_options": [("A", question.option_a), ("B", question.option_b), ("C", question.option_c), ("D", question.option_d)],
+            "question_options": [
+                ("A", question.option_a),
+                ("B", question.option_b),
+                ("C", question.option_c),
+                ("D", question.option_d),
+            ],
         },
     )
 
@@ -150,6 +181,7 @@ def practice_result(request):
     request.session.pop("practice_index", None)
     request.session.pop("practice_answers", None)
     request.session.pop("practice_weak_subject", None)
+    request.session.pop("practice_focus_source", None)
 
     return render(request, "practice/result.html", {
         "student": student,
