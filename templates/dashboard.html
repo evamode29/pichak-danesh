@@ -23,7 +23,7 @@
 <div class="pd-wrap">
 {% if student %}
 <section class="pd-hero">
-  <div class="pd-nav"><div class="pd-brand">🌿 پیچک دانش</div><div class="pd-nav-actions"><span class="pd-chip">🔥 {{ student.streak }} روز تداوم</span><a class="pd-chip" href="{% url "fixed-password" %}">🔐 رمز ثابت</a><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="pd-logout" type="submit">خروج</button></form></div></div>
+  <div class="pd-nav"><div class="pd-brand">🌿 پیچک دانش</div><div class="pd-nav-actions"><span class="pd-chip">🔥 {{ student.streak }} روز تداوم</span><a class="pd-chip" href="{% url 'account' %}">👤 حساب من</a><a class="pd-chip" href="{% url "fixed-password" %}">🔐 رمز ثابت</a><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="pd-logout" type="submit">خروج</button></form></div></div>
   <div class="pd-hero-main"><div><span class="pd-kicker">مرکز فرماندهی مسیر یادگیری تو</span><h1 class="pd-title">سلام، <em>{{ student.user.first_name|default:student.user.username }}</em> 👋</h1><p class="pd-sub">هر روز کمی بهتر؛ تمرین کن، XP بگیر، مهارت‌هایت را قوی کن و به سطح بعدی برس.</p><div class="pd-hero-buttons"><a class="pd-btn pd-btn-main" href="{% if latest_attempt %}{% url 'practice-start' %}{% else %}{% url 'placement-start' %}{% endif %}">{% if latest_attempt %}ادامه یادگیری ←{% else %}شروع آزمون تشخیصی ←{% endif %}</a><a class="pd-btn pd-btn-ghost" href="{% url 'practice-start' %}">تمرین آزاد</a></div></div></div>
 </section>
 
@@ -57,7 +57,7 @@
 </div>
 
 <section class="pd-plan"><span class="pd-eyebrow" style="color:#c7d2fe">💎 مسیر رشد بیشتر</span><h2>با برنامه ادامه بده؛ نتیجه‌اش را می‌بینی.</h2><p>تمرین منظم، تحلیل عملکرد و مسیرهای آموزشی بیشتر برای رشد سریع‌تر تو آماده‌اند.</p><div class="pd-plans">
-{% for plan in plans|slice:":3" %}<div class="pd-plan-box"><h3>{{ plan.name }}</h3><div class="pd-price">{{ plan.price }}</div><small>{{ plan.description|default:"دسترسی به امکانات آموزشی" }}</small>{% if plan.is_active %}<span class="pd-active" style="margin-top:13px">پلن فعلی</span>{% elif plan.url %}<a href="{{ plan.url }}">مشاهده پلن</a>{% endif %}</div>{% empty %}<div class="pd-plan-box"><h3>نسخه پایه</h3><div class="pd-price">رایگان</div><small>آزمون و تمرین‌های پایه پیچک دانش</small><span class="pd-active" style="margin-top:13px">فعال</span></div>{% endfor %}
+{% for plan in subscription_plans|slice:":3" %}<div class="pd-plan-box"><h3>{{ plan.name }}</h3><div class="pd-price">{{ plan.price }}</div><small>{{ plan.description|default:"دسترسی به امکانات آموزشی" }}</small>{% if active_subscription and active_subscription.plan_id == plan.id %}<span class="pd-active" style="margin-top:13px">اشتراک فعال</span>{% else %}<a href="{% url 'subscription-catalog' %}">مشاهده پلن</a>{% endif %}</div>{% empty %}<div class="pd-plan-box"><h3>نسخه پایه</h3><div class="pd-price">رایگان</div><small>آزمون و تمرین‌های پایه پیچک دانش</small><span class="pd-active" style="margin-top:13px">فعال</span></div>{% endfor %}
 </div></section>
 {% else %}<div class="pd-card"><h2>داشبورد آماده نیست</h2><p>پروفایل دانش‌آموزی برای این حساب پیدا نشد.</p></div>{% endif %}
 </div></div>
