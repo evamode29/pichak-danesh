@@ -5,7 +5,7 @@ from core.api import auth_login, auth_logout, auth_me, classrooms_api, students_
 from core.public_views import about, contact, privacy, refund, terms
 from core.views import (
     content_dashboard, dashboard, fixed_password, generate_fixed_password, home,
-    login_view, logout_view, register_view, teacher_class_detail, teacher_dashboard,
+    login_view, logout_view, register_view, account_view, teacher_class_detail, teacher_dashboard,
     teacher_student_detail, teacher_students,
 )
 from core.teacher_class import teacher_class_manage
@@ -23,6 +23,7 @@ urlpatterns = [
     path("refund/", refund, name="refund"),
     path("login/", login_view, name="login"),
     path("register/", register_view, name="register"),
+    path("account/", account_view, name="account"),
     path("account/password/", fixed_password, name="fixed-password"),
     path("account/password/generate/", generate_fixed_password, name="generate-fixed-password"),
     path("otp/", otp_request, name="otp-request"),
