@@ -69,12 +69,21 @@ def register_view(request):
         first_name = request.POST.get("first_name", "").strip()
         last_name = request.POST.get("last_name", "").strip()
         mobile = request.POST.get("mobile", "").strip()
+        requested_username = request.POST.get("username", "").strip()
         if not first_name or not mobile:
             error = "نام و شماره موبایل را وارد کنید."
         elif UserProfile.objects.filter(mobile=mobile).exists() or StudentProfile.objects.filter(mobile=mobile).exists():
             error = "این شماره موبایل قبلاً ثبت شده است. از گزینه ورود استفاده کنید."
+        elif requested_username and (
+            len(requested_username) < 4
+            or len(requested_username) > 30
+            or not requested_username.replace("_", "").replace("-", "").isalnum()
+        ):
+            error = "نام کاربری باید ۴ تا ۳۰ کاراکتر و فقط شامل حروف انگلیسی، عدد، _ یا - باشد."
+        elif requested_username and User.objects.filter(username__iexact=requested_username).exists():
+            error = "این نام کاربری قبلاً استفاده شده است. یک نام دیگر انتخاب کنید."
         else:
-            username = f"student_{mobile.lstrip('+').replace(' ', '').replace('-', '')}"
+            username = requested_username or f"student_{mobile.lstrip('+').replace(' ', '').replace('-', '')}"
             if User.objects.filter(username=username).exists():
                 username = f"student_{mobile[-8:]}"
             if User.objects.filter(username=username).exists():
