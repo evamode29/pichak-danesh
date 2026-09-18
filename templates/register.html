@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}ثبت‌نام | پیچک دانش{% endblock %}
+{% block content %}
+<section class="auth-page"><div class="container auth-grid">
+<div class="auth-copy"><span class="eyebrow"><span class="eyebrow-dot"></span> شروع ساده</span>
+<h1>حساب خودت را در <em>پیچک دانش</em> بساز.</h1>
+<p>فقط نام و شماره موبایل را وارد کن. بعد از ثبت‌نام، مستقیم وارد داشبورد می‌شوی و می‌توانی رمز ثابت خودت را فعال کنی.</p>
+<div class="auth-points"><span>✓ بدون انتخاب نقش</span><span>✓ ورود سریع با پیامک</span><span>✓ رمز ثابت قابل تغییر</span></div></div>
+<div class="auth-card"><div class="auth-icon">پ</div><h2>ثبت‌نام دانش‌آموز</h2>
+{% if error %}<div class="form-error">{{ error }}</div>{% endif %}
+<form method="post" class="auth-form">{% csrf_token %}
+<label>نام<input name="first_name" type="text" autocomplete="given-name" required placeholder="نام"></label>
+<label>نام خانوادگی<input name="last_name" type="text" autocomplete="family-name" placeholder="نام خانوادگی"></label>
+<label>شماره موبایل<input name="mobile" type="tel" inputmode="tel" autocomplete="tel" required placeholder="09123456789"></label>
+<button class="button primary auth-submit" type="submit">ساخت حساب و ورود <span>←</span></button>
+</form>
+<a class="auth-back" href="{% url 'login' %}">قبلاً حساب دارم؛ ورود</a>
+</div></div></section>
+{% endblock %}
