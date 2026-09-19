@@ -7,22 +7,65 @@
 <title>{% block title %}پیچک دانش{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'css/site.css' %}"><link rel="stylesheet" href="{% static 'css/placement.css' %}"><link rel="stylesheet" href="{% static 'css/polish.css' %}">
+<link rel="stylesheet" href="{% static 'css/site.css' %}">
+<link rel="stylesheet" href="{% static 'css/placement.css' %}">
+<link rel="stylesheet" href="{% static 'css/polish.css' %}">
+<link rel="stylesheet" href="{% static 'css/motion.css' %}">
 </head>
 <body>
-<header class="site-header"><div class="container header-inner">
-<a class="brand" href="/" aria-label="پیچک دانش"><span class="brand-mark">پ</span><span>پیچک <strong>دانش</strong></span></a>
+<header class="site-header">
+<div class="container header-inner">
+<a class="brand motion-tilt" href="/" aria-label="پیچک دانش"><span class="brand-mark">پ</span><span>پیچک <strong>دانش</strong></span></a>
 <nav class="main-nav" aria-label="منوی اصلی">
 <a href="/">خانه</a><a href="{% url 'about' %}">درباره ما</a><a href="#features">امکانات</a><a href="#path">مسیر یادگیری</a>
 {% if user.is_authenticated and user.student_profile %}<a href="{% url 'placement-history' %}">تحلیل آزمون</a>{% endif %}
 <a href="{% url 'subscription-catalog' %}">اشتراک و بسته‌ها</a>
 {% if user.is_authenticated %}<a href="{% url 'dashboard' %}">داشبورد</a>{% else %}<a href="{% url 'login' %}">ورود</a>{% endif %}
 </nav>
-{% if user.is_authenticated %}<a class="header-cta" href="{% url 'dashboard' %}">داشبورد من <span>←</span></a>{% else %}<a class="header-cta" href="{% url 'login' %}">ورود به پیچک <span>←</span></a>{% endif %}
-</div></header>
+{% if user.is_authenticated %}<a class="header-cta motion-tilt" href="{% url 'dashboard' %}">داشبورد من <span>←</span></a>{% else %}<a class="header-cta motion-tilt" href="{% url 'login' %}">ورود به پیچک <span>←</span></a>{% endif %}
+</div>
+</header>
 <main>{% block content %}{% endblock %}</main>
 <footer class="site-footer"><div class="container footer-inner">
 <div><strong>پیچک دانش</strong><span>یادگیری، تمرین و رشد؛ قدم‌به‌قدم.</span></div>
 <div><a href="{% url 'about' %}">درباره ما</a> · <a href="{% url 'contact' %}">تماس</a> · <a href="{% url 'privacy' %}">حریم خصوصی</a> · <a href="{% url 'terms' %}">قوانین</a> · <a href="{% url 'refund' %}">شرایط خرید</a></div>
 <span>© {% now "Y" %} پیچک دانش</span></div></footer>
+<script>
+(function(){
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const revealTargets=document.querySelectorAll('.hero-copy,.hero-visual,.section-heading,.feature-card,.home-stats-grid>div,.path-grid>div,.home-final-card,.pd-hero,.pd-stat,.pd-progress,.pd-card,.pd-subject,.pd-plan,.pd-plan-box');
+  revealTargets.forEach((el,i)=>{el.classList.add('motion-reveal');el.style.transitionDelay=Math.min(i*45,360)+'ms';});
+  if(reduce){revealTargets.forEach(el=>el.classList.add('is-visible'))}
+  else if('IntersectionObserver' in window){
+    const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('is-visible');io.unobserve(e.target)}}),{threshold:.12,rootMargin:'0px 0px -45px'});
+    revealTargets.forEach(el=>io.observe(el));
+  }else revealTargets.forEach(el=>el.classList.add('is-visible'));
+
+  if(!reduce){
+    document.querySelectorAll('.motion-tilt').forEach(el=>{
+      el.addEventListener('pointermove',e=>{
+        const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+        el.style.transform='perspective(800px) rotateX('+(-y*3)+'deg) rotateY('+(x*4)+'deg) translateY(-2px)';
+      });
+      el.addEventListener('pointerleave',()=>el.style.transform='');
+    });
+    document.querySelectorAll('.motion-float').forEach(el=>{
+      el.addEventListener('pointermove',e=>{
+        const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+        el.style.transform='translate3d('+(x*10)+'px,'+(y*7)+'px,0)';
+      });
+      el.addEventListener('pointerleave',()=>el.style.transform='');
+    });
+  }
+
+  document.querySelectorAll('.ivy-progress[data-progress]').forEach(box=>{
+    const value=Math.max(0,Math.min(100,Number(box.dataset.progress)||0));
+    const line=box.querySelector('.ivy-progress-line span');
+    if(line) requestAnimationFrame(()=>line.style.width=value+'%');
+    const leaves=box.querySelectorAll('.ivy-leaf');
+    const active=Math.ceil(value/100*leaves.length);
+    leaves.forEach((leaf,i)=>setTimeout(()=>{if(i<active)leaf.classList.add('active')},220+i*75));
+  });
+})();
+</script>
 </body></html>
