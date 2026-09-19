@@ -305,7 +305,7 @@ def dashboard(request):
                 diagnostic_hint = f"پیشنهاد امروز: چند تمرین بیشتر در {weakest_subject[1]}"
 
         practice_scores = practice_subject_scores(student)
-        placement_focus = weakest_subject[0] if weakest_subject else None
+        placement_focus = weakest_subject[1] if weakest_subject else None
         adaptive_focus = recommended_subject(student, placement_focus)
         if adaptive_focus:
             focus_score = practice_scores.get(adaptive_focus)
