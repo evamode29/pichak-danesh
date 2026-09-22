@@ -6,7 +6,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 from core.models import ClassRoom, UserProfile
 from core.permissions import current_role, require_roles
-from students.models import StudentProfile
 
 
 def _json_body(request):
@@ -85,6 +84,11 @@ def classrooms_api(request):
 def students_api(request):
     if request.method != "GET":
         return JsonResponse({"detail": "Method not allowed."}, status=405)
+
+    # Lazy import prevents the whole URL configuration from failing during
+    # Passenger startup if the students app is not yet fully importable.
+    from students.models import StudentProfile
+
     error = require_roles(
         request,
         UserProfile.Role.ADMIN,
