@@ -102,3 +102,65 @@ class TeacherStudentNote(models.Model):
 
     def __str__(self):
         return f"{self.student} - {self.get_kind_display()}"
+
+
+class StudentEducationalAssessment(models.Model):
+    """Periodic teacher assessment of learning and study skills."""
+    student = models.ForeignKey("students.StudentProfile", on_delete=models.CASCADE, related_name="educational_assessments")
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="educational_assessments")
+    assessment_date = models.DateField()
+    participation = models.PositiveSmallIntegerField(default=3)
+    effort = models.PositiveSmallIntegerField(default=3)
+    focus = models.PositiveSmallIntegerField(default=3)
+    independence = models.PositiveSmallIntegerField(default=3)
+    time_management = models.PositiveSmallIntegerField(default=3)
+    responsibility = models.PositiveSmallIntegerField(default=3)
+    cooperation = models.PositiveSmallIntegerField(default=3)
+    problem_solving = models.PositiveSmallIntegerField(default=3)
+    accuracy = models.PositiveSmallIntegerField(default=3)
+    perseverance = models.PositiveSmallIntegerField(default=3)
+    strengths = models.TextField(blank=True)
+    needs_improvement = models.TextField(blank=True)
+    teacher_summary = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-assessment_date", "-id"]
+        indexes = [models.Index(fields=["student", "-assessment_date"])]
+
+    def __str__(self):
+        return f"{self.student} - ارزیابی {self.assessment_date}"
+
+    @property
+    def overall_score(self):
+        fields = [
+            self.participation, self.effort, self.focus, self.independence,
+            self.time_management, self.responsibility, self.cooperation,
+            self.problem_solving, self.accuracy, self.perseverance,
+        ]
+        return round(sum(fields) / len(fields), 1)
+
+
+class StudentGoal(models.Model):
+    class Status(models.TextChoices):
+        ACTIVE = "active", "در حال پیگیری"
+        DONE = "done", "انجام شد"
+        PAUSED = "paused", "متوقف"
+
+    student = models.ForeignKey("students.StudentProfile", on_delete=models.CASCADE, related_name="learning_goals")
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="student_goals")
+    title = models.CharField(max_length=200)
+    subject = models.CharField(max_length=50, blank=True)
+    target_date = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
+    note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["status", "target_date", "-id"]
+        indexes = [models.Index(fields=["student", "status"])]
+
+    def __str__(self):
+        return self.title
