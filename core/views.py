@@ -491,6 +491,16 @@ def teacher_student_detail(request, student_id):
                 goal.save(update_fields=["status", "updated_at"])
         elif action == "delete_goal":
             StudentGoal.objects.filter(id=request.POST.get("goal_id"), student=student, teacher=request.user).delete()
+        elif action == "update_student_info":
+            student.national_id = request.POST.get("national_id", "").strip()
+            student.student_number = request.POST.get("student_number", "").strip()
+            student.school_name = request.POST.get("school_name", "").strip()
+            student.academic_year = request.POST.get("academic_year", "").strip()
+            try:
+                student.grade = max(1, min(12, int(request.POST.get("grade", student.grade))))
+            except (TypeError, ValueError):
+                pass
+            student.save(update_fields=["national_id", "student_number", "school_name", "academic_year", "grade", "updated_at"])
         elif action == "add_study_session":
             try:
                 questions = max(0, int(request.POST.get("session_questions", 0)))
