@@ -79,3 +79,26 @@ class StudentTask(models.Model):
         ordering = ["student__user__first_name", "student__user__last_name"]
 
     def __str__(self): return f"{self.student} - {self.task}"
+
+
+class TeacherStudentNote(models.Model):
+    """Teacher-entered educational notes and AI feedback for one student."""
+    class Kind(models.TextChoices):
+        NOTE = "note", "یادداشت معلم"
+        FEEDBACK = "feedback", "بازخورد"
+        AI_ANALYSIS = "ai_analysis", "تحلیل هوش مصنوعی"
+
+    student = models.ForeignKey("students.StudentProfile", on_delete=models.CASCADE, related_name="teacher_notes")
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="student_notes")
+    kind = models.CharField(max_length=20, choices=Kind.choices, default=Kind.NOTE)
+    title = models.CharField(max_length=200, blank=True)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+        indexes = [models.Index(fields=["student", "kind", "-created_at"])]
+
+    def __str__(self):
+        return f"{self.student} - {self.get_kind_display()}"
