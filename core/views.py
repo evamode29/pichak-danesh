@@ -429,13 +429,9 @@ def teacher_student_detail(request, student_id):
             content = request.POST.get("content", "").strip()
             title = request.POST.get("title", "").strip()
             if content:
-                TeacherStudentNote.objects.create(
-                    student=student, teacher=request.user, kind=kind,
-                    title=title, content=content,
-                )
+                TeacherStudentNote.objects.create(student=student, teacher=request.user, kind=kind, title=title, content=content)
         elif action == "delete_note":
-            note_id = request.POST.get("note_id")
-            TeacherStudentNote.objects.filter(id=note_id, student=student, teacher=request.user).delete()
+            TeacherStudentNote.objects.filter(id=request.POST.get("note_id"), student=student, teacher=request.user).delete()
         elif action == "add_assessment":
             def score(name):
                 try:
@@ -445,20 +441,16 @@ def teacher_student_detail(request, student_id):
             StudentEducationalAssessment.objects.create(
                 student=student, teacher=request.user,
                 assessment_date=request.POST.get("assessment_date") or timezone.localdate(),
-                participation=score("participation"), effort=score("effort"),
-                focus=score("focus"), independence=score("independence"),
-                time_management=score("time_management"), responsibility=score("responsibility"),
-                cooperation=score("cooperation"), problem_solving=score("problem_solving"),
-                accuracy=score("accuracy"), perseverance=score("perseverance"),
-                strengths=request.POST.get("strengths", "").strip(),
+                participation=score("participation"), effort=score("effort"), focus=score("focus"),
+                independence=score("independence"), time_management=score("time_management"),
+                responsibility=score("responsibility"), cooperation=score("cooperation"),
+                problem_solving=score("problem_solving"), accuracy=score("accuracy"),
+                perseverance=score("perseverance"), strengths=request.POST.get("strengths", "").strip(),
                 needs_improvement=request.POST.get("needs_improvement", "").strip(),
                 teacher_summary=request.POST.get("teacher_summary", "").strip(),
             )
         elif action == "delete_assessment":
-            assessment_id = request.POST.get("assessment_id")
-            StudentEducationalAssessment.objects.filter(
-                id=assessment_id, student=student, teacher=request.user
-            ).delete()
+            StudentEducationalAssessment.objects.filter(id=request.POST.get("assessment_id"), student=student, teacher=request.user).delete()
         elif action == "add_goal":
             title = request.POST.get("goal_title", "").strip()
             if title:
@@ -469,9 +461,7 @@ def teacher_student_detail(request, student_id):
                     note=request.POST.get("goal_note", "").strip(),
                 )
         elif action == "update_goal":
-            goal = StudentGoal.objects.filter(
-                id=request.POST.get("goal_id"), student=student, teacher=request.user
-            ).first()
+            goal = StudentGoal.objects.filter(id=request.POST.get("goal_id"), student=student, teacher=request.user).first()
             if goal:
                 status = request.POST.get("goal_status", StudentGoal.Status.ACTIVE)
                 if status not in dict(StudentGoal.Status.choices):
@@ -479,29 +469,43 @@ def teacher_student_detail(request, student_id):
                 goal.status = status
                 goal.save(update_fields=["status", "updated_at"])
         elif action == "delete_goal":
-            StudentGoal.objects.filter(
-                id=request.POST.get("goal_id"), student=student, teacher=request.user
-            ).delete()
+            StudentGoal.objects.filter(id=request.POST.get("goal_id"), student=student, teacher=request.user).delete()
         return redirect("teacher-student-detail", student_id=student.id)
 
     attempts = PracticeAttempt.objects.filter(student=student).select_related("question").order_by("-id")
     total = attempts.count()
     correct = attempts.filter(is_correct=True).count()
     accuracy = round(correct * 100 / total) if total else 0
+
     subject_names = {"math": "ریاضی", "science": "علوم", "persian": "فارسی", "social": "مطالعات اجتماعی"}
     subject_rows = []
     for code, name in subject_names.items():
         subject_attempts = attempts.filter(question__subject=code)
         subject_total = subject_attempts.count()
         subject_correct = subject_attempts.filter(is_correct=True).count()
-        subject_rows.append({"name": name, "total": subject_total, "correct": subject_correct,
-            "accuracy": round(subject_correct * 100 / subject_total) if subject_total else 0})
+        subject_rows.append({
+            "name": name, "total": subject_total, "correct": subject_correct,
+            "accuracy": round(subject_correct * 100 / subject_total) if subject_total else 0,
+        })
+
     latest_placement = PlacementAttempt.objects.filter(student=student).select_related("test", "approved_by").first()
+    assessments = StudentEducationalAssessment.objects.filter(student=student, teacher=request.user)
+    latest_assessment = assessments.first()
+    goals = StudentGoal.objects.filter(student=student, teacher=request.user)
+    active_goals = goals.filter(status=StudentGoal.Status.ACTIVE)
+    notes = TeacherStudentNote.objects.filter(student=student, teacher=request.user)
+    attention_subjects = [row["name"] for row in subject_rows if row["total"] and row["accuracy"] < 70]
+
     return render(request, "teacher/student_detail.html", {
         "student": student, "attempts": attempts[:12], "total_attempts": total,
         "correct_attempts": correct, "accuracy": accuracy, "subject_rows": subject_rows,
         "badges": earned_badges(student), "missions": daily_missions(student),
-        "latest_placement": latest_placement,\n        "teacher_notes": TeacherStudentNote.objects.filter(student=student, teacher=request.user),\n        "assessments": StudentEducationalAssessment.objects.filter(student=student, teacher=request.user)[:8],\n        "goals": StudentGoal.objects.filter(student=student, teacher=request.user),\n        "today": timezone.localdate(),\n    })
+        "latest_placement": latest_placement, "teacher_notes": notes,
+        "assessments": assessments[:8], "latest_assessment": latest_assessment,
+        "goals": goals, "active_goals_count": active_goals.count(),
+        "notes_count": notes.count(), "attention_subjects": attention_subjects,
+        "today": timezone.localdate(),
+    })
 
 
 @login_required(login_url="login")
