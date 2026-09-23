@@ -4,8 +4,9 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.crypto import get_random_string
+from django.utils import timezone
 
-from core.models import ClassRoom, TeacherStudentNote, UserProfile
+from core.models import ClassRoom, StudentEducationalAssessment, StudentGoal, TeacherStudentNote, UserProfile
 from core.permissions import current_role, is_teacher
 from exams.models import PlacementAttempt, PlacementQuestion
 from practice.models import PracticeAttempt, PracticeQuestion
@@ -429,16 +430,57 @@ def teacher_student_detail(request, student_id):
             title = request.POST.get("title", "").strip()
             if content:
                 TeacherStudentNote.objects.create(
-                    student=student,
-                    teacher=request.user,
-                    kind=kind,
-                    title=title,
-                    content=content,
+                    student=student, teacher=request.user, kind=kind,
+                    title=title, content=content,
                 )
         elif action == "delete_note":
             note_id = request.POST.get("note_id")
-            TeacherStudentNote.objects.filter(
-                id=note_id, student=student, teacher=request.user
+            TeacherStudentNote.objects.filter(id=note_id, student=student, teacher=request.user).delete()
+        elif action == "add_assessment":
+            def score(name):
+                try:
+                    return max(1, min(5, int(request.POST.get(name, 3))))
+                except (TypeError, ValueError):
+                    return 3
+            StudentEducationalAssessment.objects.create(
+                student=student, teacher=request.user,
+                assessment_date=request.POST.get("assessment_date") or timezone.localdate(),
+                participation=score("participation"), effort=score("effort"),
+                focus=score("focus"), independence=score("independence"),
+                time_management=score("time_management"), responsibility=score("responsibility"),
+                cooperation=score("cooperation"), problem_solving=score("problem_solving"),
+                accuracy=score("accuracy"), perseverance=score("perseverance"),
+                strengths=request.POST.get("strengths", "").strip(),
+                needs_improvement=request.POST.get("needs_improvement", "").strip(),
+                teacher_summary=request.POST.get("teacher_summary", "").strip(),
+            )
+        elif action == "delete_assessment":
+            assessment_id = request.POST.get("assessment_id")
+            StudentEducationalAssessment.objects.filter(
+                id=assessment_id, student=student, teacher=request.user
+            ).delete()
+        elif action == "add_goal":
+            title = request.POST.get("goal_title", "").strip()
+            if title:
+                StudentGoal.objects.create(
+                    student=student, teacher=request.user, title=title,
+                    subject=request.POST.get("goal_subject", "").strip(),
+                    target_date=request.POST.get("target_date") or None,
+                    note=request.POST.get("goal_note", "").strip(),
+                )
+        elif action == "update_goal":
+            goal = StudentGoal.objects.filter(
+                id=request.POST.get("goal_id"), student=student, teacher=request.user
+            ).first()
+            if goal:
+                status = request.POST.get("goal_status", StudentGoal.Status.ACTIVE)
+                if status not in dict(StudentGoal.Status.choices):
+                    status = StudentGoal.Status.ACTIVE
+                goal.status = status
+                goal.save(update_fields=["status", "updated_at"])
+        elif action == "delete_goal":
+            StudentGoal.objects.filter(
+                id=request.POST.get("goal_id"), student=student, teacher=request.user
             ).delete()
         return redirect("teacher-student-detail", student_id=student.id)
 
@@ -459,7 +501,7 @@ def teacher_student_detail(request, student_id):
         "student": student, "attempts": attempts[:12], "total_attempts": total,
         "correct_attempts": correct, "accuracy": accuracy, "subject_rows": subject_rows,
         "badges": earned_badges(student), "missions": daily_missions(student),
-        "latest_placement": latest_placement, "teacher_notes": TeacherStudentNote.objects.filter(student=student, teacher=request.user)})
+        "latest_placement": latest_placement,\n        "teacher_notes": TeacherStudentNote.objects.filter(student=student, teacher=request.user),\n        "assessments": StudentEducationalAssessment.objects.filter(student=student, teacher=request.user)[:8],\n        "goals": StudentGoal.objects.filter(student=student, teacher=request.user),\n        "today": timezone.localdate(),\n    })
 
 
 @login_required(login_url="login")
