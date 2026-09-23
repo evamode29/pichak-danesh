@@ -164,3 +164,55 @@ class StudentGoal(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class StudentAttendance(models.Model):
+    class Status(models.TextChoices):
+        PRESENT = "present", "حاضر"
+        ABSENT = "absent", "غایب"
+        LATE = "late", "با تأخیر"
+
+    class Mood(models.TextChoices):
+        GREAT = "great", "خیلی خوب"
+        GOOD = "good", "خوب"
+        NORMAL = "normal", "عادی"
+        LOW = "low", "کم‌انرژی"
+
+    student = models.ForeignKey("students.StudentProfile", on_delete=models.CASCADE, related_name="attendance_records")
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="student_attendance_records")
+    date = models.DateField()
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PRESENT)
+    mood = models.CharField(max_length=20, choices=Mood.choices, blank=True)
+    note = models.CharField(max_length=500, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-date", "-id"]
+        constraints = [models.UniqueConstraint(fields=["student", "date"], name="unique_student_attendance_date")]
+        indexes = [models.Index(fields=["student", "-date"])]
+
+    def __str__(self):
+        return f"{self.student} - {self.date}"
+
+
+class StudentFamilyContact(models.Model):
+    class Kind(models.TextChoices):
+        CALL = "call", "تماس"
+        MEETING = "meeting", "جلسه"
+        MESSAGE = "message", "پیام"
+        FOLLOWUP = "followup", "پیگیری"
+
+    student = models.ForeignKey("students.StudentProfile", on_delete=models.CASCADE, related_name="family_contacts")
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="student_family_contacts")
+    contact_date = models.DateField()
+    kind = models.CharField(max_length=20, choices=Kind.choices, default=Kind.CALL)
+    summary = models.TextField()
+    follow_up = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-contact_date", "-id"]
+        indexes = [models.Index(fields=["student", "-contact_date"])]
+
+    def __str__(self):
+        return f"{self.student} - {self.get_kind_display()} - {self.contact_date}"
