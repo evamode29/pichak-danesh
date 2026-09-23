@@ -35,7 +35,6 @@
 
 <section class="card" style="margin-top:16px"><div class="ch"><div><small>ارزیابی جدید</small><h2>🧠 ثبت ارزیابی دوره‌ای</h2></div><span>هر زمان لازم بود ثبت کن</span></div>
 <form method="post" class="form"><input type="hidden" name="action" value="add_assessment">{% csrf_token %}<div class="row"><input class="input" type="date" name="assessment_date" value="{{ today|date:'Y-m-d' }}"><input class="input" name="teacher_summary" placeholder="جمع‌بندی کوتاه این دوره"></div><div class="assessment-fields" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-{% for field,label in "participation|مشارکت,effort|تلاش و پشتکار,focus|تمرکز,independence|یادگیری مستقل,time_management|مدیریت زمان,responsibility|مسئولیت‌پذیری,cooperation|همکاری,problem_solving|حل مسئله,accuracy|دقت,perseverance|پشتکار".split:"," %}{% endfor %}
 <div class="fieldbox"><label>مشارکت</label><select class="select" name="participation">{% for n in "12345" %}<option value="{{ n }}" {% if n == "3" %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div>
 <div class="fieldbox"><label>تلاش و پشتکار</label><select class="select" name="effort">{% for n in "12345" %}<option value="{{ n }}" {% if n == "3" %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div>
 <div class="fieldbox"><label>تمرکز</label><select class="select" name="focus">{% for n in "12345" %}<option value="{{ n }}" {% if n == "3" %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div>
