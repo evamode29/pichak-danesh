@@ -7,7 +7,7 @@ from django.utils.crypto import get_random_string
 from django.utils import timezone
 from datetime import timedelta
 
-from core.models import ClassRoom, StudentAttendance, StudentEducationalAssessment, StudentFamilyContact, StudentGoal, TeacherStudentNote, UserProfile
+from core.models import ClassRoom, StudentAnnualReview, StudentAttendance, StudentBehaviorObservation, StudentEducationalAssessment, StudentFamilyContact, StudentGoal, StudentPortfolioItem, StudentStudySession, TeacherStudentNote, UserProfile
 from core.permissions import current_role, is_teacher
 from exams.models import PlacementAttempt, PlacementQuestion
 from practice.models import PracticeAttempt, PracticeQuestion
@@ -491,6 +491,58 @@ def teacher_student_detail(request, student_id):
                 goal.save(update_fields=["status", "updated_at"])
         elif action == "delete_goal":
             StudentGoal.objects.filter(id=request.POST.get("goal_id"), student=student, teacher=request.user).delete()
+        elif action == "add_study_session":
+            try:
+                questions = max(0, int(request.POST.get("session_questions", 0)))
+                correct_count = max(0, min(questions, int(request.POST.get("session_correct", 0))))
+                minutes = max(0, int(request.POST.get("session_minutes", 0)))
+                completion = max(0, min(100, int(request.POST.get("session_completion", 100))))
+            except (TypeError, ValueError):
+                questions, correct_count, minutes, completion = 0, 0, 0, 100
+            StudentStudySession.objects.create(
+                student=student, teacher=request.user,
+                session_date=request.POST.get("session_date") or timezone.localdate(),
+                subject=request.POST.get("session_subject", "").strip(),
+                topic=request.POST.get("session_topic", "").strip(),
+                minutes=minutes, questions_count=questions, correct_count=correct_count,
+                completion=completion, note=request.POST.get("session_note", "").strip(),
+            )
+        elif action == "add_observation":
+            observation = request.POST.get("observation", "").strip()
+            if observation:
+                kind = request.POST.get("observation_type", StudentBehaviorObservation.Type.POSITIVE)
+                if kind not in dict(StudentBehaviorObservation.Type.choices):
+                    kind = StudentBehaviorObservation.Type.POSITIVE
+                StudentBehaviorObservation.objects.create(
+                    student=student, teacher=request.user,
+                    observation_date=request.POST.get("observation_date") or timezone.localdate(),
+                    observation_type=kind, area=request.POST.get("observation_area", "").strip(),
+                    observation=observation, action_taken=request.POST.get("observation_action", "").strip(),
+                )
+        elif action == "add_portfolio":
+            title = request.POST.get("portfolio_title", "").strip()
+            if title:
+                StudentPortfolioItem.objects.create(
+                    student=student, teacher=request.user, title=title,
+                    item_date=request.POST.get("portfolio_date") or timezone.localdate(),
+                    subject=request.POST.get("portfolio_subject", "").strip(),
+                    description=request.POST.get("portfolio_description", "").strip(),
+                    file=request.FILES.get("portfolio_file"),
+                )
+        elif action == "add_annual_review":
+            StudentAnnualReview.objects.update_or_create(
+                student=student, academic_year=request.POST.get("review_year", "").strip(),
+                period=request.POST.get("review_period", StudentAnnualReview.Period.MID),
+                defaults={
+                    "teacher": request.user,
+                    "review_date": request.POST.get("review_date") or timezone.localdate(),
+                    "academic_summary": request.POST.get("review_summary", "").strip(),
+                    "strengths": request.POST.get("review_strengths", "").strip(),
+                    "needs_improvement": request.POST.get("review_needs", "").strip(),
+                    "next_steps": request.POST.get("review_next_steps", "").strip(),
+                    "parent_message": request.POST.get("review_parent_message", "").strip(),
+                },
+            )
         return redirect("teacher-student-detail", student_id=student.id)
 
     attempts = PracticeAttempt.objects.filter(student=student).select_related("question").order_by("-id")
@@ -522,6 +574,10 @@ def teacher_student_detail(request, student_id):
     attendance_late = attendance_records.filter(status=StudentAttendance.Status.LATE).count()
     attendance_rate = round(attendance_present * 100 / attendance_total) if attendance_total else 0
     family_contacts = StudentFamilyContact.objects.filter(student=student, teacher=request.user)[:6]
+    study_sessions = StudentStudySession.objects.filter(student=student, teacher=request.user)[:8]
+    observations = StudentBehaviorObservation.objects.filter(student=student, teacher=request.user)[:8]
+    portfolio_items = StudentPortfolioItem.objects.filter(student=student, teacher=request.user)[:8]
+    annual_reviews = StudentAnnualReview.objects.filter(student=student, teacher=request.user)[:6]
     active_goal_ratio = round(active_goals.count() * 100 / goals.count()) if goals.exists() else 0
     learning_health = min(100, round(
         accuracy * 0.55 +
@@ -583,6 +639,8 @@ def teacher_student_detail(request, student_id):
         "attendance_total": attendance_total, "attendance_present": attendance_present, "attendance_late": attendance_late,
         "attendance_rate": attendance_rate, "family_contacts": family_contacts,
         "learning_health": learning_health, "health_label": health_label,
+        "study_sessions": study_sessions, "observations": observations, "portfolio_items": portfolio_items,
+        "annual_reviews": annual_reviews,
         "report_summary": report_summary, "today": today,
     })
 
