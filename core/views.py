@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.crypto import get_random_string
 
-from core.models import ClassRoom, UserProfile
+from core.models import ClassRoom, TeacherStudentNote, UserProfile
 from core.permissions import current_role, is_teacher
 from exams.models import PlacementAttempt, PlacementQuestion
 from practice.models import PracticeAttempt, PracticeQuestion
@@ -418,6 +418,30 @@ def teacher_student_detail(request, student_id):
     if not is_teacher(request.user):
         return redirect("dashboard")
     student = get_object_or_404(_teacher_student_queryset(request.user), pk=student_id)
+
+    if request.method == "POST":
+        action = request.POST.get("action", "add_note")
+        if action == "add_note":
+            kind = request.POST.get("kind", TeacherStudentNote.Kind.NOTE)
+            if kind not in dict(TeacherStudentNote.Kind.choices):
+                kind = TeacherStudentNote.Kind.NOTE
+            content = request.POST.get("content", "").strip()
+            title = request.POST.get("title", "").strip()
+            if content:
+                TeacherStudentNote.objects.create(
+                    student=student,
+                    teacher=request.user,
+                    kind=kind,
+                    title=title,
+                    content=content,
+                )
+        elif action == "delete_note":
+            note_id = request.POST.get("note_id")
+            TeacherStudentNote.objects.filter(
+                id=note_id, student=student, teacher=request.user
+            ).delete()
+        return redirect("teacher-student-detail", student_id=student.id)
+
     attempts = PracticeAttempt.objects.filter(student=student).select_related("question").order_by("-id")
     total = attempts.count()
     correct = attempts.filter(is_correct=True).count()
@@ -435,7 +459,7 @@ def teacher_student_detail(request, student_id):
         "student": student, "attempts": attempts[:12], "total_attempts": total,
         "correct_attempts": correct, "accuracy": accuracy, "subject_rows": subject_rows,
         "badges": earned_badges(student), "missions": daily_missions(student),
-        "latest_placement": latest_placement})
+        "latest_placement": latest_placement, "teacher_notes": TeacherStudentNote.objects.filter(student=student, teacher=request.user)})
 
 
 @login_required(login_url="login")
