@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.crypto import get_random_string
 from django.utils import timezone
+from datetime import timedelta
 
 from core.models import ClassRoom, StudentEducationalAssessment, StudentGoal, TeacherStudentNote, UserProfile
 from core.permissions import current_role, is_teacher
@@ -496,6 +497,46 @@ def teacher_student_detail(request, student_id):
     notes = TeacherStudentNote.objects.filter(student=student, teacher=request.user)
     attention_subjects = [row["name"] for row in subject_rows if row["total"] and row["accuracy"] < 70]
 
+    # روند هشت هفته اخیر: تعداد فعالیت و دقت هر هفته
+    today = timezone.localdate()
+    trend_rows = []
+    for offset in range(7, -1, -1):
+        week_end = today - timedelta(days=offset * 7)
+        week_start = week_end - timedelta(days=6)
+        week_attempts = attempts.filter(created_at__date__gte=week_start, created_at__date__lte=week_end)
+        week_total = week_attempts.count()
+        week_correct = week_attempts.filter(is_correct=True).count()
+        trend_rows.append({
+            "label": f"{week_start.month}/{week_start.day}",
+            "total": week_total,
+            "accuracy": round(week_correct * 100 / week_total) if week_total else 0,
+        })
+
+    # تحلیل خطاها بر اساس درس و سطح سؤال؛ بدون حدس درباره علت خطا
+    wrong_attempts = attempts.filter(is_correct=False)
+    error_groups = {}
+    for item in wrong_attempts:
+        key = (item.question.subject, item.question.difficulty)
+        error_groups.setdefault(key, {"subject": subject_names.get(item.question.subject, item.question.subject), "difficulty": item.question.difficulty, "count": 0})
+        error_groups[key]["count"] += 1
+    error_rows = sorted(error_groups.values(), key=lambda row: row["count"], reverse=True)[:6]
+    recent_wrong = list(wrong_attempts[:6])
+
+    report_points = []
+    if accuracy >= 80:
+        report_points.append("دقت کلی در محدوده ۸۰٪ یا بیشتر ثبت شده است.")
+    elif total:
+        report_points.append(f"دقت کلی ثبت‌شده {accuracy}٪ است و بررسی روند ادامه‌دار آن پیشنهاد می‌شود.")
+    if attention_subjects:
+        report_points.append("درس‌های نیازمند توجه بیشتر: " + "، ".join(attention_subjects) + ".")
+    if latest_assessment:
+        report_points.append(f"آخرین ارزیابی مهارت‌های یادگیری امتیاز {latest_assessment.overall_score} از ۵ دارد.")
+    if active_goals.exists():
+        report_points.append(f"{active_goals.count()} هدف آموزشی فعال در پرونده ثبت شده است.")
+    if not report_points:
+        report_points.append("برای این دانش‌آموز هنوز داده کافی برای جمع‌بندی آموزشی ثبت نشده است.")
+    report_summary = " ".join(report_points)
+
     return render(request, "teacher/student_detail.html", {
         "student": student, "attempts": attempts[:12], "total_attempts": total,
         "correct_attempts": correct, "accuracy": accuracy, "subject_rows": subject_rows,
@@ -504,7 +545,8 @@ def teacher_student_detail(request, student_id):
         "assessments": assessments[:8], "latest_assessment": latest_assessment,
         "goals": goals, "active_goals_count": active_goals.count(),
         "notes_count": notes.count(), "attention_subjects": attention_subjects,
-        "today": timezone.localdate(),
+        "trend_rows": trend_rows, "error_rows": error_rows, "recent_wrong": recent_wrong,
+        "report_summary": report_summary, "today": today,
     })
 
 
