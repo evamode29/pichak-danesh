@@ -7,7 +7,7 @@ from django.utils.crypto import get_random_string
 from django.utils import timezone
 from datetime import timedelta
 
-from core.models import ClassRoom, StudentEducationalAssessment, StudentGoal, TeacherStudentNote, UserProfile
+from core.models import ClassRoom, StudentAttendance, StudentEducationalAssessment, StudentFamilyContact, StudentGoal, TeacherStudentNote, UserProfile
 from core.permissions import current_role, is_teacher
 from exams.models import PlacementAttempt, PlacementQuestion
 from practice.models import PracticeAttempt, PracticeQuestion
@@ -433,6 +433,26 @@ def teacher_student_detail(request, student_id):
                 TeacherStudentNote.objects.create(student=student, teacher=request.user, kind=kind, title=title, content=content)
         elif action == "delete_note":
             TeacherStudentNote.objects.filter(id=request.POST.get("note_id"), student=student, teacher=request.user).delete()
+        elif action == "add_attendance":
+            StudentAttendance.objects.update_or_create(
+                student=student, date=request.POST.get("attendance_date") or timezone.localdate(),
+                defaults={
+                    "teacher": request.user,
+                    "status": request.POST.get("attendance_status", StudentAttendance.Status.PRESENT),
+                    "mood": request.POST.get("attendance_mood", ""),
+                    "note": request.POST.get("attendance_note", "").strip(),
+                },
+            )
+        elif action == "add_family_contact":
+            summary = request.POST.get("contact_summary", "").strip()
+            if summary:
+                StudentFamilyContact.objects.create(
+                    student=student, teacher=request.user,
+                    contact_date=request.POST.get("contact_date") or timezone.localdate(),
+                    kind=request.POST.get("contact_kind", StudentFamilyContact.Kind.CALL),
+                    summary=summary,
+                    follow_up=request.POST.get("contact_follow_up", "").strip(),
+                )
         elif action == "add_assessment":
             def score(name):
                 try:
@@ -496,6 +516,20 @@ def teacher_student_detail(request, student_id):
     active_goals = goals.filter(status=StudentGoal.Status.ACTIVE)
     notes = TeacherStudentNote.objects.filter(student=student, teacher=request.user)
     attention_subjects = [row["name"] for row in subject_rows if row["total"] and row["accuracy"] < 70]
+    attendance_records = StudentAttendance.objects.filter(student=student, teacher=request.user)
+    attendance_total = attendance_records.count()
+    attendance_present = attendance_records.filter(status=StudentAttendance.Status.PRESENT).count()
+    attendance_late = attendance_records.filter(status=StudentAttendance.Status.LATE).count()
+    attendance_rate = round(attendance_present * 100 / attendance_total) if attendance_total else 0
+    family_contacts = StudentFamilyContact.objects.filter(student=student, teacher=request.user)[:6]
+    active_goal_ratio = round(active_goals.count() * 100 / goals.count()) if goals.exists() else 0
+    learning_health = min(100, round(
+        accuracy * 0.55 +
+        (attendance_rate if attendance_total else 70) * 0.20 +
+        (active_goal_ratio if goals.exists() else 70) * 0.10 +
+        min(100, total / 30 * 100) * 0.15
+    ))
+    health_label = "رو به رشد" if learning_health >= 75 else ("نیازمند پیگیری" if learning_health >= 50 else "نیازمند توجه")
 
     # روند هشت هفته اخیر: تعداد فعالیت و دقت هر هفته
     today = timezone.localdate()
@@ -546,6 +580,9 @@ def teacher_student_detail(request, student_id):
         "goals": goals, "active_goals_count": active_goals.count(),
         "notes_count": notes.count(), "attention_subjects": attention_subjects,
         "trend_rows": trend_rows, "error_rows": error_rows, "recent_wrong": recent_wrong,
+        "attendance_total": attendance_total, "attendance_present": attendance_present, "attendance_late": attendance_late,
+        "attendance_rate": attendance_rate, "family_contacts": family_contacts,
+        "learning_health": learning_health, "health_label": health_label,
         "report_summary": report_summary, "today": today,
     })
 
