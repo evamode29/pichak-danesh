@@ -216,3 +216,96 @@ class StudentFamilyContact(models.Model):
 
     def __str__(self):
         return f"{self.student} - {self.get_kind_display()} - {self.contact_date}"
+
+
+class StudentStudySession(models.Model):
+    """A recorded study session for annual learning history."""
+    student = models.ForeignKey("students.StudentProfile", on_delete=models.CASCADE, related_name="study_sessions")
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="student_study_sessions")
+    session_date = models.DateField()
+    subject = models.CharField(max_length=50, blank=True)
+    topic = models.CharField(max_length=150, blank=True)
+    minutes = models.PositiveIntegerField(default=0)
+    questions_count = models.PositiveIntegerField(default=0)
+    correct_count = models.PositiveIntegerField(default=0)
+    completion = models.PositiveSmallIntegerField(default=100)
+    note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-session_date", "-id"]
+        indexes = [models.Index(fields=["student", "-session_date"])]
+
+    def __str__(self):
+        return f"{self.student} - {self.session_date} - {self.subject}"
+
+
+class StudentBehaviorObservation(models.Model):
+    """Objective classroom observations; not a medical or psychological diagnosis."""
+    class Type(models.TextChoices):
+        POSITIVE = "positive", "نقطه قوت"
+        CHALLENGE = "challenge", "نیازمند پیگیری"
+
+    student = models.ForeignKey("students.StudentProfile", on_delete=models.CASCADE, related_name="behavior_observations")
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="student_behavior_observations")
+    observation_date = models.DateField()
+    observation_type = models.CharField(max_length=20, choices=Type.choices, default=Type.POSITIVE)
+    area = models.CharField(max_length=80, blank=True)
+    observation = models.TextField()
+    action_taken = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-observation_date", "-id"]
+        indexes = [models.Index(fields=["student", "-observation_date"])]
+
+    def __str__(self):
+        return f"{self.student} - {self.observation_date}"
+
+
+class StudentPortfolioItem(models.Model):
+    student = models.ForeignKey("students.StudentProfile", on_delete=models.CASCADE, related_name="portfolio_items")
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="student_portfolio_items")
+    title = models.CharField(max_length=200)
+    item_date = models.DateField()
+    subject = models.CharField(max_length=50, blank=True)
+    description = models.TextField(blank=True)
+    file = models.FileField(upload_to="student_portfolio/%Y/%m/", blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-item_date", "-id"]
+        indexes = [models.Index(fields=["student", "-item_date"])]
+
+    def __str__(self):
+        return self.title
+
+
+class StudentAnnualReview(models.Model):
+    class Period(models.TextChoices):
+        START = "start", "ابتدای سال"
+        MID = "mid", "میان‌سال"
+        END = "end", "پایان سال"
+
+    student = models.ForeignKey("students.StudentProfile", on_delete=models.CASCADE, related_name="annual_reviews")
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="student_annual_reviews")
+    academic_year = models.CharField(max_length=20)
+    period = models.CharField(max_length=10, choices=Period.choices)
+    review_date = models.DateField()
+    academic_summary = models.TextField(blank=True)
+    strengths = models.TextField(blank=True)
+    needs_improvement = models.TextField(blank=True)
+    next_steps = models.TextField(blank=True)
+    parent_message = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-review_date", "-id"]
+        constraints = [
+            models.UniqueConstraint(fields=["student", "academic_year", "period"], name="unique_student_annual_review_period"),
+        ]
+        indexes = [models.Index(fields=["student", "-review_date"])]
+
+    def __str__(self):
+        return f"{self.student} - {self.academic_year} - {self.get_period_display()}"
