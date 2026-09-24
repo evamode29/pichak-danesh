@@ -35,7 +35,7 @@
 
 <main class="teacher-main">
 <header class="teacher-head">
-  <div><span style="color:var(--t-green);font-size:11px;font-weight:900">مرکز کنترل آموزش</span><h1>سلام، {{ request.user.first_name|default:"معلم" }} 🌱</h1><p>کلاس، فهرست ۳۰ نفره و وضعیت یادگیری دانش‌آموزان را یکجا کنترل کن.</p></div>
+  <div><span style="color:var(--t-green);font-size:11px;font-weight:900">مرکز کنترل آموزش</span><h1>سلام، {{ request.user.first_name|default:"معلم" }} 🌱</h1><p>کلاس و وضعیت یادگیری دانش‌آموزان را یکجا کنترل کن.</p></div>
   <div class="teacher-actions">
     <a class="action primary" href="{% url 'teacher-homework' %}">+ تکلیف امروز</a>
     <a class="action" href="{% url 'teacher-class-manage' %}">مدیریت کلاس</a>
@@ -44,24 +44,24 @@
 </header>
 
 <section class="stats">
- <article class="stat green"><small>ظرفیت کلاس</small><strong>{{ total_students }}/{{ roster_total }}</strong><span>{{ named_students }} نفر در فهرست · {{ empty_slots }} جای خالی</span></article>
+ <article class="stat green"><small>تعداد دانش‌آموزان</small><strong>{{ total_students }}</strong><span>{{ named_students }} نفر در کلاس</span></article>
  <article class="stat"><small>دانش‌آموز فعال</small><strong>{{ active_students }}</strong><span>دارای امتیاز یا XP</span></article>
  <article class="stat gold"><small>مجموع XP</small><strong>{{ total_xp }}</strong><span>تجربه کسب‌شده کلاس‌ها</span></article>
  <article class="stat"><small>دقت میانگین</small><strong>{{ average_accuracy }}٪</strong><span>بر اساس تمرین‌های ثبت‌شده</span></article>
 </section>
 
 <section class="panel">
- <div class="panel-head"><div><small>دفتر کلاس</small><h2>فهرست ۳۰ جایگاه</h2></div><span class="panel-link">{{ named_students }} نفر نام‌گذاری شده · {{ empty_slots }} جای خالی</span></div>
+ <div class="panel-head"><div><small>دفتر کلاس</small><h2>فهرست دانش‌آموزان</h2></div><span class="panel-link">{{ named_students }} نفر نام‌گذاری شده · {{ empty_slots }} جای خالی</span></div>
  <div class="roster-grid">
  {% for item in roster %}
  <div class="roster {% if item.status == 'empty' %}empty{% endif %}">
   <div class="num">{{ item.number }}</div>
-  <div class="rinfo"><strong>{{ item.name }}</strong>{% if item.username %}<small>{{ item.username }}</small>{% else %}<small>آماده برای ثبت دانش‌آموز</small>{% endif %}</div>
-  {% if item.status == 'active' %}<span class="badge ok">فعال</span>{% elif item.status == 'ready' %}<span class="badge wait">آماده</span>{% else %}<span class="badge empty">خالی</span>{% endif %}
+  <div class="rinfo"><strong>{{ item.name }}</strong>{% if item.username %}<small>{{ item.username }}</small>{% else %}<small>حساب کاربری ثبت نشده</small>{% endif %}</div>
+  {% if item.status == 'active' %}<span class="badge ok">فعال</span>{% elif item.status == 'ready' %}<span class="badge wait">در انتظار ثبت</span>{% else %}<span class="badge empty">خالی</span>{% endif %}
  </div>
  {% endfor %}
  </div>
- <div class="insight">💡 «آماده» یعنی نام دانش‌آموز در فهرست ۲۷ نفره هست ولی حسابش هنوز ساخته نشده. از «مدیریت کلاس» می‌توانی همه حساب‌ها را یکجا ایجاد کنی.</div>
+ <div class="insight">💡 این فهرست بر اساس دانش‌آموزان ثبت‌شده در کلاس نمایش داده می‌شود. از «مدیریت کلاس» می‌توانی اطلاعات کلاس و دانش‌آموزان را مدیریت کنی.</div>
 </section>
 
 <div class="content-grid">
