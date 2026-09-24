@@ -344,52 +344,81 @@ def _teacher_student_queryset(user):
 def teacher_dashboard(request):
     if not is_teacher(request.user):
         return redirect("dashboard")
-    classrooms = list(ClassRoom.objects.filter(teacher=request.user, is_active=True).order_by("grade", "name"))
-    students = list(_teacher_student_queryset(request.user).order_by(
-        "classroom__grade", "classroom__name", "user__first_name", "user__last_name"))
+
+    classrooms = list(
+        ClassRoom.objects.filter(
+            teacher=request.user,
+            is_active=True,
+        ).order_by("grade", "name")
+    )
+
+    students = list(
+        _teacher_student_queryset(request.user).order_by(
+            "classroom__grade",
+            "classroom__name",
+            "user__first_name",
+            "user__last_name",
+        )
+    )
+
     total_points = sum(student.points for student in students)
     total_xp = sum(student.xp for student in students)
-    active_students = sum(1 for student in students if student.points > 0 or student.xp > 0)
+    active_students = sum(
+        1 for student in students
+        if student.points > 0 or student.xp > 0
+    )
+
     student_rows = []
     accuracy_total = 0
+
     for student in students:
         attempts = PracticeAttempt.objects.filter(student=student)
         total = attempts.count()
         correct = attempts.filter(is_correct=True).count()
         accuracy = round((correct / total) * 100) if total else 0
         accuracy_total += accuracy
-        student_rows.append({"student": student, "attempts": total, "correct": correct, "accuracy": accuracy})
-    average_accuracy = round(accuracy_total / len(student_rows)) if student_rows else 0
-    roster_names = [
-        ("ایمان", "ابراهیمی عمارت", "iman01"), ("محمدپارسا", "اکبری فرخانی", "mparsa02"),
-        ("سجاد", "الیاسی یوسف‌آباد", "sajad03"), ("امیرمحمد", "ایزی", "amir04"),
-        ("کارن", "بابایی", "karen05"), ("مهیار", "بابایی فیروزآباد", "mahyar06"),
-        ("امیرعلی", "بیگ‌زاده", "amirali07"), ("محمدمهدی", "جعفری تیکانلو", "mmahdi08"),
-        ("امیرعباس", "چوپانی", "amirabbas09"), ("سجاد", "حسن‌زاده خواجه‌ها", "sajad10"),
-        ("محمدرضا", "خان‌زاده", "mreza11"), ("سینا", "دام‌آفرین", "sina12"),
-        ("سینا یار", "رفیعی کهنه‌رود", "sinayar13"), ("امیرمحمد", "رهنمازوباران", "amirm14"),
-        ("علی", "زارعی", "ali15"), ("افشین", "سهرابی‌فر", "afshin16"),
-        ("محمدامین", "شاکری", "mamin17"), ("متین", "شریفی", "matin18"),
-        ("آرش", "صاحب‌الزمانی", "arsh19"), ("محمد", "صبوری‌پور", "mohammad20"),
-        ("پرهام", "صفی‌پور", "parham21"), ("سیدامیرمحمد", "قربانی موسوی", "samir22"),
-        ("امیرعباس", "گودرزی", "amirabbas23"), ("محمدمهدی", "محمدی‌زاده", "mmahdi24"),
-        ("طاها", "نامی", "taha25"), ("محمدصالحا", "نظری", "msaleha26"),
-        ("فرمان", "نوحه‌خوان قوچان عتیق", "farman27"),
-    ]
-    by_username = {row["student"].user.username: row for row in student_rows}
+
+        student_rows.append({
+            "student": student,
+            "attempts": total,
+            "correct": correct,
+            "accuracy": accuracy,
+        })
+
+    average_accuracy = (
+        round(accuracy_total / len(student_rows))
+        if student_rows else 0
+    )
+
     roster = []
-    for index, (first_name, last_name, username) in enumerate(roster_names, start=1):
-        row = by_username.get(username)
-        roster.append({"number": index, "name": f"{first_name} {last_name}", "username": username,
-            "row": row, "status": "active" if row else "ready"})
-    for index in range(28, 31):
-        roster.append({"number": index, "name": f"ظرفیت خالی {index - 27}", "username": "",
-            "row": None, "status": "empty"})
+
+    for index, row in enumerate(student_rows, start=1):
+        student = row["student"]
+        roster.append({
+            "number": index,
+            "name": student.user.get_full_name() or student.user.username,
+            "username": student.user.username,
+            "row": row,
+            "status": "active",
+        })
+
+    roster_total = len(roster)
+    named_students = len(roster)
+    empty_slots = 0
+
     return render(request, "teacher/dashboard.html", {
-        "role": current_role(request.user), "classrooms": classrooms, "students": student_rows,
-        "roster": roster, "total_students": len(students), "roster_total": 30,
-        "named_students": 27, "empty_slots": 3, "active_students": active_students,
-        "total_points": total_points, "total_xp": total_xp, "average_accuracy": average_accuracy,
+        "role": current_role(request.user),
+        "classrooms": classrooms,
+        "students": student_rows,
+        "roster": roster,
+        "total_students": len(students),
+        "roster_total": roster_total,
+        "named_students": named_students,
+        "empty_slots": empty_slots,
+        "active_students": active_students,
+        "total_points": total_points,
+        "total_xp": total_xp,
+        "average_accuracy": average_accuracy,
     })
 
 
