@@ -241,7 +241,7 @@ def dashboard(request):
     subscription_plans = []
 
     if student:
-        latest_attempt = PlacementAttempt.objects.filter(student=student).order_by("-created_at", "-id").first()
+        latest_attempt = PlacementAttempt.objects.filter(student=student).order_by("-completed_at", "-id").first()
         badges = earned_badges(student)
         missions = daily_missions(student)
         active_subscription = Subscription.active_for(request.user)
