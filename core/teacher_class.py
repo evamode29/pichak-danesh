@@ -183,6 +183,9 @@ def teacher_class_manage(request):
             "message": message,
             "error": error,
             "credentials": credentials,
-            "student_count": StudentProfile.objects.filter(\n                classroom__teacher=request.user,\n                classroom__is_active=True,\n            ).count(),
+            "student_count": StudentProfile.objects.filter(
+                classroom__teacher=request.user,
+                classroom__is_active=True,
+            ).count(),
         },
     )
