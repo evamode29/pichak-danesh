@@ -51,7 +51,7 @@
 </section>
 
 <section class="panel">
- <div class="panel-head"><div><small>دفتر کلاس</small><h2>فهرست دانش‌آموزان</h2></div><span class="panel-link">{{ named_students }} نفر نام‌گذاری شده · {{ empty_slots }} جای خالی</span></div>
+ <div class="panel-head"><div><small>دفتر کلاس</small><h2>فهرست دانش‌آموزان</h2></div><span class="panel-link">{{ named_students }} نفر در کلاس</span></div>
  <div class="roster-grid">
  {% for item in roster %}
  <div class="roster {% if item.status == 'empty' %}empty{% endif %}">
