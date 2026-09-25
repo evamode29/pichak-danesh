@@ -365,6 +365,12 @@ def teacher_dashboard(request):
     total_points = sum(student.points for student in students)
     total_xp = sum(student.xp for student in students)
     active_students = sum(1 for student in students if student.points > 0 or student.xp > 0)
+    today_tasks = DailyTask.objects.filter(classroom__in=classrooms, task_date=date.today())
+    homework_total = StudentTask.objects.filter(task__in=today_tasks).count()
+    homework_done = StudentTask.objects.filter(
+        task__in=today_tasks, status=StudentTask.Status.DONE
+    ).count()
+    homework_pending = max(0, homework_total - homework_done)
     student_rows = []
     accuracy_total = 0
     for student in students:
@@ -405,6 +411,8 @@ def teacher_dashboard(request):
         "roster": roster, "total_students": len(students), "roster_total": 30,
         "named_students": 27, "empty_slots": 3, "active_students": active_students,
         "total_points": total_points, "total_xp": total_xp, "average_accuracy": average_accuracy,
+        "homework_total": homework_total, "homework_done": homework_done,
+        "homework_pending": homework_pending,
     })
 
 
@@ -448,11 +456,25 @@ def teacher_student_detail(request, student_id):
         subject_rows.append({"name": name, "total": subject_total, "correct": subject_correct,
             "accuracy": round(subject_correct * 100 / subject_total) if subject_total else 0})
     latest_placement = PlacementAttempt.objects.filter(student=student).select_related("test", "approved_by").first()
+    homework_records = list(
+        StudentTask.objects.filter(student=student)
+        .select_related("task")
+        .order_by("-updated_at", "-id")[:8]
+    )
+    homework_total = StudentTask.objects.filter(student=student).count()
+    homework_done = StudentTask.objects.filter(
+        student=student, status=StudentTask.Status.DONE
+    ).count()
+    homework_pending = StudentTask.objects.filter(
+        student=student, status=StudentTask.Status.PENDING
+    ).count()
     return render(request, "teacher/student_detail.html", {
         "student": student, "attempts": attempts[:12], "total_attempts": total,
         "correct_attempts": correct, "accuracy": accuracy, "subject_rows": subject_rows,
         "badges": earned_badges(student), "missions": daily_missions(student),
-        "latest_placement": latest_placement})
+        "latest_placement": latest_placement, "homework_records": homework_records,
+        "homework_total": homework_total, "homework_done": homework_done,
+        "homework_pending": homework_pending})
 
 
 @login_required(login_url="login")
@@ -467,9 +489,21 @@ def teacher_class_detail(request, classroom_id):
         attempts = PracticeAttempt.objects.filter(student=student)
         total = attempts.count()
         correct = attempts.filter(is_correct=True).count()
+        homework_records = StudentTask.objects.filter(student=student)
         rows.append({"student": student, "attempts": total, "correct": correct,
-            "accuracy": round(correct * 100 / total) if total else 0})
-    return render(request, "teacher/class_detail.html", {"classroom": classroom, "students": rows})
+            "accuracy": round(correct * 100 / total) if total else 0,
+            "homework_total": homework_records.count(),
+            "homework_done": homework_records.filter(status=StudentTask.Status.DONE).count()})
+    today_tasks = DailyTask.objects.filter(classroom=classroom, task_date=date.today())
+    homework_total = StudentTask.objects.filter(task__in=today_tasks).count()
+    homework_done = StudentTask.objects.filter(
+        task__in=today_tasks, status=StudentTask.Status.DONE
+    ).count()
+    return render(request, "teacher/class_detail.html", {
+        "classroom": classroom, "students": rows,
+        "homework_total": homework_total, "homework_done": homework_done,
+        "homework_pending": max(0, homework_total - homework_done),
+    })
 
 
 @login_required(login_url="login")
