@@ -1,10 +1,12 @@
 import json
+from datetime import date
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import ClassRoom, UserProfile
+from .models import ClassRoom, DailyTask, StudentTask, UserProfile
+from students.models import StudentProfile
 
 
 User = get_user_model()
@@ -52,3 +54,58 @@ class CoreApiTests(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 401)
+
+
+class HomeworkFlowTests(TestCase):
+    def setUp(self):
+        self.teacher = User.objects.create_user(username="teacher_hw", password="secret123")
+        UserProfile.objects.create(user=self.teacher, role=UserProfile.Role.TEACHER)
+        self.classroom = ClassRoom.objects.create(name="ششم تکلیف", grade=6, teacher=self.teacher)
+        self.student_user = User.objects.create_user(
+            username="student_hw", password="secret123", first_name="دانش‌آموز"
+        )
+        UserProfile.objects.create(
+            user=self.student_user,
+            role=UserProfile.Role.STUDENT,
+            mobile="09120000009",
+        )
+        self.student = StudentProfile.objects.create(
+            user=self.student_user,
+            classroom=self.classroom,
+            grade=6,
+            mobile="09120000009",
+        )
+        self.task = DailyTask.objects.create(
+            classroom=self.classroom,
+            title="تمرین امروز",
+            task_date=date.today(),
+            created_by=self.teacher,
+        )
+        StudentTask.objects.create(task=self.task, student=self.student)
+
+    def test_student_can_mark_today_homework_done(self):
+        self.client.force_login(self.student_user)
+        response = self.client.post(
+            reverse("student-homework"),
+            {"action": "mark_done", "task_id": self.task.id},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            StudentTask.objects.get(task=self.task, student=self.student).status,
+            StudentTask.Status.DONE,
+        )
+
+    def test_student_cannot_mark_another_class_task_done(self):
+        other_class = ClassRoom.objects.create(name="ششم دیگر", grade=6, teacher=self.teacher)
+        other_task = DailyTask.objects.create(
+            classroom=other_class,
+            title="تکلیف دیگر",
+            task_date=date.today(),
+            created_by=self.teacher,
+        )
+        self.client.force_login(self.student_user)
+        response = self.client.post(
+            reverse("student-homework"),
+            {"action": "mark_done", "task_id": other_task.id},
+        )
+        self.assertEqual(response.status_code, 404)

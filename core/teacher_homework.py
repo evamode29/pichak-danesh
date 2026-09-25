@@ -121,6 +121,14 @@ def teacher_homework(request):
 
     tasks = list(DailyTask.objects.filter(classroom=classroom, task_date=task_date).order_by("-id"))
     selected_task = tasks[0] if tasks else None
+    requested_task_id = request.POST.get("task_id") or request.GET.get("task")
+    if requested_task_id:
+        try:
+            requested_task_id = int(requested_task_id)
+        except (TypeError, ValueError):
+            requested_task_id = None
+        if requested_task_id:
+            selected_task = next((task for task in tasks if task.id == requested_task_id), selected_task)
     rows = []
     if selected_task:
         records = {r.student_id: r for r in selected_task.student_tasks.all()}

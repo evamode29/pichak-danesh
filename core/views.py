@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.password_validation import validate_password
@@ -5,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.crypto import get_random_string
 
-from core.models import ClassRoom, UserProfile
+from core.models import ClassRoom, DailyTask, StudentTask, UserProfile
 from core.permissions import current_role, is_teacher
 from exams.models import PlacementAttempt, PlacementQuestion
 from practice.models import PracticeAttempt, PracticeQuestion
@@ -239,12 +241,24 @@ def dashboard(request):
     active_subscription = None
     subscription_products = []
     subscription_plans = []
+    homework_total = 0
+    homework_done = 0
+    homework_pending = 0
 
     if student:
         latest_attempt = PlacementAttempt.objects.filter(student=student).order_by("-completed_at", "-id").first()
         badges = earned_badges(student)
         missions = daily_missions(student)
         active_subscription = Subscription.active_for(request.user)
+        if student.classroom:
+            today_tasks = DailyTask.objects.filter(
+                classroom=student.classroom, task_date=date.today()
+            )
+            homework_total = today_tasks.count()
+            homework_done = StudentTask.objects.filter(
+                task__in=today_tasks, student=student, status=StudentTask.Status.DONE
+            ).count()
+            homework_pending = max(0, homework_total - homework_done)
         subscription_products = list(Product.objects.filter(
             product_type=Product.ProductType.SUBSCRIPTION, is_active=True
         ).order_by("price", "id")[:3])
@@ -331,6 +345,9 @@ def dashboard(request):
         "weakest_subject": weakest_subject, "diagnostic_hint": diagnostic_hint,
         "active_subscription": active_subscription, "subscription_products": subscription_products,
         "subscription_plans": subscription_plans,
+        "homework_total": homework_total,
+        "homework_done": homework_done,
+        "homework_pending": homework_pending,
     })
 
 
