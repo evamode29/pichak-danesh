@@ -1,15 +1,128 @@
 {% extends 'base.html' %}
-{% block title %}عملکرد {{ student.user.get_full_name|default:student.user.username }} | پنل معلم{% endblock %}
+{% block title %}پروفایل {{ student.user.get_full_name|default:student.user.username }} | پیچک دانش{% endblock %}
 {% block content %}
 <style>
-.page{background:#f7f5f1;min-height:calc(100vh - 80px);padding:28px 0 70px}.head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:20px}.head h1{margin:5px 0;font-size:32px}.head p{margin:0;color:#817a73}.back{padding:11px 15px;background:#171513;color:#fff;border-radius:13px;text-decoration:none;font-size:13px}.hero,.panel{background:#fff;border:1px solid #e9e3dc;border-radius:24px;overflow:hidden}.hero{padding:22px;margin-bottom:18px}.identity{display:flex;align-items:center;gap:15px}.avatar{width:58px;height:58px;border-radius:18px;background:#eee7df;display:grid;place-items:center;font-size:25px}.identity strong{font-size:19px}.identity small{display:block;color:#938b83;margin-top:5px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}.stat{background:#faf8f5;border-radius:16px;padding:15px}.stat small{color:#8b837c}.stat b{display:block;font-size:25px;margin-top:7px}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.panel h2{font-size:18px;margin:0}.panel-head{padding:18px 20px;border-bottom:1px solid #eee9e3}.subjects{padding:18px;display:grid;gap:12px}.subject{padding:14px;border:1px solid #eee9e3;border-radius:15px}.subject-top{display:flex;justify-content:space-between;font-size:13px}.bar{height:7px;background:#eeeae5;border-radius:99px;overflow:hidden;margin-top:9px}.bar i{display:block;height:100%;background:#171513}.attempts{width:100%;border-collapse:collapse}.attempts th,.attempts td{text-align:right;padding:12px 16px;border-bottom:1px solid #f0ece7;font-size:12px}.attempts th{color:#877f77;background:#faf8f5}.good{font-weight:700}.badge-list{padding:18px;display:flex;gap:8px;flex-wrap:wrap}.badge{padding:10px 12px;background:#f1ede7;border-radius:12px;font-size:11px}.empty{padding:30px;color:#918a82;text-align:center}.placement-box{margin-top:18px;background:linear-gradient(135deg,#292521,#494039);color:#fff;border-radius:24px;padding:22px}.placement-top{display:flex;justify-content:space-between;align-items:start;gap:15px;flex-wrap:wrap}.placement-box h2{color:#fff;margin:0 0 6px}.placement-box p{margin:0;color:#cfc5bc;font-size:11px}.status{padding:8px 11px;border-radius:999px;background:rgba(255,255,255,.1);font-size:10px;font-weight:800}.status.done{background:#dcefe2;color:#2f7048}.status.wait{background:#f5e8d5;color:#76552f}.approve{border:0;cursor:pointer;padding:12px 17px;border-radius:12px;background:#fff;color:#292521;font:inherit;font-size:11px;font-weight:900}.approve.secondary{background:#eee7df}.approved-info{margin-top:15px;padding:12px 14px;border-radius:13px;background:rgba(255,255,255,.07);font-size:10px;color:#d8cfc7}.no-placement{padding:20px;color:#8d857e;font-size:12px}
-@media(max-width:800px){.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}}
+.pd-page{direction:rtl;min-height:calc(100vh - 70px);background:linear-gradient(135deg,#f4f7ff,#fafbff);padding:24px 0 60px;color:#172451}.pd-page *{box-sizing:border-box}.pd-container{max-width:1240px;margin:auto;padding:0 20px}
+.pd-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}.pd-crumb{font-size:12px;color:#7a87a5;font-weight:700}.pd-back{background:#fff;border:1px solid #e5eaf5;border-radius:14px;padding:11px 16px;color:#172451;text-decoration:none;font-size:12px;font-weight:900;box-shadow:0 8px 25px #354b8c0b}
+.pd-hero{position:relative;overflow:hidden;background:linear-gradient(110deg,#f7f9ff,#edf4ff 55%,#fff3f7);border:1px solid #e2e8f7;border-radius:28px;padding:27px;box-shadow:0 18px 50px #354b8c12;margin-bottom:18px}.pd-hero:after{content:"";position:absolute;width:330px;height:220px;left:-80px;top:-100px;border-radius:50%;background:#ffffff66}.pd-hero:before{content:"";position:absolute;width:350px;height:220px;right:-100px;bottom:-120px;border-radius:50%;background:#7b9df526}
+.pd-hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr auto;align-items:center;gap:22px}.pd-profile{display:flex;align-items:center;gap:18px}.pd-avatar{width:104px;height:104px;border-radius:32px;background:linear-gradient(145deg,#dce7ff,#fff);border:6px solid #fff;display:grid;place-items:center;font-size:45px;box-shadow:0 12px 30px #405d9a2b}.pd-name{font-size:30px;margin:0;letter-spacing:-.5px}.pd-active{font-size:10px;background:#def8eb;color:#159467;border-radius:99px;padding:6px 10px;margin-right:7px;vertical-align:middle}.pd-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.pd-meta span{padding:8px 11px;background:#ffffffbd;border:1px solid #e1e7f2;border-radius:11px;font-size:11px;color:#596783;font-weight:800}.pd-hero-note{max-width:290px;color:#55627f;font-size:12px;line-height:2;text-align:right}.pd-hero-note strong{display:block;color:#172451;font-size:15px}
+.pd-score{background:#fff;border:1px solid #e2e8f4;border-radius:21px;padding:17px;min-width:205px;box-shadow:0 10px 30px #354b8c0b}.pd-score small{color:#7a87a5;font-weight:800}.pd-score b{font-size:30px;display:block;margin-top:3px}.pd-track{height:9px;background:#e9eef8;border-radius:99px;overflow:hidden;margin-top:8px}.pd-track i{display:block;width:75%;height:100%;background:linear-gradient(90deg,#4779f5,#44c3df);border-radius:99px}.pd-score-row{display:flex;justify-content:space-between;margin-top:9px;font-size:10px;color:#7785a3;font-weight:800}
+.pd-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}.pd-kpi{background:#fff;border:1px solid #e5eaf5;border-radius:19px;padding:16px;display:flex;align-items:center;gap:12px;box-shadow:0 10px 28px #354b8c09}.pd-kpi-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:20px}.pd-kpi:nth-child(1) .pd-kpi-icon{background:#eaf2ff}.pd-kpi:nth-child(2) .pd-kpi-icon{background:#e8faf2}.pd-kpi:nth-child(3) .pd-kpi-icon{background:#f1edff}.pd-kpi:nth-child(4) .pd-kpi-icon{background:#fff0f5}.pd-kpi small{display:block;color:#7c88a2;font-size:10px;font-weight:800}.pd-kpi b{font-size:22px;display:block;margin-top:4px}
+.pd-grid{display:grid;grid-template-columns:1.4fr .9fr;gap:18px}.pd-grid2{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;margin-top:18px}.pd-card{background:#fff;border:1px solid #e5eaf5;border-radius:22px;overflow:hidden;box-shadow:0 12px 34px #354b8c08}.pd-head{padding:17px 19px;border-bottom:1px solid #edf0f7;display:flex;justify-content:space-between;align-items:center}.pd-head h2{font-size:16px;margin:0}.pd-head span{font-size:10px;color:#8591aa;font-weight:800}.pd-body{padding:18px}
+.pd-chart{height:255px;position:relative}.pd-gridlines{position:absolute;inset:15px 15px 35px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 46px,#edf1f8 47px)}.pd-chart svg{position:absolute;inset:25px 25px 35px;width:calc(100% - 50px);height:175px}.pd-labels{position:absolute;bottom:7px;left:7%;right:4%;display:flex;justify-content:space-between;color:#8a95ad;font-size:9px;font-weight:800}
+.pd-subjects{display:grid;gap:12px}.pd-sub{border:1px solid #edf0f7;border-radius:15px;padding:12px;background:#fcfdff}.pd-sub-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:900}.pd-sub-top span:last-child{color:#56627e}.pd-bar{height:8px;background:#e9eef7;border-radius:99px;overflow:hidden;margin-top:9px}.pd-bar i{display:block;height:100%;background:linear-gradient(90deg,#4b7bf2,#7956e8);border-radius:99px}
+.pd-table{width:100%;border-collapse:collapse}.pd-table th,.pd-table td{text-align:right;padding:12px 14px;border-bottom:1px solid #eef1f6;font-size:11px}.pd-table th{background:#fafbfe;color:#8490a8;font-size:10px}.pd-ok{color:#10a36c;font-weight:900}.pd-bad{color:#db5e7d;font-weight:900}
+.pd-badges{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.pd-badge{border:1px solid #edf0f7;border-radius:15px;padding:14px 7px;text-align:center;background:#fcfdff}.pd-badge b{display:block;font-size:10px;margin-top:6px}.pd-badge small{color:#8a95aa;font-size:8px}.pd-badge-icon{font-size:26px}
+.pd-placement{margin-top:18px;padding:19px 21px;border-radius:22px;color:#fff;background:linear-gradient(135deg,#1a2e68,#4564b5);box-shadow:0 15px 40px #263f8c2e}.pd-placement-top{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.pd-placement h2{font-size:16px;margin:0 0 5px}.pd-placement p{font-size:10px;color:#dce4ff;margin:0}.pd-status{padding:7px 10px;border-radius:99px;background:#ffffff1c;font-size:9px;font-weight:900}.pd-status.done{background:#dcf8e9;color:#18784f}.pd-status.wait{background:#fff0d8;color:#85591e}.pd-placement-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:15px;font-size:11px}.pd-btn{border:0;border-radius:10px;padding:9px 13px;background:#fff;color:#20366f;font:inherit;font-size:9px;font-weight:900;cursor:pointer}.pd-btn.alt{background:#e9edfa}
+.pd-note{padding:21px;background:linear-gradient(145deg,#f3f0ff,#fff);height:100%;min-height:150px}.pd-note h2{font-size:16px;margin:0 0 12px}.pd-note p{font-size:11px;color:#5b6680;line-height:2;margin:0}.pd-sign{text-align:left;margin-top:20px;font-size:10px;color:#4f3a9c;font-weight:900}.pd-empty{padding:28px;text-align:center;color:#8a95aa;font-size:11px}.pd-footer{margin-top:18px;background:#edf3ff;border-radius:15px;padding:11px 15px;display:flex;justify-content:space-between;color:#7583a2;font-size:9px;font-weight:800}
+@media(max-width:1000px){.pd-hero-grid,.pd-grid,.pd-grid2{grid-template-columns:1fr}.pd-kpis{grid-template-columns:repeat(2,1fr)}.pd-hero-note{max-width:none}.pd-score{min-width:0}}
+@media(max-width:620px){.pd-container{padding:0 12px}.pd-profile{align-items:flex-start}.pd-avatar{width:80px;height:80px;border-radius:24px;font-size:34px}.pd-name{font-size:22px}.pd-hero{padding:19px}.pd-kpis{gap:8px}.pd-kpi{padding:12px}.pd-kpi b{font-size:18px}.pd-badges{grid-template-columns:repeat(2,1fr)}.pd-footer{flex-direction:column;gap:5px}}
 </style>
-<section class="page"><div class="container"><header class="head"><div><span style="color:#9a8170;font-size:12px;font-weight:700">پروفایل آموزشی</span><h1>عملکرد دانش‌آموز</h1><p>جزئیات فعالیت و پیشرفت این دانش‌آموز را بررسی کن.</p></div><a class="back" href="{% url 'teacher-students' %}">← فهرست دانش‌آموزان</a></header>
-<section class="hero"><div class="identity"><div class="avatar">👨‍🎓</div><div><strong>{{ student.user.get_full_name|default:student.user.username }}</strong><small>{{ student.mobile }} · {{ student.classroom.name|default:'بدون کلاس' }} · پایه {{ student.grade }}</small></div></div><div class="stats"><div class="stat"><small>XP</small><b>{{ student.xp }}</b></div><div class="stat"><small>سطح</small><b>{{ student.level }}</b></div><div class="stat"><small>تمرین</small><b>{{ total_attempts }}</b></div><div class="stat"><small>دقت</small><b>{{ accuracy }}٪</b></div></div></section>
-{% if latest_placement %}<section class="placement-box"><div class="placement-top"><div><h2>آزمون تشخیصی شروع ششم</h2><p>پاسخ‌نامه و تکرار آزمون فقط با تأیید شما در اختیار دانش‌آموز قرار می‌گیرد.</p></div><div style="display:flex;gap:7px;flex-wrap:wrap">{% if latest_placement.answer_key_published %}<span class="status done">✓ پاسخ‌نامه منتشر شده</span>{% else %}<span class="status">در انتظار تأیید پاسخ‌نامه</span>{% endif %}{% if latest_placement.repeat_approved_at %}<span class="status done">✓ تکرار تأیید شد</span>{% elif latest_placement.repeat_requested %}<span class="status wait">درخواست تکرار</span>{% endif %}</div></div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:18px"><span style="font-size:12px">امتیاز: <strong>{{ latest_placement.score }}٪</strong></span><span style="font-size:12px">·</span><span style="font-size:12px">صحیح: <strong>{{ latest_placement.correct_answers }}/{{ latest_placement.total_questions }}</strong></span>{% if not latest_placement.answer_key_published %}<form method="post" action="{% url 'teacher-approve-placement' latest_placement.id %}" style="margin-right:auto">{% csrf_token %}<button class="approve" type="submit">تأیید و انتشار پاسخ‌نامه ←</button></form>{% endif %}{% if latest_placement.repeat_requested and not latest_placement.repeat_approved_at %}<form method="post" action="{% url 'teacher-approve-placement-repeat' latest_placement.id %}" style="margin-right:auto">{% csrf_token %}<button class="approve secondary" type="submit">تأیید تکرار آزمون ←</button></form>{% elif latest_placement.repeat_approved_at %}<span style="margin-right:auto;font-size:10px;color:#cfc5bc">تکرار آزمون برای دانش‌آموز فعال است.</span>{% endif %}</div></section>{% else %}<section class="panel placement-box" style="background:#fff;color:#2d2925"><div class="no-placement">هنوز آزمون تشخیصی برای این دانش‌آموز ثبت نشده است.</div></section>{% endif %}
-<div class="grid"><section class="panel"><div class="panel-head"><h2>عملکرد دروس</h2></div><div class="subjects">{% for row in subject_rows %}<div class="subject"><div class="subject-top"><strong>{{ row.name }}</strong><span>{{ row.accuracy }}٪ · {{ row.correct }}/{{ row.total }}</span></div><div class="bar"><i style="width:{{ row.accuracy }}%"></i></div></div>{% endfor %}</div></section>
-<section class="panel"><div class="panel-head"><h2>نشان‌ها و مأموریت‌ها</h2></div><div class="badge-list">{% for badge in badges %}<span class="badge">🏅 {{ badge.title|default:badge.name|default:badge }}</span>{% empty %}<div class="empty">هنوز نشانی ثبت نشده است.</div>{% endfor %}{% for mission in missions %}{% if mission.completed %}<span class="badge">🎯 {{ mission.title|default:mission.code }}</span>{% endif %}{% endfor %}</div></section></div>
-<section class="panel" style="margin-top:18px"><div class="panel-head"><h2>آخرین فعالیت‌ها</h2></div>{% if attempts %}<div style="overflow-x:auto"><table class="attempts"><thead><tr><th>درس</th><th>نتیجه</th><th>امتیاز</th></tr></thead><tbody>{% for attempt in attempts %}<tr><td>{{ attempt.question.get_subject_display }}</td><td class="good">{% if attempt.is_correct %}✓ صحیح{% else %}✕ نادرست{% endif %}</td><td>{{ attempt.points_earned }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty">هنوز فعالیتی ثبت نشده است.</div>{% endif %}</section>
-</div></section>
+
+<section class="pd-page">
+<div class="pd-container">
+<div class="pd-top">
+  <div class="pd-crumb">پنل معلم / پروفایل آموزشی / <strong>{{ student.user.get_full_name|default:student.user.username }}</strong></div>
+  <a class="pd-back" href="{% url 'teacher-students' %}">← بازگشت به لیست دانش‌آموزان</a>
+</div>
+
+<section class="pd-hero">
+<div class="pd-hero-grid">
+  <div class="pd-profile">
+    <div class="pd-avatar">👨‍🎓</div>
+    <div>
+      <h1 class="pd-name">{{ student.user.get_full_name|default:student.user.username }} <span class="pd-active">● فعال</span></h1>
+      <div class="pd-meta">
+        <span>🎓 پایه {{ student.grade }}</span>
+        <span>🏫 {{ student.classroom.name|default:'کلاس ثبت نشده' }}</span>
+        <span>📱 {{ student.mobile|default:'شماره ثبت نشده' }}</span>
+      </div>
+      <div class="pd-meta">
+        <span>⚡ {{ student.xp }} XP</span><span>🏆 {{ student.points }} امتیاز</span><span>🚀 سطح {{ student.level }}</span>
+      </div>
+    </div>
+  </div>
+  <div class="pd-hero-note"><strong>🌱 مسیر رشد دانش‌آموز</strong>عملکرد، تمرین‌ها و نتایج آزمون‌ها در این صفحه یکجا جمع شده تا معلم سریع‌تر وضعیت دانش‌آموز را بررسی کند.</div>
+</div>
+</section>
+
+<div class="pd-kpis">
+  <article class="pd-kpi"><div class="pd-kpi-icon">🏆</div><div><small>آزمون تشخیصی</small><b>{% if latest_placement %}ثبت شده{% else %}ندارد{% endif %}</b></div></article>
+  <article class="pd-kpi"><div class="pd-kpi-icon">✓</div><div><small>تعداد تمرین</small><b>{{ total_attempts }}</b></div></article>
+  <article class="pd-kpi"><div class="pd-kpi-icon">🚀</div><div><small>سطح فعلی</small><b>{{ student.level }}</b></div></article>
+  <article class="pd-kpi"><div class="pd-kpi-icon">↗</div><div><small>میانگین عملکرد</small><b>{{ accuracy }}٪</b></div></article>
+</div>
+
+<div class="pd-grid">
+<section class="pd-card">
+<div class="pd-head"><h2>نمودار پیشرفت تحصیلی</h2><span>نمای کلی مسیر رشد</span></div>
+<div class="pd-chart">
+<div class="pd-gridlines"></div>
+<svg viewBox="0 0 800 170" preserveAspectRatio="none">
+<defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#4779f5"/><stop offset="1" stop-color="#7956e8"/></linearGradient></defs>
+<path d="M0 145 C100 135 120 125 200 120 S300 100 390 92 S500 75 585 66 S690 45 800 25 L800 170 L0 170 Z" fill="url(#g)" opacity=".10"/>
+<path d="M0 145 C100 135 120 125 200 120 S300 100 390 92 S500 75 585 66 S690 45 800 25" fill="none" stroke="url(#g)" stroke-width="4" stroke-linecap="round"/>
+<g fill="#fff" stroke="#5c69e8" stroke-width="3"><circle cx="0" cy="145" r="6"/><circle cx="200" cy="120" r="6"/><circle cx="390" cy="92" r="6"/><circle cx="585" cy="66" r="6"/><circle cx="800" cy="25" r="6"/></g>
+</svg>
+<div class="pd-labels"><span>شروع</span><span>مرحله ۲</span><span>مرحله ۳</span><span>مرحله ۴</span><span>اکنون</span></div>
+</div>
+</section>
+
+<section class="pd-card">
+<div class="pd-head"><h2>وضعیت دروس</h2><span>عملکرد ثبت‌شده</span></div>
+<div class="pd-body"><div class="pd-subjects">
+{% for row in subject_rows %}
+<div class="pd-sub"><div class="pd-sub-top"><span>{{ row.name }}</span><span>{{ row.accuracy }}٪</span></div><div class="pd-bar"><i style="width:{{ row.accuracy }}%"></i></div></div>
+{% empty %}<div class="pd-empty">هنوز داده‌ای برای عملکرد دروس ثبت نشده است.</div>{% endfor %}
+</div></div>
+</section>
+</div>
+
+{% if latest_placement %}
+<section class="pd-placement">
+<div class="pd-placement-top">
+<div><h2>🎯 آزمون تشخیصی شروع ششم</h2><p>پاسخ‌نامه و تکرار آزمون با کنترل معلم مدیریت می‌شود.</p></div>
+<div>
+{% if latest_placement.answer_key_published %}<span class="pd-status done">✓ پاسخ‌نامه منتشر شده</span>{% else %}<span class="pd-status">در انتظار تأیید پاسخ‌نامه</span>{% endif %}
+{% if latest_placement.repeat_approved_at %}<span class="pd-status done">✓ تکرار تأیید شد</span>{% elif latest_placement.repeat_requested %}<span class="pd-status wait">درخواست تکرار</span>{% endif %}
+</div>
+</div>
+<div class="pd-placement-actions">
+<span>امتیاز: <strong>{{ latest_placement.score }}٪</strong></span><span>صحیح: <strong>{{ latest_placement.correct_answers }}/{{ latest_placement.total_questions }}</strong></span>
+{% if not latest_placement.answer_key_published %}<form method="post" action="{% url 'teacher-approve-placement' latest_placement.id %}">{% csrf_token %}<button class="pd-btn" type="submit">تأیید و انتشار پاسخ‌نامه ←</button></form>{% endif %}
+{% if latest_placement.repeat_requested and not latest_placement.repeat_approved_at %}<form method="post" action="{% url 'teacher-approve-placement-repeat' latest_placement.id %}">{% csrf_token %}<button class="pd-btn alt" type="submit">تأیید تکرار آزمون ←</button></form>{% elif latest_placement.repeat_approved_at %}<span>تکرار آزمون فعال است.</span>{% endif %}
+</div>
+</section>
+{% else %}<section class="pd-card" style="margin-top:18px"><div class="pd-empty">هنوز آزمون تشخیصی برای این دانش‌آموز ثبت نشده است.</div></section>{% endif %}
+
+<div class="pd-grid2">
+<section class="pd-card">
+<div class="pd-head"><h2>آخرین فعالیت‌ها</h2><span>جدیدترین پاسخ‌ها</span></div>
+{% if attempts %}<div style="overflow-x:auto"><table class="pd-table"><thead><tr><th>درس</th><th>نتیجه</th><th>امتیاز</th></tr></thead><tbody>
+{% for attempt in attempts|slice:":8" %}<tr><td>{{ attempt.question.get_subject_display }}</td><td class="{% if attempt.is_correct %}pd-ok{% else %}pd-bad{% endif %}">{% if attempt.is_correct %}✓ صحیح{% else %}✕ نادرست{% endif %}</td><td>{{ attempt.points_earned }}</td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="pd-empty">هنوز فعالیتی ثبت نشده است.</div>{% endif %}
+</section>
+
+<section class="pd-card">
+<div class="pd-head"><h2>افتخارات و نشان‌ها</h2><span>دستاوردهای ثبت‌شده</span></div>
+<div class="pd-body"><div class="pd-badges">
+{% for badge in badges|slice:":6" %}<div class="pd-badge"><span class="pd-badge-icon">🏅</span><b>{{ badge.title|default:badge.name|default:badge }}</b><small>دستاورد دانش‌آموز</small></div>{% endfor %}
+{% for mission in missions %}{% if mission.completed %}<div class="pd-badge"><span class="pd-badge-icon">🎯</span><b>{{ mission.title|default:mission.code }}</b><small>ماموریت انجام شد</small></div>{% endif %}{% endfor %}
+</div>{% if not badges and not missions %}<div class="pd-empty">هنوز نشانی ثبت نشده است.</div>{% endif %}</div>
+</section>
+</div>
+
+<div class="pd-grid2">
+<section class="pd-card"><div class="pd-head"><h2>یادداشت معلم</h2><span>بازخورد آموزشی</span></div><div class="pd-note"><h2>✎ یادداشت درباره {{ student.user.first_name|default:'دانش‌آموز' }}</h2><p>این بخش برای ثبت نقاط قوت، موارد نیازمند تمرین و پیشنهاد قدم بعدی آماده شده است. فعلاً اطلاعات واقعی عملکرد از بخش‌های بالا نمایش داده می‌شود.</p><div class="pd-sign">با همراهی معلم، مسیر یادگیری روشن‌تر می‌شود 🌱</div></div></section>
+<section class="pd-card"><div class="pd-head"><h2>جمع‌بندی سریع</h2><span>وضعیت فعلی</span></div><div class="pd-body"><div class="pd-subjects">
+<div class="pd-sub"><div class="pd-sub-top"><span>⚡ تجربه یادگیری</span><span>{{ student.xp }} XP</span></div></div>
+<div class="pd-sub"><div class="pd-sub-top"><span>🏆 امتیاز کل</span><span>{{ student.points }}</span></div></div>
+<div class="pd-sub"><div class="pd-sub-top"><span>🎓 پایه تحصیلی</span><span>پایه {{ student.grade }}</span></div></div>
+<div class="pd-sub"><div class="pd-sub-top"><span>📈 میانگین عملکرد</span><span>{{ accuracy }}٪</span></div></div>
+</div></div></section>
+</div>
+
+<div class="pd-footer"><span>🌿 پیچک دانش · پروفایل آموزشی دانش‌آموز</span><span>نمایش کاملاً راست‌چین و واکنش‌گرا</span></div>
+</div>
+</section>
 {% endblock %}
