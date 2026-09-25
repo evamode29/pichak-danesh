@@ -1,1 +1,50 @@
-{% extends 'base.html' %}{% block title %}ورود با پیامک | پیچک دانش{% endblock %}{% block content %}<section class="placement-page"><div class="container placement-shell"><div class="result-card"><span class="section-kicker">ورود دانش‌آموز</span><h1>ورود با شماره همراه</h1><p>شماره همراهت را وارد کن تا کد یک‌بارمصرف برایت ارسال شود.</p>{% if error %}<div class="active-box" style="background:#fff1f1;color:#a33">{{ error }}</div>{% endif %}<form method="post" style="margin-top:24px"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"><label>شماره همراه</label><input name="mobile" inputmode="tel" autocomplete="tel" placeholder="09123456789" required style="width:100%;box-sizing:border-box;padding:14px;border:1px solid #dfe5ea;border-radius:12px;font:inherit;margin:8px 0 16px"><button class="button primary" type="submit">ارسال کد ورود</button></form><p style="margin-top:18px"><a href="{% url 'login' %}">ورود معلم یا مدیر</a></p></div></div></section>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}ورود با پیامک | پیچک دانش{% endblock %}
+{% block content %}
+<section class="otp-page">
+  <div class="otp-orb otp-orb-one"></div>
+  <div class="otp-orb otp-orb-two"></div>
+  <div class="container">
+    <div class="otp-layout">
+      <div class="otp-intro">
+        <span class="otp-kicker"><span class="otp-kicker-dot"></span> ورود امن دانش‌آموز</span>
+        <h1>شروع یادگیری،<br><em>با یک شماره همراه.</em></h1>
+        <p>شماره همراهت را وارد کن تا کد یک‌بارمصرف برایت ارسال شود و مستقیم وارد فضای شخصی پیچک دانش شوی.</p>
+        <div class="otp-trust">
+          <span>✓ بدون رمز عبور</span>
+          <span>✓ سریع و امن</span>
+          <span>✓ مخصوص دانش‌آموزان</span>
+        </div>
+      </div>
+
+      <div class="otp-card">
+        <div class="otp-card-icon" aria-hidden="true">✦</div>
+        <span class="otp-card-label">ورود با پیامک</span>
+        <h2>شماره همراهت را وارد کن</h2>
+        <p class="otp-card-text">کد تأیید را برای همین شماره ارسال می‌کنیم.</p>
+
+        {% if error %}
+          <div class="otp-error" role="alert">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" class="otp-form">
+          {% csrf_token %}
+          <label for="otp-mobile">شماره همراه</label>
+          <div class="otp-input-wrap">
+            <span class="otp-input-icon">۰۹</span>
+            <input id="otp-mobile" name="mobile" inputmode="tel" autocomplete="tel" placeholder="۱۲۳۴۵۶۷۸۹" required>
+          </div>
+          <button class="otp-submit" type="submit">
+            <span>دریافت کد ورود</span>
+            <span class="otp-arrow">←</span>
+          </button>
+        </form>
+
+        <div class="otp-divider"><span>یا</span></div>
+        <a class="otp-secondary" href="{% url 'login' %}">ورود معلم یا مدیر</a>
+        <p class="otp-note">اطلاعات ورود شما نزد پیچک دانش محفوظ می‌ماند.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
