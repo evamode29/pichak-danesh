@@ -1,1 +1,43 @@
-{% extends 'base.html' %}{% block title %}تأیید کد | پیچک دانش{% endblock %}{% block content %}<section class="placement-page"><div class="container placement-shell"><div class="result-card"><span class="section-kicker">تأیید شماره</span><h1>کد پیامک‌شده را وارد کن</h1><p>کد ارسال‌شده به <strong>{{ mobile }}</strong> را وارد کن.</p>{% if error %}<div class="active-box" style="background:#fff1f1;color:#a33">{{ error }}</div>{% endif %}<form method="post" style="margin-top:24px">{% csrf_token %}<input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="۱۲۳۴۵۶" required style="width:100%;box-sizing:border-box;padding:14px;border:1px solid #dfe5ea;border-radius:12px;font:inherit;letter-spacing:5px;text-align:center;margin-bottom:16px"><button class="button primary" type="submit">تأیید و ورود</button></form><a class="placement-exit" href="{% url 'otp-request' %}">دریافت کد جدید</a></div></div></section>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}تأیید کد | پیچک دانش{% endblock %}
+{% block content %}
+<section class="otp-page otp-verify-page">
+  <div class="otp-orb otp-orb-one"></div>
+  <div class="otp-orb otp-orb-two"></div>
+  <div class="container">
+    <div class="otp-layout otp-layout-center">
+      <div class="otp-intro">
+        <span class="otp-kicker"><span class="otp-kicker-dot"></span> یک قدم تا ورود</span>
+        <h1>کد را وارد کن،<br><em>ادامه بده.</em></h1>
+        <p>کد یک‌بارمصرف ارسال‌شده به شماره زیر را وارد کن تا وارد حساب دانش‌آموزی خودت شوی.</p>
+        <div class="otp-mobile-chip">شماره ثبت‌شده: <strong>{{ mobile }}</strong></div>
+      </div>
+
+      <div class="otp-card">
+        <div class="otp-card-icon" aria-hidden="true">✓</div>
+        <span class="otp-card-label">تأیید شماره</span>
+        <h2>کد پیامک‌شده را وارد کن</h2>
+        <p class="otp-card-text">کد ۶ رقمی ارسال‌شده به <strong>{{ mobile }}</strong> را وارد کن.</p>
+
+        {% if error %}
+          <div class="otp-error" role="alert">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" class="otp-form">
+          {% csrf_token %}
+          <label for="otp-code">کد تأیید</label>
+          <input id="otp-code" class="otp-code-input" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9۰-۹]{6}" placeholder="۱۲۳۴۵۶" required>
+          <button class="otp-submit" type="submit">
+            <span>تأیید و ورود به پیچک</span>
+            <span class="otp-arrow">←</span>
+          </button>
+        </form>
+
+        <div class="otp-divider"><span>اشتباه وارد شد؟</span></div>
+        <a class="otp-secondary" href="{% url 'otp-request' %}">دریافت کد جدید</a>
+        <p class="otp-note">کد را با دیگران به اشتراک نگذار.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
