@@ -100,7 +100,7 @@ class HomeworkFlowTests(TestCase):
         other_task = DailyTask.objects.create(
             classroom=other_class,
             title="تکلیف دیگر",
-            task_date=__import__("datetime").date.today(),
+            task_date=date.today(),
             created_by=self.teacher,
         )
         self.client.force_login(self.student_user)
