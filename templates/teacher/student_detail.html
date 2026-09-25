@@ -79,6 +79,7 @@
 </div>
 
 {% if latest_placement %}
+<section class="pd-card" style="margin-top:18px"><div class="pd-head"><h2>📚 وضعیت تکلیف‌ها</h2><span>{{ homework_done }} انجام‌شده · {{ homework_pending }} باقی‌مانده</span></div><div class="pd-body"><div class="pd-subjects"><div class="pd-sub"><div class="pd-sub-top"><span>مجموع تکلیف‌ها</span><span>{{ homework_done }}/{{ homework_total }}</span></div><div class="pd-bar"><i style="width:{% if homework_total %}{% widthratio homework_done homework_total 100 %}{% else %}0{% endif %}%"></i></div></div>{% for record in homework_records|slice:":5" %}<div class="pd-sub"><div class="pd-sub-top"><span>{{ record.task.title }}</span><span>{% if record.status == "done" %}✓ انجام شد{% elif record.status == "review" %}در حال بررسی{% else %}انجام نشده{% endif %}</span></div>{% if record.score != None %}<small style="color:#7a87a5">نمره {{ record.score }} از {{ record.task.max_score }}</small>{% endif %}{% if record.note %}<div style="margin-top:6px;color:#68768a;font-size:10px">{{ record.note }}</div>{% endif %}</div>{% empty %}<div class="pd-empty">هنوز تکلیفی برای این دانش‌آموز ثبت نشده است.</div>{% endfor %}</div></div></section>
 <section class="pd-placement">
 <div class="pd-placement-top">
 <div><h2>🎯 آزمون تشخیصی شروع ششم</h2><p>پاسخ‌نامه و تکرار آزمون با کنترل معلم مدیریت می‌شود.</p></div>
