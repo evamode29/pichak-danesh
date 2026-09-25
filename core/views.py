@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
+from django.http import JsonResponse
 from django.utils.crypto import get_random_string
 
 from core.models import ClassRoom, DailyTask, StudentTask, UserProfile
@@ -348,6 +349,77 @@ def dashboard(request):
         "homework_total": homework_total,
         "homework_done": homework_done,
         "homework_pending": homework_pending,
+    })
+
+
+@login_required(login_url="login")
+def dashboard_live(request):
+    if is_teacher(request.user) or current_role(request.user) in {"admin", UserProfile.Role.CONTENT_MANAGER}:
+        return JsonResponse({"ok": False, "detail": "student_only"}, status=403)
+
+    student = getattr(request.user, "student_profile", None)
+    if not student:
+        return JsonResponse({"ok": False, "detail": "student_profile_missing"}, status=404)
+
+    today_tasks = DailyTask.objects.filter(
+        classroom=student.classroom, task_date=date.today()
+    ) if student.classroom else DailyTask.objects.none()
+
+    homework_total = today_tasks.count()
+    homework_done = StudentTask.objects.filter(
+        task__in=today_tasks, student=student, status=StudentTask.Status.DONE
+    ).count()
+
+    attempts = PracticeAttempt.objects.filter(
+        student=student
+    ).select_related("question")
+    subjects = {
+        "math": {"name": "ریاضی", "icon": "∑"},
+        "science": {"name": "علوم", "icon": "⚗"},
+        "persian": {"name": "فارسی", "icon": "آ"},
+        "social": {"name": "مطالعات اجتماعی", "icon": "🌍"},
+    }
+    grouped = {code: {"total": 0, "correct": 0, "points": 0} for code in subjects}
+    for attempt in attempts:
+        if attempt.question.subject in grouped:
+            row = grouped[attempt.question.subject]
+            row["total"] += 1
+            row["correct"] += int(attempt.is_correct)
+            row["points"] += attempt.points_earned
+
+    subject_progress = []
+    for code, meta in subjects.items():
+        row = grouped[code]
+        accuracy = round(row["correct"] * 100 / row["total"]) if row["total"] else 0
+        subject_progress.append({
+            "code": code, "name": meta["name"], "icon": meta["icon"],
+            "total": row["total"], "correct": row["correct"],
+            "points": row["points"], "accuracy": accuracy,
+        })
+
+    latest_attempt = PlacementAttempt.objects.filter(
+        student=student
+    ).order_by("-completed_at", "-id").first()
+
+    return JsonResponse({
+        "ok": True,
+        "student": {
+            "xp": student.xp,
+            "level": student.level,
+            "points": student.points,
+            "level_progress_percent": student.level_progress_percent,
+        },
+        "homework": {
+            "done": homework_done,
+            "total": homework_total,
+            "pending": max(0, homework_total - homework_done),
+        },
+        "latest_attempt": {
+            "score": latest_attempt.score,
+            "correct": latest_attempt.correct_answers,
+            "total": latest_attempt.total_questions,
+        } if latest_attempt else None,
+        "subjects": subject_progress,
     })
 
 

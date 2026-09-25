@@ -29,14 +29,14 @@
 </section>
 
 <div class="pd-grid4">
-<article class="pd-stat"><span class="pd-stat-icon">⚡</span><span class="pd-stat-label">XP فعلی</span><div class="pd-stat-value">{{ student.xp }}</div><span class="pd-stat-note">{{ student.xp_to_next_level }} XP تا سطح بعد</span></article>
-<article class="pd-stat"><span class="pd-stat-icon">🚀</span><span class="pd-stat-label">سطح</span><div class="pd-stat-value">{{ student.level }}</div><span class="pd-stat-note">{{ student.level_progress_percent }}٪ پیشرفت</span></article>
-<article class="pd-stat"><span class="pd-stat-icon">🏆</span><span class="pd-stat-label">امتیاز</span><div class="pd-stat-value">{{ student.points }}</div><span class="pd-stat-note">امتیاز کل تو</span></article>
+<article class="pd-stat"><span class="pd-stat-icon">⚡</span><span class="pd-stat-label">XP فعلی</span><div class="pd-stat-value" data-live="xp">{{ student.xp }}</div><span class="pd-stat-note">{{ student.xp_to_next_level }} XP تا سطح بعد</span></article>
+<article class="pd-stat"><span class="pd-stat-icon">🚀</span><span class="pd-stat-label">سطح</span><div class="pd-stat-value" data-live="level">{{ student.level }}</div><span class="pd-stat-note">{{ student.level_progress_percent }}٪ پیشرفت</span></article>
+<article class="pd-stat"><span class="pd-stat-icon">🏆</span><span class="pd-stat-label">امتیاز</span><div class="pd-stat-value" data-live="points">{{ student.points }}</div><span class="pd-stat-note">امتیاز کل تو</span></article>
 <article class="pd-stat"><span class="pd-stat-icon">🎓</span><span class="pd-stat-label">پایه و کلاس</span><div class="pd-stat-value">{{ student.grade }}</div><span class="pd-stat-note">{% if student.classroom %}{{ student.classroom.name }}{% else %}کلاس ثبت نشده{% endif %}</span></article>
-<article class="pd-stat"><span class="pd-stat-icon">📚</span><span class="pd-stat-label">تکلیف امروز</span><div class="pd-stat-value">{{ homework_done }}/{{ homework_total }}</div><span class="pd-stat-note">{% if homework_pending %}{{ homework_pending }} تکلیف باقی مانده{% else %}همه انجام شده{% endif %}</span></article>
+<article class="pd-stat"><span class="pd-stat-icon">📚</span><span class="pd-stat-label">تکلیف امروز</span><div class="pd-stat-value" data-live="homework">{{ homework_done }}/{{ homework_total }}</div><span class="pd-stat-note">{% if homework_pending %}{{ homework_pending }} تکلیف باقی مانده{% else %}همه انجام شده{% endif %}</span></article>
 </div>
 
-<div class="pd-progress"><div class="pd-progress-top"><span class="pd-progress-title">🌱 رشد تو تا سطح بعد</span><strong class="pd-progress-percent">{{ student.level_progress_percent }}٪</strong></div><div class="pd-track"><span style="width:{{ student.level_progress_percent }}%"></span></div></div>
+<div class="pd-progress"><div class="pd-progress-top"><span class="pd-progress-title">🌱 رشد تو تا سطح بعد</span><strong class="pd-progress-percent" data-live="level-progress">{{ student.level_progress_percent }}٪</strong></div><div class="pd-track"><span data-live="level-track" style="width:{{ student.level_progress_percent }}%"></span></div></div>
 
 <div class="pd-two">
 <section class="pd-card pd-card-green"><span class="pd-eyebrow">🎯 پیشنهاد هوشمند امروز</span>
@@ -56,7 +56,7 @@
 <div class="ivy-progress" data-progress="{{ item.accuracy }}" aria-label="رشد {{ item.name }} {{ item.accuracy }} درصد"><div class="ivy-progress-line"><span></span></div><div class="ivy-leaves">
 <span class="ivy-leaf"></span><span class="ivy-leaf"></span><span class="ivy-leaf"></span><span class="ivy-leaf"></span><span class="ivy-leaf"></span><span class="ivy-leaf"></span><span class="ivy-leaf"></span><span class="ivy-leaf"></span><span class="ivy-leaf"></span><span class="ivy-leaf final"></span>
 </div><div class="ivy-percent"><span>شروع 🌱</span><strong>رشد {{ item.accuracy }}٪</strong><span>تسلط کامل 🌿</span></div></div>
-<p>{{ item.correct }} پاسخ درست از {{ item.total }}</p>
+<p data-live-subject-note="{{ item.code }}">{{ item.correct }} پاسخ درست از {{ item.total }}</p>
 </article>
 {% endfor %}
 </div></section>
@@ -72,5 +72,59 @@
 {% for plan in subscription_plans|slice:":3" %}<div class="pd-plan-box"><h3>{{ plan.name }}</h3><div class="pd-price">{{ plan.price }}</div><small>{{ plan.description|default:"دسترسی به امکانات آموزشی" }}</small>{% if active_subscription and active_subscription.plan_id == plan.id %}<span class="pd-active">اشتراک فعال</span>{% else %}<a href="{% url 'subscription-catalog' %}">مشاهده پلن</a>{% endif %}</div>{% empty %}<div class="pd-plan-box"><h3>نسخه پایه</h3><div class="pd-price">رایگان</div><small>آزمون و تمرین‌های پایه پیچک دانش</small><span class="pd-active">فعال</span></div>{% endfor %}
 </div></section>
 {% else %}<div class="pd-card"><h2>داشبورد آماده نیست</h2><p>پروفایل دانش‌آموزی برای این حساب پیدا نشد.</p></div>{% endif %}
+
+<script>
+(function () {
+  const api = "{% url 'dashboard-live' %}";
+  let refreshing = false;
+
+  async function refreshDashboard() {
+    if (refreshing || document.hidden) return;
+    refreshing = true;
+    try {
+      const response = await fetch(api, {
+        headers: {"X-Requested-With": "XMLHttpRequest"},
+        credentials: "same-origin",
+        cache: "no-store"
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!data.ok) return;
+
+      const setText = (selector, value) => {
+        const el = document.querySelector(selector);
+        if (el) el.textContent = value;
+      };
+
+      setText('[data-live="xp"]', data.student.xp);
+      setText('[data-live="level"]', data.student.level);
+      setText('[data-live="points"]', data.student.points);
+      setText('[data-live="homework"]', data.homework.done + "/" + data.homework.total);
+      setText('[data-live="level-progress"]', data.student.level_progress_percent + "٪");
+
+      const track = document.querySelector('[data-live="level-track"]');
+      if (track) track.style.width = data.student.level_progress_percent + "%";
+
+      (data.subjects || []).forEach(function (item) {
+        const percent = document.querySelector('[data-live-subject="' + item.code + '"]');
+        if (percent) percent.textContent = item.accuracy + "٪";
+        const note = document.querySelector('[data-live-subject-note="' + item.code + '"]');
+        if (note) note.textContent = item.correct + " پاسخ درست از " + item.total;
+      });
+    } catch (error) {
+      // Dashboard remains fully usable when the live endpoint is temporarily unavailable.
+    } finally {
+      refreshing = false;
+    }
+  }
+
+  refreshDashboard();
+  setInterval(refreshDashboard, 30000);
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) refreshDashboard();
+  });
+})();
+</script>
+
 </div></div>
 {% endblock %}

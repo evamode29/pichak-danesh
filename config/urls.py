@@ -6,7 +6,7 @@ from core.public_views import about, contact, privacy, refund, terms
 from core.views import (
     content_dashboard, dashboard, fixed_password, generate_fixed_password, home,
     login_view, logout_view, register_view, account_view, teacher_class_detail, teacher_dashboard,
-    teacher_student_detail, teacher_students,
+    teacher_student_detail, teacher_students, dashboard_live,
 )
 from core.teacher_class import teacher_class_manage
 from core.teacher_homework import teacher_homework
@@ -30,6 +30,7 @@ urlpatterns = [
     path("otp/verify/", otp_verify, name="otp-verify"),
     path("logout/", logout_view, name="logout"),
     path("dashboard/", dashboard, name="dashboard"),
+    path("api/v1/dashboard/live/", dashboard_live, name="dashboard-live"),
     path("teacher/", teacher_dashboard, name="teacher-dashboard"),
     path("content/", content_dashboard, name="content-dashboard"),
     path("teacher/class-manage/", teacher_class_manage, name="teacher-class-manage"),
