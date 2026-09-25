@@ -109,3 +109,49 @@ class HomeworkFlowTests(TestCase):
             {"action": "mark_done", "task_id": other_task.id},
         )
         self.assertEqual(response.status_code, 404)
+class TeacherHomeworkReportTests(TestCase):
+    def setUp(self):
+        self.teacher = User.objects.create_user(username="teacher_report", password="secret123")
+        UserProfile.objects.create(user=self.teacher, role=UserProfile.Role.TEACHER)
+        self.classroom = ClassRoom.objects.create(name="ششم گزارش", grade=6, teacher=self.teacher)
+        self.student_user = User.objects.create_user(
+            username="student_report", password="secret123", first_name="گزارش"
+        )
+        UserProfile.objects.create(
+            user=self.student_user, role=UserProfile.Role.STUDENT, mobile="09120000010"
+        )
+        self.student = StudentProfile.objects.create(
+            user=self.student_user,
+            classroom=self.classroom,
+            grade=6,
+            mobile="09120000010",
+        )
+        self.task = DailyTask.objects.create(
+            classroom=self.classroom,
+            title="گزارش تکلیف",
+            task_date=date.today(),
+            created_by=self.teacher,
+        )
+        self.record = StudentTask.objects.create(
+            task=self.task, student=self.student, status=StudentTask.Status.DONE, score=18
+        )
+
+    def test_teacher_student_detail_contains_homework_report(self):
+        self.client.force_login(self.teacher)
+        response = self.client.get(
+            reverse("teacher-student-detail", args=[self.student.id])
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["homework_done"], 1)
+        self.assertEqual(response.context["homework_total"], 1)
+        self.assertContains(response, "گزارش تکلیف")
+
+    def test_teacher_class_detail_contains_today_homework_summary(self):
+        self.client.force_login(self.teacher)
+        response = self.client.get(
+            reverse("teacher-class-detail", args=[self.classroom.id])
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["homework_done"], 1)
+        self.assertEqual(response.context["homework_total"], 1)
+
