@@ -1,5 +1,8 @@
 from django.contrib import admin
 from django.urls import include, path
+from django.contrib.sitemaps.views import sitemap
+
+from core.seo import PublicSitemap, robots_txt
 
 from core.api import auth_login, auth_logout, auth_me, classrooms_api, students_api, teachers_api
 from core.public_views import about, contact, privacy, refund, terms
@@ -13,8 +16,12 @@ from core.teacher_homework import teacher_homework
 from core.student_homework import student_homework
 from core.otp_views import otp_request, otp_verify
 
+sitemaps = {"public": PublicSitemap()}
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("robots.txt", robots_txt, name="robots-txt"),
+    path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     path("", home, name="home"),
     path("about/", about, name="about"),
     path("contact/", contact, name="contact"),
