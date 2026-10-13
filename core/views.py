@@ -37,7 +37,7 @@ def _redirect_after_login(user):
     if role == UserProfile.Role.CONTENT_MANAGER:
         return redirect("content-dashboard")
     if role == UserProfile.Role.STUDENT or hasattr(user, "student_profile"):
-        return redirect("dashboard")
+        return redirect("brainquiz:start")
     return redirect("dashboard")
 
 

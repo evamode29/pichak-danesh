@@ -1,25 +1,7 @@
 {% extends 'base.html' %}
-{% block title %}ورود | پیچک دانش{% endblock %}
+{% block title %}ورود دانش‌آموز | پیچک دانش{% endblock %}
 {% block content %}
-<section class="auth-page"><div class="container auth-grid">
-<div class="auth-copy">
-<span class="eyebrow"><span class="eyebrow-dot"></span> ورود یکپارچه</span>
-<h1>همه از یک در وارد <em>پیچک دانش</em> می‌شوند.</h1>
-<p>شماره موبایل یا نام کاربری را وارد کن و با رمز ثابت وارد شو. اگر بخواهی، می‌توانی با کد پیامکی هم وارد شوی.</p>
-<div class="auth-points"><span>✓ یک ورود برای همه</span><span>✓ تشخیص خودکار نقش</span><span>✓ رمز ثابت یا کد پیامکی</span></div>
-</div>
-<div class="auth-card">
-<div class="auth-icon">پ</div><h2>ورود به پیچک دانش</h2><p class="auth-muted">برای دانش‌آموز شماره موبایل و برای حساب‌های مدیریتی نام کاربری را وارد کنید.</p>
-{% if error %}<div class="form-error">{{ error }}</div>{% endif %}
-<form method="post" class="auth-form">{% csrf_token %}
-<label>شماره موبایل یا نام کاربری<input name="identifier" type="text" autocomplete="username" required placeholder="مثلاً 09123456789"></label>
-<label>رمز ثابت<input name="password" type="password" autocomplete="current-password" required placeholder="رمز ثابت"></label>
-<button class="button primary auth-submit" type="submit">ورود به پیچک دانش <span>←</span></button>
-</form>
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-<a class="button secondary" href="{% url 'otp-request' %}" style="flex:1;text-align:center;text-decoration:none">ورود با کد پیامکی</a>
-<a class="button secondary" href="{% url 'register' %}" style="flex:1;text-align:center;text-decoration:none">ثبت‌نام</a>
-</div>
-<a class="auth-back" href="/">بازگشت به صفحه اصلی</a>
-</div></div></section>
+<style>.student-login{max-width:980px;margin:30px auto;padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}.student-login-intro{border-radius:26px;padding:clamp(25px,4vw,42px);background:linear-gradient(145deg,#12334b,#16776f);color:#fff;display:flex;flex-direction:column;justify-content:center}.student-login-intro h1{color:#fff;font-size:clamp(28px,4vw,42px);line-height:1.5}.student-login-intro p{color:#e0f4ee;line-height:2}.student-login-shapes{font-size:32px;letter-spacing:8px;margin-top:20px}.student-login-card{border:1px solid #e0ebe8;border-radius:26px;padding:clamp(23px,4vw,40px);background:#fff;box-shadow:0 18px 50px #153d4510}.student-login-card h2{color:#174c56}.student-login-card .muted{color:#6b8083;line-height:1.9;font-size:14px}.student-login-card label{display:block;margin:18px 0 7px;font-weight:700;color:#254b53}.student-login-card input{display:block;width:100%;box-sizing:border-box;border:1px solid #d7e5e1;border-radius:12px;padding:14px;margin-top:8px;font:inherit;outline-color:#299988}.student-login-card .button{width:100%;margin-top:20px;justify-content:center;cursor:pointer}.student-login-card .form-error{padding:12px;border-radius:12px;background:#fff0ed;color:#9d3027;margin:12px 0}.student-login-card a{color:#18776f}.login-small-links{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:16px;font-size:13px}@media(max-width:720px){.student-login{grid-template-columns:1fr}}
+</style>
+<section class="student-login"><div class="student-login-intro"><span>🌿 پیچک دانش</span><h1>آماده‌ای ذهنت رو به چالش بکشی؟</h1><p>با حسابی که معلم در اختیارت گذاشته وارد شو و چالش هوش تصویری را شروع کن. نام کاربری و رمزت را محرمانه نگه دار.</p><div class="student-login-shapes">▲ ● ◆ ★ ◈</div></div><div class="student-login-card"><h2>ورود به آزمون</h2><p class="muted">نام کاربری یا شماره موبایل و رمز اختصاصی خودت را وارد کن.</p>{% if error %}<div class="form-error">{{ error }}</div>{% endif %}<form method="post">{% csrf_token %}<label>نام کاربری یا شماره موبایل<input name="identifier" type="text" autocomplete="username" required placeholder="نام کاربری یا شماره موبایل"></label><label>رمز ورود<input name="password" type="password" autocomplete="current-password" required placeholder="رمز اختصاصی"></label><button class="button primary" type="submit">ورود و شروع چالش ←</button></form><div class="login-small-links"><a href="{% url 'otp-request' %}">ورود با کد پیامکی</a><a href="/">بازگشت به صفحه اصلی</a></div></div></section>
 {% endblock %}
