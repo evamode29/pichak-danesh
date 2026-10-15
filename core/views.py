@@ -33,12 +33,12 @@ def _redirect_after_login(user):
     if role == UserProfile.Role.ADMIN or (profile is None and (user.is_superuser or user.is_staff)):
         return redirect("admin:index")
     if role == UserProfile.Role.TEACHER:
-        return redirect("teacher-dashboard")
+        return redirect("simple-teacher")
     if role == UserProfile.Role.CONTENT_MANAGER:
         return redirect("content-dashboard")
     if role == UserProfile.Role.STUDENT or hasattr(user, "student_profile"):
-        return redirect("dashboard")
-    return redirect("dashboard")
+        return redirect("simple-student")
+    return redirect("simple-student")
 
 
 def _user_for_identifier(identifier):
