@@ -69,7 +69,7 @@ def simple_teacher(request):
     if not (is_teacher(request.user) or is_admin(request.user) or request.user.is_superuser):
         return redirect("simple-student")
     students = list(StudentProfile.objects.select_related("user", "classroom").order_by("user__first_name", "user__last_name")[:30])
-    attempts = PlacementAttempt.objects.filter(test__title=IQ_TEST_TITLE).select_related("student__user").order_by("-completed_at")[:30]
+    attempts = PlacementAttempt.objects.select_related("student__user", "test").order_by("-completed_at")[:30]
     return render(request, "simple/teacher.html", {
         "students": students,
         "student_count": StudentProfile.objects.count(),
