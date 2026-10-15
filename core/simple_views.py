@@ -2,7 +2,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from core.models import UserProfile
 from core.permissions import is_teacher, is_admin
 from exams.models import PlacementAttempt, PlacementTest
 from students.models import StudentProfile
