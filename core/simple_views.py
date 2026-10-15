@@ -1,9 +1,9 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from core.permissions import is_teacher, is_admin
-from exams.models import PlacementAttempt, PlacementTest
+from exams.models import PlacementAttempt, PlacementQuestion, PlacementTest
 from students.models import StudentProfile
 
 
@@ -74,4 +74,91 @@ def simple_teacher(request):
         "students": students,
         "student_count": StudentProfile.objects.count(),
         "attempts": attempts,
+        "tests": PlacementTest.objects.prefetch_related("questions").order_by("-id")[:8],
     })
+
+
+@login_required(login_url="login")
+def teacher_test_manager(request):
+    if not (is_teacher(request.user) or is_admin(request.user) or request.user.is_superuser):
+        return redirect("simple-student")
+    message = None
+    error = None
+    if request.method == "POST":
+        action = request.POST.get("action", "")
+        if action == "create_test":
+            title = request.POST.get("title", "").strip()
+            try:
+                duration = int(request.POST.get("duration_minutes", "15"))
+            except (TypeError, ValueError):
+                duration = 15
+            if not title:
+                error = "عنوان آزمون را بنویس."
+            elif not 1 <= duration <= 240:
+                error = "زمان آزمون باید بین ۱ تا ۲۴۰ دقیقه باشد."
+            else:
+                test = PlacementTest.objects.create(title=title, grade=6, duration_minutes=duration, is_active=False)
+                message = f"آزمون «{test.title}» ساخته شد. حالا سؤال اضافه کن."
+        elif action == "add_question":
+            test = get_object_or_404(PlacementTest, pk=request.POST.get("test_id"))
+            question_text = request.POST.get("question_text", "").strip()
+            options = [request.POST.get("option_" + letter.lower(), "").strip() for letter in "ABCD"]
+            correct = request.POST.get("correct_option", "")
+            if not question_text or any(not option for option in options):
+                error = "متن سؤال و هر چهار گزینه را کامل کن."
+            elif correct not in ("A", "B", "C", "D"):
+                error = "گزینه درست را انتخاب کن."
+            else:
+                next_order = (test.questions.order_by("-order").values_list("order", flat=True).first() or 0) + 1
+                PlacementQuestion.objects.create(test=test, text=question_text, option_a=options[0],
+                    option_b=options[1], option_c=options[2], option_d=options[3],
+                    correct_option=correct, order=next_order, is_active=True)
+                message = "سؤال به آزمون اضافه شد."
+        elif action == "toggle_test":
+            test = get_object_or_404(PlacementTest, pk=request.POST.get("test_id"))
+            if not test.questions.filter(is_active=True).exists():
+                error = "برای فعال‌کردن، ابتدا دست‌کم یک سؤال فعال اضافه کن."
+            else:
+                test.is_active = not test.is_active
+                test.save(update_fields=["is_active"])
+                message = "وضعیت آزمون تغییر کرد."
+        elif action == "toggle_question":
+            question = get_object_or_404(PlacementQuestion, pk=request.POST.get("question_id"))
+            question.is_active = not question.is_active
+            question.save(update_fields=["is_active"])
+            message = "وضعیت سؤال تغییر کرد."
+    tests = PlacementTest.objects.prefetch_related("questions").order_by("-id")
+    return render(request, "simple/test_manager.html", {"tests": tests, "message": message, "error": error})
+
+
+@login_required(login_url="login")
+def student_test_list(request):
+    student = getattr(request.user, "student_profile", None)
+    if student is None:
+        return redirect("simple-teacher" if is_teacher(request.user) or is_admin(request.user) else "login")
+    tests = PlacementTest.objects.filter(is_active=True, questions__is_active=True).distinct().prefetch_related("questions").order_by("-id")
+    return render(request, "simple/test_list.html", {"tests": tests})
+
+
+@login_required(login_url="login")
+def student_take_test(request, test_id):
+    student = getattr(request.user, "student_profile", None)
+    if student is None:
+        return redirect("simple-teacher" if is_teacher(request.user) or is_admin(request.user) else "login")
+    test = get_object_or_404(PlacementTest, pk=test_id, is_active=True)
+    questions = list(test.questions.filter(is_active=True).order_by("order", "id"))
+    if not questions:
+        return redirect("student-test-list")
+    error = None
+    if request.method == "POST":
+        answers = {str(q.id): request.POST.get("question_" + str(q.id), "") for q in questions}
+        if any(value not in ("A", "B", "C", "D") for value in answers.values()):
+            error = "لطفاً برای همه سؤال‌ها یک گزینه انتخاب کن."
+        else:
+            correct = sum(answers[str(q.id)] == q.correct_option for q in questions)
+            attempt = PlacementAttempt.objects.create(student=student, test=test,
+                score=round(correct * 100 / len(questions)), correct_answers=correct,
+                total_questions=len(questions), level=max(1, min(10, round(correct * 10 / len(questions)))),
+                completed_at=timezone.now())
+            return render(request, "simple/result.html", {"attempt": attempt})
+    return render(request, "simple/test_take.html", {"test": test, "questions": questions, "error": error})
