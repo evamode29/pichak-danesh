@@ -9,7 +9,7 @@
 @media(max-width:650px){.teacher-stats{grid-template-columns:1fr}.teacher-stat{display:flex;align-items:center;justify-content:space-between}.teacher-stat strong{margin:0}.teacher-hero-icon{width:54px;height:54px;flex-basis:54px;border-radius:17px}.teacher-panel-head{padding:17px}.teacher-table th,.teacher-table td{padding:12px}}
 </style>
 <section class="teacher-page" dir="rtl"><div class="teacher-inner">
-<header class="teacher-hero"><div><span class="teacher-eyebrow">مدیریت یادگیری</span><h1>پنل معلم</h1><p>نمایی سریع از دانش‌آموزان و نتیجه‌های آزمون هوش تصویری.</p></div><div class="teacher-hero-icon" aria-hidden="true">✦</div></header>
+<header class="teacher-hero"><div><span class="teacher-eyebrow">مدیریت یادگیری</span><h1>پنل معلم</h1><p>دانش‌آموزان، نتیجه‌ها و آزمون‌های پیچک دانش را از همین‌جا مدیریت کن.</p><a href="{% url 'teacher-test-manager' %}" style="display:inline-flex;margin-top:18px;padding:11px 16px;border-radius:12px;background:#fff;color:#176b38;text-decoration:none;font-weight:900;font-size:13px">＋ مدیریت و ساخت آزمون</a></div><div class="teacher-hero-icon" aria-hidden="true">✦</div></header>
 <div class="teacher-stats">
 <div class="teacher-stat"><div class="teacher-stat-top"><small>کل دانش‌آموزان ثبت‌شده</small><span class="teacher-stat-icon">👥</span></div><strong>{{ student_count }}</strong></div>
 <div class="teacher-stat"><div class="teacher-stat-top"><small>دانش‌آموزان این فهرست</small><span class="teacher-stat-icon">📋</span></div><strong>{{ students|length }}</strong></div>
