@@ -116,7 +116,7 @@ def teacher_test_manager(request):
                 message = "سؤال به آزمون اضافه شد."
         elif action == "toggle_test":
             test = get_object_or_404(PlacementTest, pk=request.POST.get("test_id"))
-            if not test.questions.filter(is_active=True).exists():
+            if not test.is_active and not test.questions.filter(is_active=True).exists():
                 error = "برای فعال‌کردن، ابتدا دست‌کم یک سؤال فعال اضافه کن."
             else:
                 test.is_active = not test.is_active
