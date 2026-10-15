@@ -1,22 +1,39 @@
 {% extends 'base.html' %}
-{% block title %}ورود | پیچک دانش{% endblock %}
+{% block title %}پیچک دانش | یادگیری، کشف، پیشرفت{% endblock %}
+{% block og_title %}پیچک دانش | یادگیری، کشف، پیشرفت{% endblock %}
 {% block content %}
 <style>
-.simple-wrap{min-height:76vh;background:radial-gradient(circle at 15% 15%,#dff5e8,transparent 35%),#f6faf7;padding:48px 18px;display:grid;place-items:center}
-.simple-card{width:min(560px,100%);background:#fff;border:1px solid #e2eee5;border-radius:28px;padding:clamp(28px,6vw,54px);box-shadow:0 24px 70px #16472a12;text-align:center}
-.simple-mark{width:66px;height:66px;border-radius:22px;background:#176b38;color:#fff;display:grid;place-items:center;font-size:30px;font-weight:900;margin:0 auto 18px}
-.simple-card h1{font-size:clamp(28px,5vw,42px);margin:0;color:#173c27}
-.simple-card p{color:#697a70;line-height:2;margin:14px auto 26px;max-width:430px}
-.simple-btn{display:inline-block;padding:14px 28px;border-radius:14px;text-decoration:none;font-weight:800;background:#176b38;color:#fff}
-.simple-note{font-size:12px!important;margin-top:22px!important}
+.landing{position:relative;isolation:isolate;overflow:hidden;min-height:calc(100vh - 145px);padding:clamp(36px,7vw,86px) 20px;display:grid;place-items:center;background:radial-gradient(circle at 12% 20%,#d9f2e2 0,transparent 30%),radial-gradient(circle at 88% 80%,#e6f1e8 0,transparent 28%),linear-gradient(135deg,#f8fcf9,#eff7f1)}
+.landing:before,.landing:after{content:"";position:absolute;border:1px solid #cde5d3;border-radius:50%;z-index:-1}.landing:before{width:380px;height:380px;top:-200px;right:-140px}.landing:after{width:260px;height:260px;bottom:-145px;left:-70px}
+.landing-inner{width:min(1050px,100%);display:grid;grid-template-columns:1.08fr .92fr;align-items:center;gap:clamp(28px,6vw,76px)}
+.landing-copy{padding:8px 0}.landing-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:999px;background:#e0f2e5;border:1px solid #cce7d3;color:#24653a;font-size:12px;font-weight:800}.landing-dot{width:8px;height:8px;border-radius:50%;background:#21844a;box-shadow:0 0 0 4px #21844a18}
+.landing h1{margin:20px 0 15px;font-size:clamp(34px,5vw,58px);line-height:1.35;letter-spacing:-1.8px;color:#163b25}.landing h1 span{color:#21844a}.landing-copy>p{max-width:530px;margin:0;color:#6a7b70;font-size:16px;line-height:2.2}
+.landing-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:28px}.landing-primary,.landing-secondary{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:51px;padding:0 22px;border-radius:14px;text-decoration:none;font-weight:900}.landing-primary{color:#fff;background:linear-gradient(135deg,#21844a,#124a2b);box-shadow:0 12px 25px #176b382a}.landing-primary:hover{transform:translateY(-2px);box-shadow:0 16px 30px #176b3835}.landing-secondary{color:#28613a;background:#fff;border:1px solid #dce9df}.landing-secondary:hover{background:#f5fbf6}
+.landing-trust{display:flex;flex-wrap:wrap;gap:17px;margin-top:24px;color:#728176;font-size:12px}.landing-trust span{display:flex;align-items:center;gap:6px}.landing-trust b{color:#21844a}
+.landing-art{position:relative;min-height:370px;display:grid;place-items:center}.art-glow{position:absolute;width:min(340px,90%);aspect-ratio:1;border-radius:50%;background:#d9efdf;filter:blur(1px)}.art-card{position:relative;width:min(350px,100%);padding:24px;border:1px solid #ffffff;background:rgba(255,255,255,.92);border-radius:28px;box-shadow:0 28px 70px #1c58301c;transform:rotate(-1deg)}.art-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.art-logo{display:flex;align-items:center;gap:10px;font-weight:900;color:#173c27}.art-logo-mark{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:#176b38;color:#fff;font-size:22px}.art-caption{color:#7b897f;font-size:11px}.art-title{font-size:20px;font-weight:900;margin:23px 0 6px}.art-sub{font-size:12px;color:#718076;margin:0 0 18px}.shape-row{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.shape{aspect-ratio:1;border-radius:15px;display:grid;place-items:center;font-size:25px;background:#eff7f0;border:1px solid #dfede2}.shape:nth-child(2){background:#fff6dc;border-color:#f1e7c8}.shape:nth-child(3){background:#eef2ff;border-color:#e0e7ff}.shape:nth-child(4){background:#f5efff;border-color:#e9defb}.art-progress{margin-top:18px;padding:14px 15px;border-radius:16px;background:#f6faf7;display:flex;align-items:center;justify-content:space-between;gap:12px}.art-progress strong{display:block;font-size:13px}.art-progress small{display:block;color:#7a887e;font-size:11px}.art-progress-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#e0f2e5;color:#21844a;font-size:19px}.art-float{position:absolute;padding:12px 15px;border:1px solid #e1ece3;border-radius:15px;background:#fff;box-shadow:0 12px 30px #1c583018;font-size:12px;font-weight:900;color:#275f39}.art-float-one{top:30px;right:-5px}.art-float-two{bottom:26px;left:-8px}.landing-bottom{width:min(1050px,100%);display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:35px}.landing-mini{display:flex;align-items:center;gap:12px;padding:15px 17px;background:#ffffffc9;border:1px solid #e2eee5;border-radius:17px}.landing-mini-icon{flex:0 0 40px;width:40px;height:40px;display:grid;place-items:center;border-radius:13px;background:#eaf6ee;font-size:20px}.landing-mini strong{display:block;font-size:13px}.landing-mini small{display:block;color:#7b897f;font-size:11px;margin-top:2px}
+@media(max-width:760px){.landing{padding:36px 16px 42px}.landing-inner{grid-template-columns:1fr;gap:24px}.landing-copy{text-align:center}.landing-copy>p{margin-inline:auto;font-size:14px}.landing-actions,.landing-trust{justify-content:center}.landing-art{min-height:320px}.art-card{max-width:330px}.art-float-one{right:0}.art-float-two{left:0}.landing-bottom{grid-template-columns:1fr;max-width:500px;margin:25px auto 0}.landing h1{font-size:clamp(32px,9vw,45px)}}
 </style>
-<section class="simple-wrap" dir="rtl">
-  <div class="simple-card">
-    <div class="simple-mark">پ</div>
-    <h1>ورود به پیچک دانش</h1>
-    <p>دانش‌آموز یا معلم عزیز، با نام کاربری و رمز عبور خود وارد شو.</p>
-    <a class="simple-btn" href="{% url 'login' %}">ورود با نام کاربری و رمز</a>
-    <p class="simple-note">برای حفظ امنیت، حساب‌های موجود و رمزهایشان بدون تغییر باقی می‌مانند.</p>
-  </div>
+<section class="landing" dir="rtl">
+<div>
+<div class="landing-inner">
+<div class="landing-copy">
+<div class="landing-pill"><span class="landing-dot"></span> فضای یادگیری پایه ششم</div>
+<h1>هر روز، یک قدم<br><span>نزدیک‌تر به توانایی‌هایت</span></h1>
+<p>به پیچک دانش خوش آمدی؛ جایی برای فکر کردن، پیدا کردن الگوها و دیدن مسیر پیشرفتت. با حساب خود وارد شو و آزمون هوش تصویری را تجربه کن.</p>
+<div class="landing-actions"><a class="landing-primary" href="{% url 'login' %}">ورود به فضای من <span aria-hidden="true">←</span></a><a class="landing-secondary" href="{% url 'login' %}">ورود دانش‌آموز و معلم</a></div>
+<div class="landing-trust"><span><b>✓</b> ساده و فارسی</span><span><b>✓</b> مناسب موبایل</span><span><b>✓</b> نتیجه قابل مشاهده</span></div>
+</div>
+<div class="landing-art" aria-hidden="true"><div class="art-glow"></div><div class="art-card">
+<div class="art-top"><div class="art-logo"><span class="art-logo-mark">پ</span><span>پیچک دانش</span></div><span class="art-caption">کشف الگوها</span></div>
+<div class="art-title">آماده‌ای فکر کنی؟ 🧩</div><p class="art-sub">به شکل‌ها دقت کن و الگو را پیدا کن.</p>
+<div class="shape-row"><div class="shape">●</div><div class="shape">■</div><div class="shape">●</div><div class="shape">؟</div></div>
+<div class="art-progress"><div><strong>آزمون هوش تصویری</strong><small>۵ پرسش کوتاه و سرگرم‌کننده</small></div><div class="art-progress-icon">✦</div></div>
+</div><div class="art-float art-float-one">🌱 یادگیری با آرامش</div><div class="art-float art-float-two">⭐ پیشرفت قدم‌به‌قدم</div></div>
+</div>
+<div class="landing-bottom">
+<div class="landing-mini"><div class="landing-mini-icon">🔐</div><div><strong>ورود امن</strong><small>با نام کاربری و رمز اختصاصی</small></div></div>
+<div class="landing-mini"><div class="landing-mini-icon">🧠</div><div><strong>فکر و کشف</strong><small>تمرین الگوها با آزمون تصویری</small></div></div>
+<div class="landing-mini"><div class="landing-mini-icon">📈</div><div><strong>دیدن نتیجه</strong><small>ثبت پاسخ‌ها در پنل معلم</small></div></div>
+</div>
 </section>
 {% endblock %}
