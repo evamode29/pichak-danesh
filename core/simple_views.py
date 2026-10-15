@@ -60,7 +60,7 @@ def simple_iq_test(request):
                 level=max(1, min(10, correct * 2)),
                 completed_at=timezone.now(),
             )
-            return render(request, "simple/result.html", {"attempt": attempt, "custom_test": True})
+            return render(request, "simple/result.html", {"attempt": attempt})
     return render(request, "simple/iq.html", {"questions": IQ_QUESTIONS, "error": error})
 
 
@@ -160,5 +160,5 @@ def student_take_test(request, test_id):
                 score=round(correct * 100 / len(questions)), correct_answers=correct,
                 total_questions=len(questions), level=max(1, min(10, round(correct * 10 / len(questions)))),
                 completed_at=timezone.now())
-            return render(request, "simple/result.html", {"attempt": attempt})
+            return render(request, "simple/result.html", {"attempt": attempt, "custom_test": True})
     return render(request, "simple/test_take.html", {"test": test, "questions": questions, "error": error})
