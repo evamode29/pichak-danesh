@@ -7,15 +7,7 @@ from django.urls import reverse
 from django.contrib.sitemaps import Sitemap
 
 
-PUBLIC_URL_NAMES = (
-    "home",
-    "about",
-    "contact",
-    "privacy",
-    "terms",
-    "refund",
-    "subscription-catalog",
-)
+PUBLIC_URL_NAMES = ("home",)
 
 NOINDEX_PREFIXES = (
     "/login/",
