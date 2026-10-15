@@ -1,4 +1,6 @@
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
+from django.forms import ImageField as DjangoImageField
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
@@ -103,17 +105,38 @@ def teacher_test_manager(request):
             test = get_object_or_404(PlacementTest, pk=request.POST.get("test_id"))
             question_text = request.POST.get("question_text", "").strip()
             options = [request.POST.get("option_" + letter.lower(), "").strip() for letter in "ABCD"]
+            question_image = request.FILES.get("question_image")
+            option_images = [request.FILES.get("option_" + letter.lower() + "_image") for letter in "ABCD"]
             correct = request.POST.get("correct_option", "")
-            if not question_text or any(not option for option in options):
-                error = "متن سؤال و هر چهار گزینه را کامل کن."
+            uploads = [("تصویر سؤال", question_image)] + [
+                ("تصویر گزینه " + str(i + 1), upload) for i, upload in enumerate(option_images)
+            ]
+            try:
+                for label, upload in uploads:
+                    if upload:
+                        if upload.size > 5 * 1024 * 1024:
+                            raise ValidationError(f"{label}: حجم عکس نباید بیشتر از ۵ مگابایت باشد.")
+                        DjangoImageField().clean(upload)
+            except ValidationError as exc:
+                error = " ".join(exc.messages)
+            if error:
+                pass
+            elif not question_text and not question_image:
+                error = "متن سؤال یا تصویر سؤال را وارد کن."
+            elif any(not option and not option_images[i] for i, option in enumerate(options)):
+                error = "برای هر گزینه متن یا تصویر قرار بده."
             elif correct not in ("A", "B", "C", "D"):
                 error = "گزینه درست را انتخاب کن."
             else:
                 next_order = (test.questions.order_by("-order").values_list("order", flat=True).first() or 0) + 1
-                PlacementQuestion.objects.create(test=test, text=question_text, option_a=options[0],
-                    option_b=options[1], option_c=options[2], option_d=options[3],
+                PlacementQuestion.objects.create(
+                    test=test, text=question_text, question_image=question_image,
+                    option_a=options[0], option_a_image=option_images[0],
+                    option_b=options[1], option_b_image=option_images[1],
+                    option_c=options[2], option_c_image=option_images[2],
+                    option_d=options[3], option_d_image=option_images[3],
                     correct_option=correct, order=next_order, is_active=True)
-                message = "سؤال به آزمون اضافه شد."
+                message = "سؤال و تصاویر آن با موفقیت اضافه شد."
         elif action == "toggle_test":
             test = get_object_or_404(PlacementTest, pk=request.POST.get("test_id"))
             if not test.is_active and not test.questions.filter(is_active=True).exists():
