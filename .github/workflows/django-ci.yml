@@ -40,6 +40,12 @@ jobs:
           DJANGO_SECRET_KEY: "ci-secret-key"
         run: python manage.py migrate --noinput
 
+      - name: Collect static files for tests
+        env:
+          DJANGO_DEBUG: "True"
+          DJANGO_SECRET_KEY: "ci-secret-key"
+        run: python manage.py collectstatic --noinput
+
       - name: Django tests
         env:
           DJANGO_DEBUG: "True"
