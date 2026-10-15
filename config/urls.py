@@ -3,7 +3,7 @@ from django.contrib.sitemaps.views import sitemap
 from django.urls import path
 
 from core.seo import PublicSitemap, robots_txt
-from core.views import login_view, logout_view
+from core.simple_auth import login_view, logout_view
 from core.simple_views import simple_home, simple_student, simple_iq_test, simple_teacher
 
 sitemaps = {"public": PublicSitemap()}
