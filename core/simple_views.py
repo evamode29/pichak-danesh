@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from core.models import ClassRoom, UserProfile
+from core.models import UserProfile
 from core.permissions import is_teacher, is_admin
 from exams.models import PlacementAttempt, PlacementTest
 from students.models import StudentProfile
@@ -75,5 +75,4 @@ def simple_teacher(request):
         "students": students,
         "student_count": StudentProfile.objects.count(),
         "attempts": attempts,
-        "classrooms": ClassRoom.objects.filter(is_active=True).order_by("name")[:30],
     })
