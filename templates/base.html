@@ -13,7 +13,7 @@
 <title>{% block title %}پیچک دانش{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'css/site.css' %}"><link rel="stylesheet" href="{% static 'css/placement.css' %}"><link rel="stylesheet" href="{% static 'css/polish.css' %}"><link rel="stylesheet" href="{% static 'css/premium.css' %}">
+<link rel="stylesheet" href="{% static 'css/site.css' %}">
 <style>
 .simple-header{background:#fff;border-bottom:1px solid #e6eee8;position:relative;z-index:5}.simple-header-inner{max-width:1160px;min-height:76px;margin:auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}.simple-brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:#173c27;font-size:21px;font-weight:800}.simple-brand-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:#176b38;color:#fff;font-size:22px}.simple-nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.simple-nav a{display:inline-block;text-decoration:none;color:#176b38;font-weight:800;font-size:14px;padding:10px 14px;border-radius:11px;background:#edf6ef}.simple-footer{padding:22px 18px;text-align:center;color:#77847b;background:#fff;border-top:1px solid #e6eee8;font-size:13px}@media(max-width:520px){.simple-header-inner{min-height:66px;padding:10px 14px}.simple-brand{font-size:18px}.simple-brand-mark{width:36px;height:36px}.simple-nav{gap:5px}.simple-nav a{font-size:12px;padding:9px}}
 </style>
@@ -22,7 +22,7 @@
 <header class="simple-header"><div class="simple-header-inner">
 <a class="simple-brand" href="/" aria-label="پیچک دانش"><span class="simple-brand-mark">پ</span><span>پیچک <strong>دانش</strong></span></a>
 <nav class="simple-nav" aria-label="منوی اصلی">
-{% if user.is_authenticated %}<a href="{% url 'simple-student' %}">پنل من</a><a href="{% url 'simple-iq' %}">آزمون هوش تصویری</a><a href="{% url 'logout' %}">خروج</a>{% else %}<a href="{% url 'login' %}">ورود</a>{% endif %}
+{% if user.is_authenticated %}<a href="{% url 'simple-student' %}">پنل من</a><a href="{% url 'simple-iq' %}">آزمون هوش تصویری</a><form method="post" action="{% url 'logout' %}" style="display:inline">{% csrf_token %}<button type="submit" style="border:0;cursor:pointer;font:inherit;display:inline-block;color:#176b38;font-weight:800;font-size:14px;padding:10px 14px;border-radius:11px;background:#edf6ef">خروج</button></form>{% else %}<a href="{% url 'login' %}">ورود</a>{% endif %}
 </nav></div></header>
 <main>{% block content %}{% endblock %}</main>
 <footer class="simple-footer"><strong>پیچک دانش</strong> · فضای ساده یادگیری پایه ششم · © {% now "Y" %}</footer>
