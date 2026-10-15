@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}آزمون‌های من | پیچک دانش{% endblock %}
+{% block content %}
+<style>
+.tl-page{min-height:70vh;padding:30px 0 60px;background:#f6faf7;direction:rtl}.tl-wrap{max-width:900px;margin:auto;padding:0 17px}.tl-hero{padding:25px;border-radius:22px;background:linear-gradient(125deg,#143f25,#21844a);color:#fff}.tl-hero h1{margin:0 0 8px;font-size:27px}.tl-hero p{margin:0;color:#e0f1e5;font-size:13px;line-height:1.9}.tl-card{margin-top:13px;padding:20px;background:#fff;border:1px solid #e0ebe3;border-radius:17px;display:flex;align-items:center;justify-content:space-between;gap:14px}.tl-card h2{margin:0 0 7px;font-size:17px}.tl-meta{font-size:12px;color:#728076}.tl-btn{display:inline-block;text-decoration:none;background:#176b38;color:white;padding:11px 15px;border-radius:11px;font-size:12px;font-weight:800;white-space:nowrap}.tl-empty{background:#fff;border:1px solid #e0ebe3;border-radius:17px;padding:28px;text-align:center;margin-top:15px;color:#728076;line-height:2}
+@media(max-width:550px){.tl-card{align-items:flex-start;flex-direction:column}.tl-hero h1{font-size:23px}}
+</style>
+<section class="tl-page"><div class="tl-wrap"><header class="tl-hero"><h1>آزمون‌های آماده تو 🧩</h1><p>آزمون را انتخاب کن، با دقت پاسخ بده و نتیجه‌ات را ببین.</p></header>
+{% for test in tests %}<article class="tl-card"><div><h2>{{ test.title }}</h2><div class="tl-meta">{{ test.questions.count }} سؤال · حدود {{ test.duration_minutes }} دقیقه</div></div><a class="tl-btn" href="{% url 'student-take-test' test.id %}">شروع آزمون ←</a></article>{% empty %}<div class="tl-empty">فعلاً آزمون تازه‌ای منتشر نشده است.<br>بعداً دوباره سر بزن!</div>{% endfor %}
+</div></section>
+{% endblock %}
