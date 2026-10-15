@@ -1,25 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}ورود | پیچک دانش{% endblock %}
 {% block content %}
-<section class="auth-page"><div class="container auth-grid">
-<div class="auth-copy">
-<span class="eyebrow"><span class="eyebrow-dot"></span> ورود یکپارچه</span>
-<h1>همه از یک در وارد <em>پیچک دانش</em> می‌شوند.</h1>
-<p>شماره موبایل یا نام کاربری را وارد کن و با رمز ثابت وارد شو. اگر بخواهی، می‌توانی با کد پیامکی هم وارد شوی.</p>
-<div class="auth-points"><span>✓ یک ورود برای همه</span><span>✓ تشخیص خودکار نقش</span><span>✓ رمز ثابت یا کد پیامکی</span></div>
-</div>
-<div class="auth-card">
-<div class="auth-icon">پ</div><h2>ورود به پیچک دانش</h2><p class="auth-muted">برای دانش‌آموز شماره موبایل و برای حساب‌های مدیریتی نام کاربری را وارد کنید.</p>
-{% if error %}<div class="form-error">{{ error }}</div>{% endif %}
-<form method="post" class="auth-form">{% csrf_token %}
-<label>شماره موبایل یا نام کاربری<input name="identifier" type="text" autocomplete="username" required placeholder="مثلاً 09123456789"></label>
-<label>رمز ثابت<input name="password" type="password" autocomplete="current-password" required placeholder="رمز ثابت"></label>
-<button class="button primary auth-submit" type="submit">ورود به پیچک دانش <span>←</span></button>
+<style>
+.simple-login-page{min-height:76vh;padding:42px 18px;display:grid;place-items:center;background:radial-gradient(circle at 15% 15%,#dff5e8,transparent 35%),#f6faf7}
+.simple-login-card{width:min(500px,100%);padding:clamp(26px,5vw,44px);border-radius:26px;background:#fff;border:1px solid #e2eee5;box-shadow:0 24px 70px #16472a12}
+.simple-login-mark{width:58px;height:58px;border-radius:19px;background:#176b38;color:#fff;display:grid;place-items:center;font-size:27px;font-weight:900;margin-bottom:18px}
+.simple-login-card h1{margin:0;color:#173c27;font-size:clamp(27px,5vw,36px)}.simple-login-card>p{color:#718076;line-height:2;margin:12px 0 24px}
+.simple-login-form{display:grid;gap:16px}.simple-login-form label{display:grid;gap:8px;font-weight:800;color:#284a35;font-size:14px}.simple-login-form input{width:100%;box-sizing:border-box;border:1px solid #dce8df;border-radius:12px;padding:14px;font:inherit;outline:none}.simple-login-form input:focus{border-color:#21824a;box-shadow:0 0 0 3px #21824a18}.simple-login-form button{border:0;border-radius:13px;background:#176b38;color:#fff;padding:14px;font:inherit;font-weight:900;cursor:pointer}.simple-login-error{border-radius:12px;padding:12px;background:#fff0ed;color:#a33b2b;margin:0 0 15px;line-height:1.8}.simple-login-hint{font-size:12px!important;margin:18px 0 0!important}
+</style>
+<section class="simple-login-page" dir="rtl"><div class="simple-login-card">
+<div class="simple-login-mark">پ</div><h1>ورود به پیچک دانش</h1>
+<p>نام کاربری و رمز موقت خود را وارد کن تا وارد فضای دانش‌آموز یا معلم شوی.</p>
+{% if error %}<div class="simple-login-error">{{ error }}</div>{% endif %}
+<form method="post" class="simple-login-form">{% csrf_token %}
+<label>نام کاربری<input name="identifier" type="text" autocomplete="username" required autofocus placeholder="مثلاً pichak001"></label>
+<label>رمز عبور<input name="password" type="password" autocomplete="current-password" required placeholder="رمز ورود"></label>
+<button type="submit">ورود به حساب ←</button>
 </form>
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-<a class="button secondary" href="{% url 'otp-request' %}" style="flex:1;text-align:center;text-decoration:none">ورود با کد پیامکی</a>
-<a class="button secondary" href="{% url 'register' %}" style="flex:1;text-align:center;text-decoration:none">ثبت‌نام</a>
-</div>
-<a class="auth-back" href="/">بازگشت به صفحه اصلی</a>
-</div></div></section>
+<p class="simple-login-hint">اگر رمز خود را نداری، از معلم کلاس راهنمایی بگیر.</p>
+</div></section>
 {% endblock %}
