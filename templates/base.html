@@ -3,7 +3,7 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#15966d">
+<meta name="theme-color" content="#176b38">
 <meta name="description" content="{{ seo_description }}">
 <meta name="robots" content="{{ seo_robots }}">
 <link rel="canonical" href="{{ seo_canonical }}">
@@ -13,17 +13,31 @@
 <title>{% block title %}پیچک دانش{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'css/site.css' %}">
 <style>
-.simple-header{background:#fff;border-bottom:1px solid #e6eee8;position:relative;z-index:5}.simple-header-inner{max-width:1160px;min-height:76px;margin:auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}.simple-brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:#173c27;font-size:21px;font-weight:800}.simple-brand-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:#176b38;color:#fff;font-size:22px}.simple-nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.simple-nav a{display:inline-block;text-decoration:none;color:#176b38;font-weight:800;font-size:14px;padding:10px 14px;border-radius:11px;background:#edf6ef}.simple-footer{padding:22px 18px;text-align:center;color:#77847b;background:#fff;border-top:1px solid #e6eee8;font-size:13px}@media(max-width:520px){.simple-header-inner{min-height:66px;padding:10px 14px}.simple-brand{font-size:18px}.simple-brand-mark{width:36px;height:36px}.simple-nav{gap:5px}.simple-nav a{font-size:12px;padding:9px}}
+:root{color-scheme:light;--green:#176b38;--green-dark:#124a2b;--mint:#eaf6ee;--paper:#f5f9f6;--ink:#183b27;--muted:#728076;--line:#e1ebe3;--shadow:0 18px 48px rgba(20,68,39,.08)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:Vazirmatn,Tahoma,Arial,sans-serif;font-size:15px;line-height:1.85;-webkit-font-smoothing:antialiased}button,input,select,textarea{font:inherit}a{color:inherit}button,a,input{ -webkit-tap-highlight-color:transparent}a,button{transition:background-color .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #78c796;outline-offset:3px}::selection{background:#ccebd6;color:#124a2b}
+.simple-header{background:rgba(255,255,255,.94);border-bottom:1px solid rgba(225,235,227,.9);position:sticky;top:0;z-index:20;backdrop-filter:blur(14px)}.simple-header-inner{max-width:1160px;min-height:76px;margin:auto;padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}.simple-brand{display:inline-flex;align-items:center;gap:11px;text-decoration:none;color:#173c27;font-size:21px;font-weight:900;white-space:nowrap}.simple-brand-mark{display:grid;place-items:center;width:43px;height:43px;border-radius:15px;background:linear-gradient(145deg,#21844a,#124a2b);color:#fff;font-size:22px;box-shadow:0 8px 20px #176b3826}.simple-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.simple-nav a,.simple-nav button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:#176b38;font-weight:800;font-size:13px;padding:9px 14px;border-radius:12px;background:#edf6ef;border:1px solid transparent}.simple-nav a:hover,.simple-nav button:hover{background:#dff0e4;border-color:#cce5d2;transform:translateY(-1px)}.simple-footer{padding:24px 18px;text-align:center;color:#7a887e;background:#fff;border-top:1px solid #e6eee8;font-size:12px}.simple-footer strong{color:#315c3d}
+main{min-height:70vh}h1,h2,h3,p{overflow-wrap:anywhere}h1,h2,h3{line-height:1.45}h1{letter-spacing:-.035em}input,button{max-width:100%}
+.simple-login-page,.simple-wrap,.simple-page,.teacher-simple,.iq-page,.result-page{background:radial-gradient(ellipse at 8% 8%,rgba(218,243,226,.62),transparent 34%),radial-gradient(ellipse at 94% 92%,rgba(228,241,231,.5),transparent 30%),#f5f9f6}
+.simple-login-card,.simple-card,.simple-tile,.simple-list,.simple-stat,.simple-panel,.iq-head,.iq-card,.result-card{box-shadow:var(--shadow);transition:box-shadow .2s ease,border-color .2s ease,transform .2s ease}
+.simple-login-card,.simple-card,.simple-tile,.simple-list,.simple-stat,.simple-panel,.iq-head,.iq-card,.result-card{border-color:var(--line)!important}
+.simple-tile:hover{transform:translateY(-3px);box-shadow:0 22px 45px rgba(20,68,39,.12);border-color:#c7e3cf!important}
+.simple-login-form input{transition:border-color .18s,box-shadow .18s}.simple-login-form input:focus{border-color:#21824a;box-shadow:0 0 0 4px #21824a18}
+.simple-login-form button,.iq-submit,.result-actions a:not(.alt){box-shadow:0 10px 22px #176b3824}.simple-login-form button:hover,.iq-submit:hover,.result-actions a:hover{transform:translateY(-2px);box-shadow:0 14px 28px #176b382e}
+.simple-welcome,.teacher-simple .hero{box-shadow:0 16px 36px rgba(20,68,39,.12)}
+.simple-stat strong{letter-spacing:-.04em}.simple-table tbody tr:hover{background:#f6fbf7}.simple-table th{position:sticky;top:0}
+.iq-option{transition:border-color .16s,background .16s,transform .16s}.iq-option:hover{border-color:#a9d5b5;transform:translateY(-1px)}.iq-option input{accent-color:#176b38;width:17px;height:17px;flex:0 0 auto}
+.result-score{box-shadow:inset 0 0 0 8px rgba(23,107,56,.045)}
+@media(max-width:640px){.simple-header-inner{min-height:66px;padding:9px 14px;gap:9px}.simple-brand{font-size:17px;gap:8px}.simple-brand-mark{width:36px;height:36px;border-radius:12px;font-size:19px}.simple-nav{gap:5px}.simple-nav a,.simple-nav button{font-size:11px;padding:8px 10px}.simple-footer{padding:18px 12px}.simple-welcome{padding:23px!important}.simple-row{align-items:flex-start}.simple-table{min-width:490px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
 <header class="simple-header"><div class="simple-header-inner">
 <a class="simple-brand" href="/" aria-label="پیچک دانش"><span class="simple-brand-mark">پ</span><span>پیچک <strong>دانش</strong></span></a>
 <nav class="simple-nav" aria-label="منوی اصلی">
-{% if user.is_authenticated %}<a href="{% url 'simple-student' %}">پنل من</a><a href="{% url 'simple-iq' %}">آزمون هوش تصویری</a><form method="post" action="{% url 'logout' %}" style="display:inline">{% csrf_token %}<button type="submit" style="border:0;cursor:pointer;font:inherit;display:inline-block;color:#176b38;font-weight:800;font-size:14px;padding:10px 14px;border-radius:11px;background:#edf6ef">خروج</button></form>{% else %}<a href="{% url 'login' %}">ورود</a>{% endif %}
+{% if user.is_authenticated %}<a href="{% url 'simple-student' %}">پنل من</a><a href="{% url 'simple-iq' %}">آزمون هوش تصویری</a><form method="post" action="{% url 'logout' %}" style="display:inline">{% csrf_token %}<button type="submit">خروج</button></form>{% else %}<a href="{% url 'login' %}">ورود</a>{% endif %}
 </nav></div></header>
 <main>{% block content %}{% endblock %}</main>
-<footer class="simple-footer"><strong>پیچک دانش</strong> · فضای ساده یادگیری پایه ششم · © {% now "Y" %}</footer>
+<footer class="simple-footer"><strong>پیچک دانش</strong> · فضای یادگیری و کشف توانایی‌ها · © {% now "Y" %}</footer>
 </body></html>
