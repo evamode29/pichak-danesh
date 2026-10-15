@@ -1,8 +1,13 @@
 import secrets
+import shutil
 import string
 import unicodedata
+from datetime import datetime
+from pathlib import Path
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
@@ -83,8 +88,35 @@ class Command(BaseCommand):
             help="Create or match roster accounts without preparing teacher/demo accounts.",
         )
 
-    @transaction.atomic
     def handle(self, *args, **options):
+        # Back up the current SQLite database before applying any schema changes.
+        database = settings.DATABASES["default"]
+        database_name = database.get("NAME")
+        preexisting_usernames = set()
+        if "sqlite3" in database.get("ENGINE", "") and database_name:
+            database_path = Path(database_name)
+            if database_path.is_file():
+                # auth_user is present in the current production database.
+                preexisting_usernames = set(
+                    User.objects.values_list("username", flat=True)
+                )
+                stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+                backup_path = database_path.with_name(
+                    f"{database_path.name}.backup-before-setup-{stamp}"
+                )
+                shutil.copy2(database_path, backup_path)
+                self.stdout.write(self.style.SUCCESS(
+                    f"نسخه پشتیبان پایگاه داده ساخته شد: {backup_path}"
+                ))
+
+        self.stdout.write(self.style.WARNING(
+            "در حال بررسی و اجرای مهاجرت‌های Django هستم؛ حساب‌های قبلی حذف نمی‌شوند."
+        ))
+        call_command("migrate", interactive=False)
+        self._setup_accounts(options, preexisting_usernames)
+
+    @transaction.atomic
+    def _setup_accounts(self, options, preexisting_usernames):
         classroom = ClassRoom.objects.filter(grade=6, is_active=True).order_by("id").first()
         credentials = []
         created_count = 0
@@ -123,8 +155,18 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.WARNING(
                         f"حساب {teacher_username} از قبل وجود دارد اما نقش آن {profile.role!r} است؛ تغییری ندادم."
                     ))
+                elif teacher_username not in preexisting_usernames:
+                    # A pending legacy migration may just have created this account.
+                    # Give only that newly-created account a fresh password we can report.
+                    password = temporary_password(14)
+                    teacher.set_password(password)
+                    teacher.save(update_fields=["password"])
+                    credentials.append(("حساب معلم", teacher_username, password))
+                    self.stdout.write(self.style.SUCCESS(
+                        "حساب معلمی که هنگام مهاجرت ساخته شد، رمز اولیه دریافت کرد."
+                    ))
                 else:
-                    self.stdout.write("حساب معلم موجود است؛ رمز و نقش موجود تغییر نکرد.")
+                    self.stdout.write("حساب معلم از قبل وجود دارد؛ رمز و نقش آن تغییر نکرد.")
 
             demo_username = options["demo_username"]
             demo = User.objects.filter(username=demo_username).first()
