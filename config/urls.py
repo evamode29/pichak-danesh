@@ -3,7 +3,6 @@ from django.urls import include, path
 from django.contrib.sitemaps.views import sitemap
 
 from core.seo import PublicSitemap, robots_txt
-
 from core.api import auth_login, auth_logout, auth_me, classrooms_api, students_api, teachers_api
 from core.public_views import about, contact, privacy, refund, terms
 from core.views import (
@@ -11,6 +10,7 @@ from core.views import (
     login_view, logout_view, register_view, account_view, teacher_class_detail, teacher_dashboard,
     teacher_student_detail, teacher_students, dashboard_live,
 )
+from core.simple_views import simple_home, simple_student, simple_iq_test, simple_teacher
 from core.teacher_class import teacher_class_manage
 from core.teacher_homework import teacher_homework
 from core.student_homework import student_homework
@@ -22,7 +22,10 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("robots.txt", robots_txt, name="robots-txt"),
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
-    path("", home, name="home"),
+    path("", simple_home, name="home"),
+    path("simple/student/", simple_student, name="simple-student"),
+    path("simple/iq/", simple_iq_test, name="simple-iq"),
+    path("simple/teacher/", simple_teacher, name="simple-teacher"),
     path("about/", about, name="about"),
     path("contact/", contact, name="contact"),
     path("privacy/", privacy, name="privacy"),

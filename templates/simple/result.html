@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}نتیجه آزمون | پیچک دانش{% endblock %}
+{% block content %}
+<style>
+.result-page{min-height:70vh;display:grid;place-items:center;background:#f6faf7;padding:35px 18px}.result-card{max-width:600px;width:100%;background:#fff;border:1px solid #e2eee5;border-radius:26px;padding:35px;text-align:center}.result-score{width:120px;height:120px;border-radius:50%;background:#e7f6eb;color:#176b38;display:grid;place-items:center;margin:18px auto;font-size:31px;font-weight:900}.result-card h1{color:#173c27}.result-card p{color:#738177;line-height:1.9}.result-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.result-actions a{padding:13px 18px;border-radius:13px;text-decoration:none;background:#176b38;color:#fff;font-weight:800}.result-actions a.alt{background:#edf6ef;color:#176b38}
+</style>
+<section class="result-page"><div class="result-card"><div style="font-size:42px">🌟</div><h1>آفرین! آزمون ثبت شد</h1><div class="result-score">{{ attempt.correct_answers }}/{{ attempt.total_questions }}</div><p>درصد پاسخ‌های درست: {{ attempt.score }}٪</p><p>نتیجه برای پنل معلم ذخیره شد. این آزمون فقط یک تمرین کوتاه است و معیار تشخیص هوش یا توانایی کلی نیست.</p><div class="result-actions"><a href="{% url 'simple-student' %}">بازگشت به فضای من</a><a class="alt" href="{% url 'simple-iq' %}">آزمون دوباره</a></div></div></section>
+{% endblock %}
