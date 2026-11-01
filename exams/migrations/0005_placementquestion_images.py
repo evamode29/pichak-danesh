@@ -3,7 +3,8 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("exams", "0004_seed_diagnostic_topics"),
+        # Run after the existing exams migration branches have been merged.
+        ("exams", "0007_rename_exams_place_answer__b2b8b1_idx_exams_place_answer__14142a_idx_and_more"),
     ]
 
     operations = [
