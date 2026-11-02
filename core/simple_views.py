@@ -264,6 +264,7 @@ def teacher_activities(request):
         "records": records,
         "message": message,
         "error": error,
+        "today": timezone.localdate(),
     })
 
 @login_required(login_url="login")
