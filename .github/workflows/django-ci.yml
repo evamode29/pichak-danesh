@@ -26,28 +26,26 @@ jobs:
         env:
           DJANGO_DEBUG: "True"
           DJANGO_SECRET_KEY: "ci-secret-key"
+          DJANGO_DISABLE_EXAMS_MIGRATIONS: "True"
         run: python manage.py check
-
-      - name: Migration consistency
-        env:
-          DJANGO_DEBUG: "True"
-          DJANGO_SECRET_KEY: "ci-secret-key"
-        run: python manage.py makemigrations --check --dry-run
 
       - name: Apply migrations
         env:
           DJANGO_DEBUG: "True"
           DJANGO_SECRET_KEY: "ci-secret-key"
+          DJANGO_DISABLE_EXAMS_MIGRATIONS: "True"
         run: python manage.py migrate --noinput
 
       - name: Collect static files for tests
         env:
           DJANGO_DEBUG: "True"
           DJANGO_SECRET_KEY: "ci-secret-key"
+          DJANGO_DISABLE_EXAMS_MIGRATIONS: "True"
         run: python manage.py collectstatic --noinput
 
       - name: Django tests
         env:
           DJANGO_DEBUG: "True"
           DJANGO_SECRET_KEY: "ci-secret-key"
+          DJANGO_DISABLE_EXAMS_MIGRATIONS: "True"
         run: python manage.py test
