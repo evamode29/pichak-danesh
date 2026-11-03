@@ -1,10 +1,14 @@
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.db.models import Count, Q
 from django.core.exceptions import ValidationError
 from django.forms import ImageField as DjangoImageField
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.dateparse import parse_date
 from django.utils import timezone
 
 from core.permissions import is_teacher, is_admin
+from core.models import ClassRoom, DailyTask, StudentTask
 from exams.models import PlacementAttempt, PlacementQuestion, PlacementTest
 from students.models import StudentProfile
 
@@ -66,19 +70,202 @@ def simple_iq_test(request):
     return render(request, "simple/iq.html", {"questions": IQ_QUESTIONS, "error": error})
 
 
+
 @login_required(login_url="login")
 def simple_teacher(request):
-    if not (is_teacher(request.user) or is_admin(request.user) or request.user.is_superuser):
+    if not _can_manage_learning(request.user):
         return redirect("simple-student")
-    students = list(StudentProfile.objects.select_related("user", "classroom").order_by("user__first_name", "user__last_name")[:30])
-    attempts = PlacementAttempt.objects.select_related("student__user", "test").order_by("-completed_at")[:30]
+
+    students = StudentProfile.objects.select_related(
+        "user", "classroom"
+    ).order_by("user__first_name", "user__last_name")
+
+    classrooms = ClassRoom.objects.filter(is_active=True)
+    if not (is_admin(request.user) or request.user.is_superuser):
+        classrooms = classrooms.filter(teacher=request.user)
+
+    tasks = DailyTask.objects.filter(classroom__in=classrooms).select_related(
+        "classroom", "created_by"
+    ).annotate(
+        assigned_count=Count("student_tasks"),
+        completed_count=Count(
+            "student_tasks",
+            filter=Q(student_tasks__status=StudentTask.Status.DONE),
+        ),
+    ).order_by("-task_date", "-id")[:6]
+
     return render(request, "simple/teacher.html", {
         "students": students,
-        "student_count": StudentProfile.objects.count(),
-        "attempts": attempts,
-        "tests": PlacementTest.objects.prefetch_related("questions").order_by("-id")[:8],
+        "student_count": students.count(),
+        "classrooms": classrooms,
+        "classroom_count": classrooms.count(),
+        "task_count": DailyTask.objects.filter(classroom__in=classrooms).count(),
+        "pending_count": StudentTask.objects.filter(
+            task__classroom__in=classrooms,
+            status=StudentTask.Status.PENDING,
+        ).count(),
+        "review_count": StudentTask.objects.filter(
+            task__classroom__in=classrooms,
+            status=StudentTask.Status.REVIEW,
+        ).count(),
+        "tasks": tasks,
     })
 
+
+def _can_manage_learning(user):
+    return bool(
+        user.is_authenticated
+        and (is_teacher(user) or is_admin(user) or user.is_superuser)
+    )
+
+
+@login_required(login_url="login")
+def teacher_student_detail(request, student_id):
+    if not _can_manage_learning(request.user):
+        return redirect("simple-student")
+
+    queryset = StudentProfile.objects.select_related("user", "classroom")
+    if not (is_admin(request.user) or request.user.is_superuser):
+        teacher_classes = ClassRoom.objects.filter(teacher=request.user)
+        if teacher_classes.exists():
+            queryset = queryset.filter(classroom__in=teacher_classes)
+
+    student = get_object_or_404(queryset, pk=student_id)
+    task_records = StudentTask.objects.filter(
+        student=student
+    ).select_related("task", "task__classroom").order_by("-updated_at")[:30]
+    placement_attempts = PlacementAttempt.objects.filter(
+        student=student
+    ).select_related("test").order_by("-completed_at")[:10]
+
+    return render(request, "simple/student_detail.html", {
+        "student": student,
+        "task_records": task_records,
+        "placement_attempts": placement_attempts,
+    })
+
+
+@login_required(login_url="login")
+def teacher_activities(request):
+    if not _can_manage_learning(request.user):
+        return redirect("simple-student")
+
+    is_manager = is_admin(request.user) or request.user.is_superuser
+    classrooms = ClassRoom.objects.filter(is_active=True)
+    if not is_manager:
+        classrooms = classrooms.filter(teacher=request.user)
+
+    message = None
+    error = None
+
+    if request.method == "POST":
+        action = request.POST.get("action", "")
+
+        if action == "setup_class":
+            with transaction.atomic():
+                classroom = classrooms.filter(name="ششم ۱", grade=6).first()
+                if classroom is None:
+                    classroom = ClassRoom.objects.create(
+                        name="ششم ۱",
+                        grade=6,
+                        teacher=request.user,
+                        is_active=True,
+                    )
+                unassigned = StudentProfile.objects.filter(
+                    grade=6, classroom__isnull=True
+                )
+                assigned_count = unassigned.update(classroom=classroom)
+            message = f"کلاس ششم ۱ آماده شد و {assigned_count} دانش‌آموز به آن متصل شدند."
+
+        elif action == "create_task":
+            classroom_id = request.POST.get("classroom_id")
+            classroom = get_object_or_404(classrooms, pk=classroom_id)
+            title = request.POST.get("title", "").strip()
+            description = request.POST.get("description", "").strip()
+            task_date = parse_date(request.POST.get("task_date", ""))
+            try:
+                max_score = int(request.POST.get("max_score", "20"))
+            except (TypeError, ValueError):
+                max_score = 0
+
+            if not title:
+                error = "عنوان فعالیت را وارد کن."
+            elif task_date is None:
+                error = "تاریخ فعالیت معتبر نیست."
+            elif not 1 <= max_score <= 100:
+                error = "امتیاز فعالیت باید بین ۱ تا ۱۰۰ باشد."
+            else:
+                with transaction.atomic():
+                    task = DailyTask.objects.create(
+                        classroom=classroom,
+                        title=title,
+                        description=description,
+                        task_date=task_date,
+                        max_score=max_score,
+                        created_by=request.user,
+                    )
+                    students_in_class = list(
+                        StudentProfile.objects.filter(classroom=classroom)
+                    )
+                    StudentTask.objects.bulk_create(
+                        [StudentTask(task=task, student=student) for student in students_in_class],
+                        ignore_conflicts=True,
+                    )
+                message = f"فعالیت ساخته شد و برای {len(students_in_class)} دانش‌آموز ثبت شد."
+
+        elif action == "review_task":
+            record_id = request.POST.get("record_id")
+            records = StudentTask.objects.select_related("task", "student")
+            if not is_manager:
+                records = records.filter(task__classroom__teacher=request.user)
+            record = get_object_or_404(records, pk=record_id)
+            status = request.POST.get("status", "")
+            note = request.POST.get("note", "").strip()[:500]
+            score_text = request.POST.get("score", "").strip()
+
+            if status not in StudentTask.Status.values:
+                error = "وضعیت انتخاب‌شده معتبر نیست."
+            else:
+                score = None
+                if score_text:
+                    try:
+                        score = int(score_text)
+                    except ValueError:
+                        score = -1
+                if score is not None and not 0 <= score <= record.task.max_score:
+                    error = f"امتیاز باید بین صفر تا {record.task.max_score} باشد."
+                else:
+                    record.status = status
+                    record.score = score
+                    record.note = note
+                    record.save(update_fields=["status", "score", "note", "updated_at"])
+                    message = "عملکرد دانش‌آموز ذخیره شد."
+
+    classrooms = classrooms.order_by("grade", "name")
+    tasks = DailyTask.objects.filter(classroom__in=classrooms).select_related(
+        "classroom"
+    ).annotate(
+        assigned_count=Count("student_tasks"),
+        completed_count=Count(
+            "student_tasks",
+            filter=Q(student_tasks__status=StudentTask.Status.DONE),
+        ),
+    ).order_by("-task_date", "-id")
+
+    records = StudentTask.objects.filter(
+        task__classroom__in=classrooms
+    ).select_related("student__user", "task", "task__classroom").order_by(
+        "-updated_at"
+    )[:100]
+
+    return render(request, "simple/activities.html", {
+        "classrooms": classrooms,
+        "tasks": tasks,
+        "records": records,
+        "message": message,
+        "error": error,
+        "today": timezone.localdate(),
+    })
 
 @login_required(login_url="login")
 def teacher_test_manager(request):
