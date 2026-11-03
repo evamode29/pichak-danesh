@@ -1,14 +1,79 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}فضای دانش‌آموز | پیچک دانش{% endblock %}
+{% block title %}خانه یادگیری من | پیچک دانش{% endblock %}
 {% block content %}
 <style>
-.student-home{max-width:940px;margin:auto;padding:30px 18px 64px;direction:rtl}.student-hero{padding:28px;border-radius:23px;background:linear-gradient(120deg,#143f27,#21844a);color:#fff}.student-hero h1{margin:0 0 6px;font-size:27px}.student-hero p{margin:0;color:#dcefe2;font-size:13px}.student-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.student-stat,.student-note{background:linear-gradient(155deg,#fffef7,#fff);border:1px solid #e2ece4;border-radius:17px;padding:17px;box-shadow:0 10px 26px rgba(28,80,30,.045)}.student-stat small{display:block;color:#849087;font-size:11px}.student-stat strong{display:block;color:#194b2d;font-size:25px}.student-note{margin-top:14px}.student-note h2{font-size:17px;margin:0 0 7px}.student-note p{font-size:12px;color:#748278;line-height:2;margin:0}.student-logout{display:inline-block;margin-top:18px;padding:9px 13px;background:#edf6ef;border-radius:10px;color:#176b38;text-decoration:none;font-weight:900;font-size:12px}
-@media(max-width:620px){.student-stats{grid-template-columns:repeat(2,1fr)}.student-hero{padding:22px}.student-hero h1{font-size:23px}}
+.studio{max-width:1080px;margin:auto;padding:28px 18px 68px;direction:rtl;color:#23432e}
+.studio-hero{position:relative;overflow:hidden;display:grid;grid-template-columns:1.3fr .7fr;gap:20px;align-items:center;padding:30px;border-radius:28px;background:linear-gradient(125deg,#104a27 0%,#197b43 62%,#65b83e 100%);color:#fff;box-shadow:0 20px 50px #14542d22}
+.studio-hero:after{content:"";position:absolute;left:-25px;bottom:-60px;width:270px;height:230px;background:url("{% static 'img/brand/vine-divider.svg' %}") center/contain no-repeat;opacity:.23;transform:rotate(-12deg)}
+.studio-hello,.studio-art{position:relative;z-index:1}.studio-kicker{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid #ffffff45;border-radius:99px;background:#ffffff18;font-size:11px;font-weight:800}
+.studio-hero h1{font-size:clamp(23px,4vw,32px);margin:12px 0 5px;line-height:1.5}.studio-hero p{margin:0;color:#e4f4e8;font-size:13px;line-height:2}
+.studio-art{justify-self:center;width:150px;height:150px;border-radius:42px;background:#ffffff19;border:1px solid #ffffff42;display:grid;place-items:center;transform:rotate(-5deg)}
+.studio-art img{width:116px;height:116px;object-fit:contain;transform:rotate(5deg)}
+.studio-level{margin-top:17px;max-width:430px}.studio-level-top{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#e6f4e9;margin-bottom:7px}.studio-track{height:9px;border-radius:20px;background:#ffffff35;overflow:hidden}.studio-track span{display:block;height:100%;border-radius:20px;background:#f7c957}
+.studio-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0 22px}.studio-stat{padding:15px 16px;border:1px solid #e3ebdf;border-radius:18px;background:linear-gradient(145deg,#fff,#f7fbf3);box-shadow:0 10px 26px #234c2b09}
+.studio-stat small{display:block;color:#78867a;font-size:11px}.studio-stat strong{display:block;font-size:25px;color:#1d6838;line-height:1.6}.studio-stat span{font-size:10px;color:#9aa59a}
+.studio-section{margin-top:18px}.studio-section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px}.studio-section h2{font-size:18px;margin:0;color:#204b2e}.studio-section-head p{margin:3px 0 0;color:#8a978b;font-size:11px}
+.studio-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.studio-task{padding:17px;border:1px solid #e2ebdf;border-radius:19px;background:#fff;box-shadow:0 9px 24px #1f4d2a08;min-width:0}
+.studio-task-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.studio-task-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:#edf7e9;font-size:21px}.studio-status{padding:5px 9px;border-radius:99px;font-size:10px;font-weight:800;white-space:nowrap}.status-pending{background:#fff4d9;color:#946414}.status-review{background:#eaf1ff;color:#4264a6}.status-done{background:#e7f6eb;color:#247442}
+.studio-task h3{font-size:15px;margin:12px 0 4px;color:#244c30}.studio-task p{font-size:12px;color:#77857a;line-height:2;margin:0 0 10px;white-space:pre-line}.studio-task-meta{display:flex;gap:12px;flex-wrap:wrap;color:#89968a;font-size:10px;padding-top:9px;border-top:1px solid #eff3ed}
+.studio-feedback{margin-top:11px;padding:10px 12px;border-radius:12px;background:#f4f9f0;color:#42654a;font-size:11px;line-height:1.9}
+.studio-action{margin-top:13px;display:inline-flex;border:0;border-radius:11px;padding:9px 13px;background:#1d7a43;color:white;font:inherit;font-size:11px;font-weight:900;cursor:pointer}.studio-action:disabled{background:#edf2ed;color:#8a968b;cursor:default}
+.studio-empty{padding:30px 18px;text-align:center;border:1px dashed #cdddc9;border-radius:20px;background:#fbfdf8;color:#829084}.studio-empty b{display:block;color:#426a4a;font-size:14px;margin-bottom:5px}.studio-empty p{font-size:11px;margin:0}
+.studio-alert{padding:11px 14px;border-radius:12px;margin:13px 0;font-size:12px;background:#e9f7ed;color:#176b38}.studio-alert.error{background:#fff0ed;color:#a33b2b}
+.studio-lower{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:17px}.studio-info{padding:17px;border:1px solid #e2ebdf;border-radius:18px;background:#fff}.studio-info h3{font-size:14px;margin:0 0 7px}.studio-info p{font-size:11px;color:#7e8b80;line-height:2;margin:0}
+@media(max-width:700px){.studio-hero{grid-template-columns:1fr;padding:23px}.studio-art{display:none}.studio-stats{grid-template-columns:repeat(2,1fr);gap:9px}.studio-grid,.studio-lower{grid-template-columns:1fr}.studio-stat{padding:12px}.studio-stat strong{font-size:22px}}
 </style>
-<section class="student-home"><header class="student-hero"><h1>سلام {{ student.user.first_name|default:student.user.username }} 🌱</h1><p>اینجا مسیر یادگیری و پیشرفت تو در پیچک دانش دنبال می‌شود.</p></header>
-<div class="student-stats"><div class="student-stat"><small>امتیاز</small><strong>{{ student.points }}</strong></div><div class="student-stat"><small>تجربه (XP)</small><strong>{{ student.xp }}</strong></div><div class="student-stat"><small>سطح</small><strong>{{ student.level }}</strong></div><div class="student-stat"><small>روزهای پیوسته</small><strong>{{ student.streak }}</strong></div></div>
-<section class="student-note"><h2>فعالیت‌های کلاس</h2><p>وقتی معلم فعالیت یا تکلیفی برای کلاس ثبت کند، از همین بخش مسیر انجام و بازخوردت را دنبال خواهی کرد. فعلاً می‌توانی امتیاز و سطح پیشرفتت را در بالا ببینی.</p><p>کلاس: {{ student.classroom.name|default:"هنوز کلاسی به حساب تو متصل نشده است." }}</p></section>
-<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="student-logout" type="submit">خروج امن از حساب</button></form>
+<section class="studio">
+<header class="studio-hero">
+  <div class="studio-hello">
+    <span class="studio-kicker">🌱 مسیر رشد من در پیچک</span>
+    <h1>سلام {{ student.user.first_name|default:student.user.username }}! خوش اومدی</h1>
+    <p>هر قدم کوچیک، یک پیشرفت بزرگه. مأموریت‌هات رو انجام بده و مسیر یادگیری خودت رو بساز.</p>
+    <div class="studio-level">
+      <div class="studio-level-top"><span>سطح {{ student.level }} · {{ student.xp }} امتیاز تجربه</span><span>{{ student.xp_to_next_level }} تا سطح بعدی</span></div>
+      <div class="studio-track"><span style="width:{{ student.level_progress_percent }}%"></span></div>
+    </div>
+  </div>
+  <div class="studio-art"><img src="{% static 'img/brand/sprout.svg' %}" alt="نماد رشد پیچک"></div>
+</header>
+{% if message %}<div class="studio-alert">{{ message }}</div>{% endif %}{% if error %}<div class="studio-alert error">{{ error }}</div>{% endif %}
+<div class="studio-stats">
+  <div class="studio-stat"><small>امتیازهای من</small><strong>{{ student.points }}</strong><span>⭐ امتیاز تلاش‌ها</span></div>
+  <div class="studio-stat"><small>فعالیت‌های من</small><strong>{{ total_tasks }}</strong><span>📚 در مجموع</span></div>
+  <div class="studio-stat"><small>تأییدشده</small><strong>{{ completed_tasks }}</strong><span>🏅 با موفقیت</span></div>
+  <div class="studio-stat"><small>در انتظار بررسی</small><strong>{{ waiting_tasks }}</strong><span>⏳ فرستاده‌شده برای معلم</span></div>
+</div>
+<section class="studio-section">
+  <div class="studio-section-head"><div><h2>🎯 مأموریت‌های یادگیری من</h2><p>فعالیت‌هایی که معلم برای کلاس تو فرستاده است</p></div></div>
+  {% if task_records %}
+  <div class="studio-grid">
+  {% for record in task_records %}
+    <article class="studio-task">
+      <div class="studio-task-top">
+        <div class="studio-task-icon">{% if record.status == "done" %}🏅{% elif record.status == "review" %}📨{% else %}🌟{% endif %}</div>
+        {% if record.status == "done" %}<span class="studio-status status-done">تأیید شده</span>{% elif record.status == "review" %}<span class="studio-status status-review">در انتظار بررسی</span>{% else %}<span class="studio-status status-pending">منتظر شروع</span>{% endif %}
+      </div>
+      <h3>{{ record.task.title }}</h3>
+      {% if record.task.description %}<p>{{ record.task.description }}</p>{% else %}<p>برای این مأموریت آماده شو و با تمرکز انجامش بده.</p>{% endif %}
+      <div class="studio-task-meta"><span>📅 {{ record.task.task_date|date:"Y/m/d" }}</span><span>⭐ تا {{ record.task.max_score }} امتیاز</span><span>📘 {{ record.task.classroom.name }}</span></div>
+      {% if record.note %}<div class="studio-feedback"><b>پیام معلم:</b> {{ record.note }}</div>{% endif %}
+      {% if record.score != None %}<div class="studio-feedback">امتیاز ثبت‌شده: <b>{{ record.score }} از {{ record.task.max_score }}</b></div>{% endif %}
+      {% if record.status == "pending" %}
+      <form method="post">{% csrf_token %}<input type="hidden" name="action" value="submit_task"><input type="hidden" name="record_id" value="{{ record.id }}"><button class="studio-action" type="submit">انجام دادم؛ ارسال برای معلم ←</button></form>
+      {% elif record.status == "review" %}<button class="studio-action" type="button" disabled>منتظر نظر معلم هستم</button>
+      {% else %}<button class="studio-action" type="button" disabled>این مأموریت کامل شد ✓</button>{% endif %}
+    </article>
+  {% endfor %}
+  </div>
+  {% else %}
+  <div class="studio-empty"><b>هنوز مأموریتی برایت ثبت نشده 🌿</b><p>به‌زودی معلمت فعالیت‌های تازه‌ای به اینجا اضافه می‌کند.</p></div>
+  {% endif %}
+</section>
+<div class="studio-lower">
+  <section class="studio-info"><h3>🏫 کلاس من</h3><p>{{ student.classroom.name|default:"هنوز کلاسی به حساب تو متصل نشده است." }}{% if student.classroom %} · پایه {{ student.grade }}{% endif %}</p></section>
+  <section class="studio-info"><h3>💡 یک یادآوری کوچک</h3><p>قرار نیست همیشه بی‌نقص باشی؛ مهم اینه که هر روز چیزی تازه یاد بگیری و از دیروز خودت یک قدم جلوتر باشی.</p></section>
+</div>
+<form method="post" action="{% url 'logout' %}" style="margin-top:20px">{% csrf_token %}<button class="studio-action" type="submit" style="background:#edf4ec;color:#42654a">خروج امن از حساب</button></form>
 </section>
 {% endblock %}
