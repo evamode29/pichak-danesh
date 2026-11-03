@@ -214,6 +214,7 @@ class StudentLearningPanelTests(TestCase):
         )
         UserProfile.objects.create(user=other_user, role=UserProfile.Role.STUDENT)
         other_student = StudentProfile.objects.create(user=other_user, grade=6)
+        self.client.force_login(other_user)
         response = self.client.post(
             reverse("simple-student"),
             {"action": "submit_task", "record_id": self.record.pk},
