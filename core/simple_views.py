@@ -37,8 +37,45 @@ def simple_student(request):
     student = getattr(request.user, "student_profile", None)
     if student is None:
         return redirect("simple-teacher" if is_teacher(request.user) or is_admin(request.user) else "login")
+
+    message = None
+    error = None
+    if request.method == "POST" and request.POST.get("action") == "submit_task":
+        record = get_object_or_404(
+            StudentTask.objects.select_related("task"),
+            pk=request.POST.get("record_id"),
+            student=student,
+        )
+        if record.status == StudentTask.Status.DONE:
+            error = "این فعالیت قبلاً تأیید شده است."
+        elif record.status == StudentTask.Status.REVIEW:
+            message = "این فعالیت قبلاً برای بررسی معلم فرستاده شده است."
+        else:
+            record.status = StudentTask.Status.REVIEW
+            record.save(update_fields=["status", "updated_at"])
+            message = "آفرین! فعالیتت برای بررسی معلم فرستاده شد."
+
+    task_records = StudentTask.objects.filter(
+        student=student
+    ).select_related("task", "task__classroom").order_by(
+        "-task__task_date", "-task_id"
+    )
     attempts = PlacementAttempt.objects.filter(student=student).select_related("test")[:5]
-    return render(request, "simple/student.html", {"student": student, "attempts": attempts})
+    total_tasks = task_records.count()
+    completed_tasks = task_records.filter(status=StudentTask.Status.DONE).count()
+    waiting_tasks = task_records.filter(status=StudentTask.Status.REVIEW).count()
+    pending_tasks = task_records.filter(status=StudentTask.Status.PENDING).count()
+    return render(request, "simple/student.html", {
+        "student": student,
+        "attempts": attempts,
+        "task_records": task_records,
+        "total_tasks": total_tasks,
+        "completed_tasks": completed_tasks,
+        "waiting_tasks": waiting_tasks,
+        "pending_tasks": pending_tasks,
+        "message": message,
+        "error": error,
+    })
 
 
 @login_required(login_url="login")
