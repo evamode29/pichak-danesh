@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, safe/teacher-panel-foundation]
   pull_request:
-    branches: [main]
+    branches: [main, production-baseline-2026-11-02]
 
 jobs:
   check:
