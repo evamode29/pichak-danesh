@@ -160,3 +160,64 @@ class TeacherPanelTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "دانش‌آموز 1")
+
+
+class StudentLearningPanelTests(TestCase):
+    def setUp(self):
+        self.teacher = User.objects.create_user(
+            username="student_view_teacher", password="test-password-123"
+        )
+        UserProfile.objects.create(user=self.teacher, role=UserProfile.Role.TEACHER)
+        self.student_user = User.objects.create_user(
+            username="student_view_user",
+            password="test-password-123",
+            first_name="آراد",
+        )
+        UserProfile.objects.create(user=self.student_user, role=UserProfile.Role.STUDENT)
+        self.student = StudentProfile.objects.create(user=self.student_user, grade=6)
+        self.classroom = ClassRoom.objects.create(
+            name="ششم ۱", grade=6, teacher=self.teacher
+        )
+        self.student.classroom = self.classroom
+        self.student.save(update_fields=["classroom"])
+        self.task = DailyTask.objects.create(
+            classroom=self.classroom,
+            title="تمرین ریاضی",
+            description="پنج مسئله حل کن.",
+            task_date=date.today(),
+            max_score=20,
+            created_by=self.teacher,
+        )
+        self.record = StudentTask.objects.create(task=self.task, student=self.student)
+        self.client.force_login(self.student_user)
+
+    def test_student_dashboard_shows_assigned_learning_tasks(self):
+        response = self.client.get(reverse("simple-student"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "تمرین ریاضی")
+        self.assertContains(response, "پنج مسئله حل کن.")
+        self.assertContains(response, "ارسال برای معلم")
+
+    def test_student_can_submit_task_for_teacher_review(self):
+        response = self.client.post(
+            reverse("simple-student"),
+            {"action": "submit_task", "record_id": self.record.pk},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.record.refresh_from_db()
+        self.assertEqual(self.record.status, StudentTask.Status.REVIEW)
+        self.assertContains(response, "برای بررسی معلم فرستاده شد")
+
+    def test_student_cannot_submit_another_students_task(self):
+        other_user = User.objects.create_user(
+            username="another_student", password="test-password-123"
+        )
+        UserProfile.objects.create(user=other_user, role=UserProfile.Role.STUDENT)
+        other_student = StudentProfile.objects.create(user=other_user, grade=6)
+        response = self.client.post(
+            reverse("simple-student"),
+            {"action": "submit_task", "record_id": self.record.pk},
+        )
+        self.assertEqual(response.status_code, 404)
+        self.record.refresh_from_db()
+        self.assertEqual(self.record.status, StudentTask.Status.PENDING)
