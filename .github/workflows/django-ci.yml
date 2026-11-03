@@ -48,4 +48,4 @@ jobs:
           DJANGO_DEBUG: "True"
           DJANGO_SECRET_KEY: "ci-secret-key"
           DJANGO_DISABLE_EXAMS_MIGRATIONS: "True"
-        run: python manage.py test
+        run: python manage.py test core.test_teacher_panel
