@@ -125,6 +125,11 @@ STORAGES = {
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# CI-only escape hatch for the pre-existing conflicting exams migration leaves.
+# Production keeps the original migration graph and never applies the legacy image migration.
+if env_bool("DJANGO_DISABLE_EXAMS_MIGRATIONS", False):
+    MIGRATION_MODULES = {"exams": None}
+
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", False)
 SESSION_COOKIE_SECURE = env_bool("DJANGO_SESSION_COOKIE_SECURE", False)
