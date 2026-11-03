@@ -2,7 +2,7 @@ name: Django CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, safe/teacher-panel-foundation]
   pull_request:
     branches: [main]
 
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.12"
           cache: pip
 
       - name: Install project dependencies
