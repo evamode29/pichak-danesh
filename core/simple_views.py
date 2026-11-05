@@ -120,12 +120,13 @@ def simple_teacher(request):
 
     # Teachers can see unassigned students so they can place them into a class;
     # students already assigned to another teacher remain hidden.
-    visible_grades = classrooms.values_list("grade", flat=True).distinct()
+    # The current Pichak classroom workflow serves grade 6. Allow teachers
+    # to see unassigned grade-6 learners so they can place them in a class.
     students = StudentProfile.objects.select_related(
         "user", "classroom"
     ).filter(
         Q(classroom__in=classrooms)
-        | Q(classroom__isnull=True, grade__in=visible_grades)
+        | Q(classroom__isnull=True, grade=6)
     ).order_by("user__first_name", "user__last_name")
 
     tasks = DailyTask.objects.filter(classroom__in=classrooms).select_related(
@@ -171,10 +172,9 @@ def teacher_student_detail(request, student_id):
     queryset = StudentProfile.objects.select_related("user", "classroom")
     if not (is_admin(request.user) or request.user.is_superuser):
         teacher_classes = ClassRoom.objects.filter(teacher=request.user, is_active=True)
-        visible_grades = teacher_classes.values_list("grade", flat=True).distinct()
         queryset = queryset.filter(
             Q(classroom__in=teacher_classes)
-            | Q(classroom__isnull=True, grade__in=visible_grades)
+            | Q(classroom__isnull=True, grade=6)
         )
 
     student = get_object_or_404(queryset, pk=student_id)
