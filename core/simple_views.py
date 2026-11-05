@@ -118,11 +118,13 @@ def simple_teacher(request):
     if not is_manager:
         classrooms = classrooms.filter(teacher=request.user)
 
+    # Teachers can see unassigned students so they can place them into a class;
+    # students already assigned to another teacher remain hidden.
     students = StudentProfile.objects.select_related(
         "user", "classroom"
-    ).filter(classroom__in=classrooms).order_by(
-        "user__first_name", "user__last_name"
-    )
+    ).filter(
+        Q(classroom__in=classrooms) | Q(classroom__isnull=True)
+    ).order_by("user__first_name", "user__last_name")
 
     tasks = DailyTask.objects.filter(classroom__in=classrooms).select_related(
         "classroom", "created_by"
@@ -167,7 +169,9 @@ def teacher_student_detail(request, student_id):
     queryset = StudentProfile.objects.select_related("user", "classroom")
     if not (is_admin(request.user) or request.user.is_superuser):
         teacher_classes = ClassRoom.objects.filter(teacher=request.user, is_active=True)
-        queryset = queryset.filter(classroom__in=teacher_classes)
+        queryset = queryset.filter(
+            Q(classroom__in=teacher_classes) | Q(classroom__isnull=True)
+        )
 
     student = get_object_or_404(queryset, pk=student_id)
     task_records = StudentTask.objects.filter(
