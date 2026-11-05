@@ -42,7 +42,7 @@
   <div class="studio-stat"><small>امتیازهای من</small><strong>{{ student.points }}</strong><span>⭐ امتیاز تلاش‌ها</span></div>
   <div class="studio-stat"><small>فعالیت‌های من</small><strong>{{ total_tasks }}</strong><span>📚 در مجموع</span></div>
   <div class="studio-stat"><small>تأییدشده</small><strong>{{ completed_tasks }}</strong><span>🏅 با موفقیت</span></div>
-  <div class="studio-stat"><small>در انتظار بررسی</small><strong>{{ waiting_tasks }}</strong><span>⏳ فرستاده‌شده برای معلم</span></div>
+  <div class="studio-stat"><small>در انتظار انجام</small><strong>{{ pending_tasks }}</strong><span>🌱 قدم بعدی من</span></div><div class="studio-stat"><small>در انتظار بررسی</small><strong>{{ waiting_tasks }}</strong><span>📨 فرستاده‌شده برای معلم</span></div>
 </div>
 <section class="studio-section">
   <div class="studio-section-head"><div><h2>🎯 مأموریت‌های یادگیری من</h2><p>فعالیت‌هایی که معلم برای کلاس تو فرستاده است</p></div></div>
@@ -70,6 +70,7 @@
   <div class="studio-empty"><b>هنوز مأموریتی برایت ثبت نشده 🌿</b><p>به‌زودی معلمت فعالیت‌های تازه‌ای به اینجا اضافه می‌کند.</p></div>
   {% endif %}
 </section>
+<section class="studio-section"><div class="studio-section-head"><div><h2>🧩 آزمون‌های من</h2><p>نتیجه تلاش‌های قبلی و آزمون‌های منتشرشده</p></div><a class="studio-action" href="{% url 'student-test-list' %}">دیدن آزمون‌ها ←</a></div>{% if attempts %}<div class="studio-grid">{% for attempt in attempts %}<article class="studio-task"><div class="studio-task-top"><div class="studio-task-icon">🧠</div><span class="studio-status status-done">ثبت‌شده</span></div><h3>{{ attempt.test.title }}</h3><p>نتیجه: {{ attempt.correct_answers }} پاسخ درست از {{ attempt.total_questions }}</p><div class="studio-task-meta"><span>📊 {{ attempt.score }}٪</span><span>📅 {{ attempt.completed_at|date:"Y/m/d" }}</span></div></article>{% endfor %}</div>{% else %}<div class="studio-empty"><b>هنوز آزمونی انجام نداده‌ای</b><p>وقتی معلم آزمونی منتشر کند، از بخش آزمون‌ها می‌توانی شروع کنی.</p></div>{% endif %}</section>
 <div class="studio-lower">
   <section class="studio-info"><h3>🏫 کلاس من</h3><p>{{ student.classroom.name|default:"هنوز کلاسی به حساب تو متصل نشده است." }}{% if student.classroom %} · پایه {{ student.grade }}{% endif %}</p></section>
   <section class="studio-info"><h3>💡 یک یادآوری کوچک</h3><p>قرار نیست همیشه بی‌نقص باشی؛ مهم اینه که هر روز چیزی تازه یاد بگیری و از دیروز خودت یک قدم جلوتر باشی.</p></section>
