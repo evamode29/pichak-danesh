@@ -113,13 +113,16 @@ def simple_teacher(request):
     if not _can_manage_learning(request.user):
         return redirect("simple-student")
 
+    is_manager = is_admin(request.user) or request.user.is_superuser
+    classrooms = ClassRoom.objects.filter(is_active=True)
+    if not is_manager:
+        classrooms = classrooms.filter(teacher=request.user)
+
     students = StudentProfile.objects.select_related(
         "user", "classroom"
-    ).order_by("user__first_name", "user__last_name")
-
-    classrooms = ClassRoom.objects.filter(is_active=True)
-    if not (is_admin(request.user) or request.user.is_superuser):
-        classrooms = classrooms.filter(teacher=request.user)
+    ).filter(classroom__in=classrooms).order_by(
+        "user__first_name", "user__last_name"
+    )
 
     tasks = DailyTask.objects.filter(classroom__in=classrooms).select_related(
         "classroom", "created_by"
@@ -163,9 +166,8 @@ def teacher_student_detail(request, student_id):
 
     queryset = StudentProfile.objects.select_related("user", "classroom")
     if not (is_admin(request.user) or request.user.is_superuser):
-        teacher_classes = ClassRoom.objects.filter(teacher=request.user)
-        if teacher_classes.exists():
-            queryset = queryset.filter(classroom__in=teacher_classes)
+        teacher_classes = ClassRoom.objects.filter(teacher=request.user, is_active=True)
+        queryset = queryset.filter(classroom__in=teacher_classes)
 
     student = get_object_or_404(queryset, pk=student_id)
     task_records = StudentTask.objects.filter(
@@ -180,7 +182,6 @@ def teacher_student_detail(request, student_id):
         "task_records": task_records,
         "placement_attempts": placement_attempts,
     })
-
 
 @login_required(login_url="login")
 def teacher_activities(request):
@@ -306,8 +307,23 @@ def teacher_activities(request):
 
 @login_required(login_url="login")
 def teacher_test_manager(request):
-    if not (is_teacher(request.user) or is_admin(request.user) or request.user.is_superuser):
+    if not _can_manage_learning(request.user):
         return redirect("simple-student")
+
+    is_manager = is_admin(request.user) or request.user.is_superuser
+    if is_manager:
+        allowed_grades = None
+    else:
+        allowed_grades = list(
+            ClassRoom.objects.filter(
+                teacher=request.user, is_active=True
+            ).values_list("grade", flat=True).distinct()
+        )
+
+    tests = PlacementTest.objects.all()
+    if allowed_grades is not None:
+        tests = tests.filter(grade__in=allowed_grades)
+
     message = None
     error = None
     if request.method == "POST":
@@ -322,68 +338,120 @@ def teacher_test_manager(request):
                 error = "عنوان آزمون را بنویس."
             elif not 1 <= duration <= 240:
                 error = "زمان آزمون باید بین ۱ تا ۲۴۰ دقیقه باشد."
+            elif allowed_grades is not None and 6 not in allowed_grades:
+                error = "برای ساخت آزمون، ابتدا کلاس پایه ششم را به حساب معلم متصل کن."
             else:
-                test = PlacementTest.objects.create(title=title, grade=6, duration_minutes=duration, is_active=False)
+                test = PlacementTest.objects.create(
+                    title=title, grade=6, duration_minutes=duration, is_active=False
+                )
                 message = f"آزمون «{test.title}» ساخته شد. حالا سؤال اضافه کن."
-        elif action == "add_question":
-            test = get_object_or_404(PlacementTest, pk=request.POST.get("test_id"))
-            question_text = request.POST.get("question_text", "").strip()
-            options = [request.POST.get("option_" + letter.lower(), "").strip() for letter in "ABCD"]
-            question_image = request.FILES.get("question_image")
-            option_images = [request.FILES.get("option_" + letter.lower() + "_image") for letter in "ABCD"]
-            correct = request.POST.get("correct_option", "")
-            uploads = [("تصویر سؤال", question_image)] + [
-                ("تصویر گزینه " + str(i + 1), upload) for i, upload in enumerate(option_images)
-            ]
-            try:
-                for label, upload in uploads:
-                    if upload:
-                        if upload.size > 5 * 1024 * 1024:
-                            raise ValidationError(f"{label}: حجم عکس نباید بیشتر از ۵ مگابایت باشد.")
-                        DjangoImageField().clean(upload)
-            except ValidationError as exc:
-                error = " ".join(exc.messages)
-            if error:
-                pass
-            elif not question_text and not question_image:
-                error = "متن سؤال یا تصویر سؤال را وارد کن."
-            elif any(not option and not option_images[i] for i, option in enumerate(options)):
-                error = "برای هر گزینه متن یا تصویر قرار بده."
-            elif correct not in ("A", "B", "C", "D"):
-                error = "گزینه درست را انتخاب کن."
+
+        elif action in ("add_question", "toggle_test"):
+            test = get_object_or_404(tests, pk=request.POST.get("test_id"))
+            if action == "toggle_test":
+                if not test.is_active and not test.questions.filter(is_active=True).exists():
+                    error = "برای فعال‌کردن، ابتدا دست‌کم یک سؤال فعال اضافه کن."
+                else:
+                    test.is_active = not test.is_active
+                    test.save(update_fields=["is_active"])
+                    message = "وضعیت آزمون تغییر کرد."
             else:
-                next_order = (test.questions.order_by("-order").values_list("order", flat=True).first() or 0) + 1
-                PlacementQuestion.objects.create(
-                    test=test, text=question_text, question_image=question_image,
-                    option_a=options[0], option_a_image=option_images[0],
-                    option_b=options[1], option_b_image=option_images[1],
-                    option_c=options[2], option_c_image=option_images[2],
-                    option_d=options[3], option_d_image=option_images[3],
-                    correct_option=correct, order=next_order, is_active=True)
-                message = "سؤال و تصاویر آن با موفقیت اضافه شد."
-        elif action == "toggle_test":
-            test = get_object_or_404(PlacementTest, pk=request.POST.get("test_id"))
-            if not test.is_active and not test.questions.filter(is_active=True).exists():
-                error = "برای فعال‌کردن، ابتدا دست‌کم یک سؤال فعال اضافه کن."
-            else:
-                test.is_active = not test.is_active
-                test.save(update_fields=["is_active"])
-                message = "وضعیت آزمون تغییر کرد."
+                question_text = request.POST.get("question_text", "").strip()
+                options = [
+                    request.POST.get("option_" + letter.lower(), "").strip()
+                    for letter in "ABCD"
+                ]
+                question_image = request.FILES.get("question_image")
+                option_images = [
+                    request.FILES.get("option_" + letter.lower() + "_image")
+                    for letter in "ABCD"
+                ]
+                correct = request.POST.get("correct_option", "")
+                uploads = [("تصویر سؤال", question_image)] + [
+                    ("تصویر گزینه " + str(i + 1), upload)
+                    for i, upload in enumerate(option_images)
+                ]
+                try:
+                    for label, upload in uploads:
+                        if upload:
+                            if upload.size > 5 * 1024 * 1024:
+                                raise ValidationError(
+                                    f"{label}: حجم عکس نباید بیشتر از ۵ مگابایت باشد."
+                                )
+                            DjangoImageField().clean(upload)
+                except ValidationError as exc:
+                    error = " ".join(exc.messages)
+
+                if not error and not question_text and not question_image:
+                    error = "متن سؤال یا تصویر سؤال را وارد کن."
+                elif not error and any(
+                    not option and not option_images[i]
+                    for i, option in enumerate(options)
+                ):
+                    error = "برای هر گزینه متن یا تصویر قرار بده."
+                elif not error and correct not in ("A", "B", "C", "D"):
+                    error = "گزینه درست را انتخاب کن."
+
+                if not error:
+                    next_order = (
+                        test.questions.order_by("-order").values_list(
+                            "order", flat=True
+                        ).first() or 0
+                    ) + 1
+                    PlacementQuestion.objects.create(
+                        test=test,
+                        text=question_text,
+                        question_image=question_image,
+                        option_a=options[0],
+                        option_a_image=option_images[0],
+                        option_b=options[1],
+                        option_b_image=option_images[1],
+                        option_c=options[2],
+                        option_c_image=option_images[2],
+                        option_d=options[3],
+                        option_d_image=option_images[3],
+                        correct_option=correct,
+                        order=next_order,
+                        is_active=True,
+                    )
+                    message = "سؤال و تصاویر آن با موفقیت اضافه شد."
+
         elif action == "toggle_question":
-            question = get_object_or_404(PlacementQuestion, pk=request.POST.get("question_id"))
+            question = get_object_or_404(
+                PlacementQuestion.objects.select_related("test").filter(test__in=tests),
+                pk=request.POST.get("question_id"),
+            )
             question.is_active = not question.is_active
             question.save(update_fields=["is_active"])
             message = "وضعیت سؤال تغییر کرد."
-    tests = PlacementTest.objects.prefetch_related("questions").order_by("-id")
-    return render(request, "simple/test_manager.html", {"tests": tests, "message": message, "error": error})
+
+    tests = tests.prefetch_related("questions").order_by("-id")
+    return render(
+        request,
+        "simple/test_manager.html",
+        {"tests": tests, "message": message, "error": error},
+    )
 
 
 @login_required(login_url="login")
 def student_test_list(request):
     student = getattr(request.user, "student_profile", None)
     if student is None:
-        return redirect("simple-teacher" if is_teacher(request.user) or is_admin(request.user) else "login")
-    tests = PlacementTest.objects.filter(is_active=True, questions__is_active=True).distinct().prefetch_related("questions").order_by("-id")
+        return redirect(
+            "simple-teacher"
+            if is_teacher(request.user) or is_admin(request.user)
+            else "login"
+        )
+    tests = (
+        PlacementTest.objects.filter(
+            is_active=True,
+            grade=student.grade,
+            questions__is_active=True,
+        )
+        .distinct()
+        .prefetch_related("questions")
+        .order_by("-id")
+    )
     return render(request, "simple/test_list.html", {"tests": tests})
 
 
@@ -391,21 +459,52 @@ def student_test_list(request):
 def student_take_test(request, test_id):
     student = getattr(request.user, "student_profile", None)
     if student is None:
-        return redirect("simple-teacher" if is_teacher(request.user) or is_admin(request.user) else "login")
-    test = get_object_or_404(PlacementTest, pk=test_id, is_active=True)
-    questions = list(test.questions.filter(is_active=True).order_by("order", "id"))
+        return redirect(
+            "simple-teacher"
+            if is_teacher(request.user) or is_admin(request.user)
+            else "login"
+        )
+    test = get_object_or_404(
+        PlacementTest, pk=test_id, is_active=True, grade=student.grade
+    )
+    questions = list(
+        test.questions.filter(is_active=True).order_by("order", "id")
+    )
     if not questions:
         return redirect("student-test-list")
+
     error = None
     if request.method == "POST":
-        answers = {str(q.id): request.POST.get("question_" + str(q.id), "") for q in questions}
+        answers = {
+            str(question.id): request.POST.get("question_" + str(question.id), "")
+            for question in questions
+        }
         if any(value not in ("A", "B", "C", "D") for value in answers.values()):
             error = "لطفاً برای همه سؤال‌ها یک گزینه انتخاب کن."
         else:
-            correct = sum(answers[str(q.id)] == q.correct_option for q in questions)
-            attempt = PlacementAttempt.objects.create(student=student, test=test,
-                score=round(correct * 100 / len(questions)), correct_answers=correct,
-                total_questions=len(questions), level=max(1, min(10, round(correct * 10 / len(questions)))),
-                completed_at=timezone.now())
-            return render(request, "simple/result.html", {"attempt": attempt, "custom_test": True})
-    return render(request, "simple/test_take.html", {"test": test, "questions": questions, "error": error})
+            correct = sum(
+                answers[str(question.id)] == question.correct_option
+                for question in questions
+            )
+            attempt = PlacementAttempt.objects.create(
+                student=student,
+                test=test,
+                score=round(correct * 100 / len(questions)),
+                correct_answers=correct,
+                total_questions=len(questions),
+                level=max(
+                    1, min(10, round(correct * 10 / len(questions)))
+                ),
+                completed_at=timezone.now(),
+            )
+            return render(
+                request,
+                "simple/result.html",
+                {"attempt": attempt, "custom_test": True},
+            )
+    return render(
+        request,
+        "simple/test_take.html",
+        {"test": test, "questions": questions, "error": error},
+    )
+
