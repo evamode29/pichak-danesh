@@ -36,7 +36,7 @@ main{min-height:70vh}h1,h2,h3,p{overflow-wrap:anywhere}h1,h2,h3{line-height:1.45
 <header class="simple-header"><div class="simple-header-inner">
 <a class="simple-brand" href="/" aria-label="پیچک دانش"><img class="simple-wordmark" src="{% static 'img/brand/wordmark.svg' %}" alt="پیچک دانش"></a>
 <nav class="simple-nav" aria-label="منوی اصلی">
-{% if user.is_authenticated %}{% if user.profile.role == "teacher" or user.profile.role == "admin" or user.is_superuser %}<a href="{% url 'simple-teacher' %}">پنل معلم</a><a href="{% url 'teacher-activities' %}">فعالیت‌ها</a><a href="{% url 'teacher-test-manager' %}">آزمون‌ها</a>{% else %}<a href="{% url 'simple-student' %}">پنل دانش‌آموز</a>{% endif %}<form method="post" action="{% url 'logout' %}" style="display:inline">{% csrf_token %}<button type="submit">خروج</button></form>{% else %}<a href="{% url 'login' %}">ورود</a>{% endif %}
+{% if user.is_authenticated %}{% if user.profile.role == "teacher" or user.profile.role == "admin" or user.is_superuser %}<a href="{% url 'simple-teacher' %}">پنل معلم</a><a href="{% url 'teacher-activities' %}">فعالیت‌ها</a><a href="{% url 'teacher-test-manager' %}">آزمون‌ها</a>{% else %}<a href="{% url 'simple-student' %}">پنل دانش‌آموز</a><a href="{% url 'student-test-list' %}">آزمون‌ها</a>{% endif %}<form method="post" action="{% url 'logout' %}" style="display:inline">{% csrf_token %}<button type="submit">خروج</button></form>{% else %}<a href="{% url 'login' %}">ورود</a>{% endif %}
 </nav></div></header>
 <main>{% block content %}{% endblock %}</main>
 <footer class="simple-footer"><strong>پیچک دانش</strong> · فضای یادگیری و کشف توانایی‌ها · © {% now "Y" %}</footer>
