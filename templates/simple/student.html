@@ -11,7 +11,7 @@
 .studio-art{justify-self:center;width:150px;height:150px;border-radius:42px;background:#ffffff19;border:1px solid #ffffff42;display:grid;place-items:center;transform:rotate(-5deg)}
 .studio-art img{width:116px;height:116px;object-fit:contain;transform:rotate(5deg)}
 .studio-level{margin-top:17px;max-width:430px}.studio-level-top{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#e6f4e9;margin-bottom:7px}.studio-track{height:9px;border-radius:20px;background:#ffffff35;overflow:hidden}.studio-track span{display:block;height:100%;border-radius:20px;background:#f7c957}
-.studio-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0 22px}.studio-stat{padding:15px 16px;border:1px solid #e3ebdf;border-radius:18px;background:linear-gradient(145deg,#fff,#f7fbf3);box-shadow:0 10px 26px #234c2b09}
+.studio-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:16px 0 22px}.studio-stat{padding:15px 16px;border:1px solid #e3ebdf;border-radius:18px;background:linear-gradient(145deg,#fff,#f7fbf3);box-shadow:0 10px 26px #234c2b09}
 .studio-stat small{display:block;color:#78867a;font-size:11px}.studio-stat strong{display:block;font-size:25px;color:#1d6838;line-height:1.6}.studio-stat span{font-size:10px;color:#9aa59a}
 .studio-section{margin-top:18px}.studio-section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px}.studio-section h2{font-size:18px;margin:0;color:#204b2e}.studio-section-head p{margin:3px 0 0;color:#8a978b;font-size:11px}
 .studio-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.studio-task{padding:17px;border:1px solid #e2ebdf;border-radius:19px;background:#fff;box-shadow:0 9px 24px #1f4d2a08;min-width:0}
@@ -42,7 +42,7 @@
   <div class="studio-stat"><small>امتیازهای من</small><strong>{{ student.points }}</strong><span>⭐ امتیاز تلاش‌ها</span></div>
   <div class="studio-stat"><small>فعالیت‌های من</small><strong>{{ total_tasks }}</strong><span>📚 در مجموع</span></div>
   <div class="studio-stat"><small>تأییدشده</small><strong>{{ completed_tasks }}</strong><span>🏅 با موفقیت</span></div>
-  <div class="studio-stat"><small>در انتظار بررسی</small><strong>{{ waiting_tasks }}</strong><span>⏳ فرستاده‌شده برای معلم</span></div>
+  <div class="studio-stat"><small>در انتظار انجام</small><strong>{{ pending_tasks }}</strong><span>🌱 قدم بعدی من</span></div><div class="studio-stat"><small>در انتظار بررسی</small><strong>{{ waiting_tasks }}</strong><span>📨 فرستاده‌شده برای معلم</span></div>
 </div>
 <section class="studio-section">
   <div class="studio-section-head"><div><h2>🎯 مأموریت‌های یادگیری من</h2><p>فعالیت‌هایی که معلم برای کلاس تو فرستاده است</p></div></div>
@@ -70,6 +70,7 @@
   <div class="studio-empty"><b>هنوز مأموریتی برایت ثبت نشده 🌿</b><p>به‌زودی معلمت فعالیت‌های تازه‌ای به اینجا اضافه می‌کند.</p></div>
   {% endif %}
 </section>
+<section class="studio-section"><div class="studio-section-head"><div><h2>🧩 آزمون‌های من</h2><p>نتیجه تلاش‌های قبلی و آزمون‌های منتشرشده</p></div><a class="studio-action" href="{% url 'student-test-list' %}">دیدن آزمون‌ها ←</a></div>{% if attempts %}<div class="studio-grid">{% for attempt in attempts %}<article class="studio-task"><div class="studio-task-top"><div class="studio-task-icon">🧠</div><span class="studio-status status-done">ثبت‌شده</span></div><h3>{{ attempt.test.title }}</h3><p>نتیجه: {{ attempt.correct_answers }} پاسخ درست از {{ attempt.total_questions }}</p><div class="studio-task-meta"><span>📊 {{ attempt.score }}٪</span><span>📅 {{ attempt.completed_at|date:"Y/m/d" }}</span></div></article>{% endfor %}</div>{% else %}<div class="studio-empty"><b>هنوز آزمونی انجام نداده‌ای</b><p>وقتی معلم آزمونی منتشر کند، از بخش آزمون‌ها می‌توانی شروع کنی.</p></div>{% endif %}</section>
 <div class="studio-lower">
   <section class="studio-info"><h3>🏫 کلاس من</h3><p>{{ student.classroom.name|default:"هنوز کلاسی به حساب تو متصل نشده است." }}{% if student.classroom %} · پایه {{ student.grade }}{% endif %}</p></section>
   <section class="studio-info"><h3>💡 یک یادآوری کوچک</h3><p>قرار نیست همیشه بی‌نقص باشی؛ مهم اینه که هر روز چیزی تازه یاد بگیری و از دیروز خودت یک قدم جلوتر باشی.</p></section>
