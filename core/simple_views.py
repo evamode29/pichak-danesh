@@ -86,8 +86,15 @@ def simple_iq_test(request):
     error = None
     if request.method == "POST":
         answers = {q["id"]: request.POST.get(q["id"], "") for q in IQ_QUESTIONS}
-        if any(not value for value in answers.values()):
-            error = "لطفاً برای هر پنج سؤال یک پاسخ انتخاب کن."
+        valid_options = {
+            question["id"]: {value for value, _label in question["options"]}
+            for question in IQ_QUESTIONS
+        }
+        if any(
+            answers[question_id] not in allowed
+            for question_id, allowed in valid_options.items()
+        ):
+            error = "لطفاً برای هر پنج سؤال یک گزینه معتبر انتخاب کن."
         else:
             correct = sum(answers[q["id"]] == q["answer"] for q in IQ_QUESTIONS)
             test, _ = PlacementTest.objects.get_or_create(
