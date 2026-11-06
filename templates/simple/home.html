@@ -1,59 +1,30 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}پیچک دانش | با هم یاد می‌گیریم{% endblock %}
-{% block og_title %}پیچک دانش | با هم یاد می‌گیریم{% endblock %}
+{% block title %}پیچک دانش | با هم، از یادگیری لذت ببریم{% endblock %}
+{% block og_title %}پیچک دانش | با هم، از یادگیری لذت ببریم{% endblock %}
 {% block content %}
 <style>
-.pichak-home{direction:rtl;min-height:calc(100vh - 140px);padding:48px 18px 56px;background:linear-gradient(145deg,#fffdf5 0%,#f2f8ed 100%);color:#294536;overflow:hidden}
-.ph-wrap{width:min(1040px,100%);margin:auto}
-.ph-hero{display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:32px;padding:clamp(24px,5vw,54px);border:1px solid #e4eddd;border-radius:30px;background:#ffffffd9;box-shadow:0 18px 55px #244b2c0d}
-.ph-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:99px;background:#eff7e8;color:#347044;font-size:12px;font-weight:800}
-.ph-kicker:before{content:"";width:8px;height:8px;border-radius:50%;background:#65a943}
-.ph-copy h1{margin:18px 0 12px;font-size:clamp(32px,5vw,51px);line-height:1.45;color:#17472c;letter-spacing:-1px}
-.ph-copy h1 span{color:#4a982f}
-.ph-copy p{max-width:510px;margin:0;color:#718174;font-size:15px;line-height:2.2}
-.ph-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:25px}
-.ph-btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 21px;border-radius:13px;text-decoration:none;font-size:13px;font-weight:900;transition:.18s}
-.ph-btn-main{background:#1d7843;color:#fff;box-shadow:0 9px 20px #1d784326}
-.ph-btn-main:hover{background:#155e34;transform:translateY(-2px)}
-.ph-btn-soft{background:#f4f8ef;border:1px solid #e1ebd9;color:#356444}
-.ph-art{min-height:285px;display:grid;place-items:center;position:relative}
-.ph-orbit{position:absolute;width:min(275px,80%);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#e4f2cf,#f4f8e9 68%,#fff8e8)}
-.ph-mascot{position:relative;width:min(245px,90%);height:255px;display:grid;place-items:center}
-.ph-mascot img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 14px 16px #315b2c20)}
-.ph-note{position:absolute;right:0;bottom:12px;padding:10px 13px;border:1px solid #e6eedf;border-radius:13px;background:#fff;color:#55715b;font-size:11px;font-weight:800;box-shadow:0 8px 22px #315b2c10}
-.ph-features{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:16px}
-.ph-feature{display:flex;align-items:center;gap:12px;padding:16px;border:1px solid #e5eddf;border-radius:17px;background:#ffffffc9}
-.ph-icon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:13px;background:#eff7e8;font-size:20px}
-.ph-feature strong{display:block;color:#31573c;font-size:13px}
-.ph-feature small{display:block;margin-top:3px;color:#849186;font-size:11px}
-.ph-footer{text-align:center;margin-top:22px;color:#98a397;font-size:10px}
-@media(max-width:720px){.pichak-home{padding:25px 13px 36px}.ph-hero{grid-template-columns:1fr;gap:12px;text-align:center;padding:25px 19px}.ph-copy p{margin:auto;font-size:13px}.ph-actions{justify-content:center}.ph-art{min-height:220px;grid-row:1}.ph-mascot{height:210px;width:205px}.ph-features{grid-template-columns:1fr;gap:9px}.ph-feature{text-align:right}.ph-copy h1{font-size:34px}}
+.p-home{direction:rtl;overflow:hidden;background:#f6f8f2;color:#203c2b;padding:30px 20px 68px}
+.p-home-wrap{width:min(1160px,100%);margin:auto}
+.p-home-nav{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:0 0 20px}.p-home-label{display:flex;align-items:center;gap:9px;color:#52705a;font-size:12px;font-weight:800}.p-home-dot{width:9px;height:9px;border-radius:50%;background:#78b64b;box-shadow:0 0 0 5px #78b64b20}.p-home-mini{color:#8a988b;font-size:11px}
+.p-home-hero{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:35px;min-height:430px;padding:clamp(28px,5vw,62px);border-radius:30px;background:linear-gradient(120deg,#143e2a 0%,#1d6540 58%,#3a8a4c 100%);color:white;box-shadow:0 22px 60px #173e2b20}
+.p-home-hero:before{content:"";position:absolute;z-index:-1;left:-130px;top:-190px;width:520px;height:520px;border:1px solid #ffffff1d;border-radius:50%;box-shadow:0 0 0 48px #ffffff08,0 0 0 100px #ffffff05}
+.p-home-hero:after{content:"";position:absolute;z-index:-1;right:0;bottom:0;width:100%;height:45%;background:linear-gradient(0deg,#0e332322,transparent);pointer-events:none}
+.p-home-copy{position:relative;z-index:2}.p-home-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid #ffffff3b;border-radius:99px;background:#ffffff12;color:#e7f4e8;font-size:11px;font-weight:800}.p-home-kicker b{color:#c5e58c}
+.p-home-copy h1{margin:20px 0 13px;font-size:clamp(34px,5vw,58px);line-height:1.42;letter-spacing:-1.4px;color:#fff}.p-home-copy h1 span{color:#c5e58c}.p-home-copy p{max-width:500px;margin:0;color:#d8e9dc;font-size:14px;line-height:2.25}
+.p-home-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:27px}.p-home-btn{display:inline-flex;align-items:center;justify-content:center;min-height:49px;padding:0 21px;border-radius:13px;text-decoration:none;font-size:12px;font-weight:900;transition:.18s}.p-home-btn.main{background:#f4f7e9;color:#194a30;box-shadow:0 10px 25px #082e1d35}.p-home-btn.alt{border:1px solid #ffffff55;background:#ffffff12;color:#fff}.p-home-btn:hover{transform:translateY(-2px)}
+.p-home-art{position:relative;z-index:1;display:grid;place-items:center;min-height:300px}.p-home-glow{position:absolute;width:min(340px,85%);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#d9edb8 0%,#a8cf7040 50%,transparent 72%)}.p-home-mascot{position:relative;width:min(290px,90%);height:300px;display:grid;place-items:center}.p-home-mascot img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 22px 22px #092d1d60)}.p-home-float{position:absolute;padding:10px 14px;border:1px solid #ffffff55;border-radius:13px;background:#ffffffeb;color:#315b3c;font-size:11px;font-weight:900;box-shadow:0 12px 30px #082e1d30}.p-home-float.one{right:0;top:45px}.p-home-float.two{left:0;bottom:36px}
+.p-home-benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:16px}.p-home-benefit{display:flex;align-items:center;gap:13px;padding:18px;border:1px solid #e5ebe1;border-radius:17px;background:#fff;box-shadow:0 8px 22px #244a2b08}.p-home-icon{width:45px;height:45px;flex:0 0 45px;display:grid;place-items:center;border-radius:14px;background:#eff6e9;font-size:21px}.p-home-benefit strong{display:block;color:#294e34;font-size:13px}.p-home-benefit small{display:block;margin-top:3px;color:#89958b;font-size:10px}
+.p-home-bottom{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:26px;padding:17px 3px;border-top:1px solid #e2e9df;color:#89958b;font-size:11px}.p-home-bottom strong{color:#52765a}
+@media(max-width:760px){.p-home{padding:18px 12px 45px}.p-home-hero{grid-template-columns:1fr;gap:0;padding:25px 21px;min-height:auto;text-align:center}.p-home-art{grid-row:1;min-height:220px}.p-home-mascot{height:215px;width:210px}.p-home-copy h1{font-size:36px;margin:12px 0}.p-home-copy p{font-size:12px;margin:auto}.p-home-actions{justify-content:center;margin-top:19px}.p-home-benefits{grid-template-columns:1fr;gap:8px}.p-home-benefit{padding:13px}.p-home-float.one{right:2px;top:25px}.p-home-float.two{left:0;bottom:18px}.p-home-bottom{flex-direction:column;text-align:center}.p-home-mini{display:none}}
 </style>
-<section class="pichak-home">
- <div class="ph-wrap">
-  <div class="ph-hero">
-   <div class="ph-copy">
-    <span class="ph-kicker">فضای یادگیری پایه ششم</span>
-    <h1>با هم، از یادگیری<br><span>لذت ببریم!</span></h1>
-    <p>به پیچک دانش خوش آمدی؛ یک فضای ساده برای دیدن تکلیف‌ها، شرکت در آزمون‌ها و دنبال کردن قدم‌های کوچک پیشرفت.</p>
-    <div class="ph-actions">
-     <a class="ph-btn ph-btn-main" href="{% url 'login' %}">ورود به سامانه <span aria-hidden="true">←</span></a>
-     <a class="ph-btn ph-btn-soft" href="#ph-features">آشنایی با امکانات</a>
-    </div>
-   </div>
-   <div class="ph-art" aria-label="شخصیت پیچک دانش">
-    <div class="ph-orbit"></div>
-    <div class="ph-mascot"><img src="{% static 'img/brand/sprout.svg' %}" alt="پیچک، همراه یادگیری"></div>
-    <div class="ph-note">🌱 هر روز، یک قدم رو به رشد</div>
-   </div>
-  </div>
-  <div class="ph-features" id="ph-features">
-   <div class="ph-feature"><span class="ph-icon">📚</span><div><strong>یادگیری و تمرین</strong><small>تکلیف‌ها و فعالیت‌های کلاسی</small></div></div>
-   <div class="ph-feature"><span class="ph-icon">🧠</span><div><strong>فکر کردن و آزمون</strong><small>فرصتی برای سنجیدن آموخته‌ها</small></div></div>
-   <div class="ph-feature"><span class="ph-icon">🌿</span><div><strong>دیدن پیشرفت</strong><small>پیگیری تلاش‌ها و بازخورد معلم</small></div></div>
-  </div>
-  <div class="ph-footer">پیچک دانش · با هم یاد می‌گیریم و رشد می‌کنیم</div>
- </div>
-</section>
+<section class="p-home"><div class="p-home-wrap">
+ <div class="p-home-nav"><div class="p-home-label"><span class="p-home-dot"></span> فضای یادگیری و رشد پایه ششم</div><span class="p-home-mini">ویژه دانش‌آموزان، معلمان و خانواده‌ها</span></div>
+ <header class="p-home-hero">
+  <div class="p-home-copy"><span class="p-home-kicker"><b>✦</b> یادگیری، تمرین و پیشرفت در کنار هم</span><h1>با هم، از یادگیری<br><span>لذت ببریم!</span></h1><p>پیچک دانش جایی است برای تمرین کردن، آزمون دادن، دیدن نتیجه تلاش‌ها و قدم برداشتن به سوی پیشرفت؛ هر روز کمی بیشتر از دیروز.</p><div class="p-home-actions"><a class="p-home-btn main" href="{% url 'login' %}">ورود به فضای یادگیری ←</a><a class="p-home-btn alt" href="#p-home-benefits">امکانات پیچک</a></div></div>
+  <div class="p-home-art" aria-label="شخصیت پیچک دانش"><div class="p-home-glow"></div><div class="p-home-mascot"><img src="{% static 'img/brand/sprout.svg' %}" alt="پیچک، همراه مسیر یادگیری"></div><div class="p-home-float one">🌱 هر روز یک قدم رو به رشد</div><div class="p-home-float two">⭐ تلاش تو ارزشمنده</div></div>
+ </header>
+ <div class="p-home-benefits" id="p-home-benefits"><article class="p-home-benefit"><span class="p-home-icon">📚</span><div><strong>تمرین و فعالیت‌های کلاسی</strong><small>تکلیف‌ها را ببین و نتیجه تلاشت را ثبت کن</small></div></article><article class="p-home-benefit"><span class="p-home-icon">🧩</span><div><strong>آزمون و سنجش یادگیری</strong><small>آموخته‌هایت را در آزمون‌ها محک بزن</small></div></article><article class="p-home-benefit"><span class="p-home-icon">🌿</span><div><strong>رشد و بازخورد</strong><small>پیشرفتت را ببین و از معلم بازخورد بگیر</small></div></article></div>
+ <footer class="p-home-bottom"><strong>پیچک دانش · با هم یاد می‌گیریم و رشد می‌کنیم</strong><span>یک فضای امن برای یادگیری و تلاش روزانه</span></footer>
+</div></section>
 {% endblock %}
