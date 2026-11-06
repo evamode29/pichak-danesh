@@ -1,80 +1,28 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}خانه یادگیری من | پیچک دانش{% endblock %}
+{% block title %}فضای یادگیری من | پیچک دانش{% endblock %}
 {% block content %}
 <style>
-.studio{max-width:1080px;margin:auto;padding:28px 18px 68px;direction:rtl;color:#23432e}
-.studio-hero{position:relative;overflow:hidden;display:grid;grid-template-columns:1.3fr .7fr;gap:20px;align-items:center;padding:30px;border-radius:28px;background:linear-gradient(125deg,#104a27 0%,#197b43 62%,#65b83e 100%);color:#fff;box-shadow:0 20px 50px #14542d22}
-.studio-hero:after{content:"";position:absolute;left:-25px;bottom:-60px;width:270px;height:230px;background:url("{% static 'img/brand/vine-divider.svg' %}") center/contain no-repeat;opacity:.23;transform:rotate(-12deg)}
-.studio-hello,.studio-art{position:relative;z-index:1}.studio-kicker{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid #ffffff45;border-radius:99px;background:#ffffff18;font-size:11px;font-weight:800}
-.studio-hero h1{font-size:clamp(23px,4vw,32px);margin:12px 0 5px;line-height:1.5}.studio-hero p{margin:0;color:#e4f4e8;font-size:13px;line-height:2}
-.studio-art{justify-self:center;width:150px;height:150px;border-radius:42px;background:#ffffff19;border:1px solid #ffffff42;display:grid;place-items:center;transform:rotate(-5deg)}
-.studio-art img{width:116px;height:116px;object-fit:contain;transform:rotate(5deg)}
-.studio-level{margin-top:17px;max-width:430px}.studio-level-top{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#e6f4e9;margin-bottom:7px}.studio-track{height:9px;border-radius:20px;background:#ffffff35;overflow:hidden}.studio-track span{display:block;height:100%;border-radius:20px;background:#f7c957}
-.studio-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:16px 0 22px}.studio-stat{padding:15px 16px;border:1px solid #e3ebdf;border-radius:18px;background:linear-gradient(145deg,#fff,#f7fbf3);box-shadow:0 10px 26px #234c2b09}
-.studio-stat small{display:block;color:#78867a;font-size:11px}.studio-stat strong{display:block;font-size:25px;color:#1d6838;line-height:1.6}.studio-stat span{font-size:10px;color:#9aa59a}
-.studio-section{margin-top:18px}.studio-section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px}.studio-section h2{font-size:18px;margin:0;color:#204b2e}.studio-section-head p{margin:3px 0 0;color:#8a978b;font-size:11px}
-.studio-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.studio-task{padding:17px;border:1px solid #e2ebdf;border-radius:19px;background:#fff;box-shadow:0 9px 24px #1f4d2a08;min-width:0}
-.studio-task-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.studio-task-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:#edf7e9;font-size:21px}.studio-status{padding:5px 9px;border-radius:99px;font-size:10px;font-weight:800;white-space:nowrap}.status-pending{background:#fff4d9;color:#946414}.status-review{background:#eaf1ff;color:#4264a6}.status-done{background:#e7f6eb;color:#247442}
-.studio-task h3{font-size:15px;margin:12px 0 4px;color:#244c30}.studio-task p{font-size:12px;color:#77857a;line-height:2;margin:0 0 10px;white-space:pre-line}.studio-task-meta{display:flex;gap:12px;flex-wrap:wrap;color:#89968a;font-size:10px;padding-top:9px;border-top:1px solid #eff3ed}
-.studio-feedback{margin-top:11px;padding:10px 12px;border-radius:12px;background:#f4f9f0;color:#42654a;font-size:11px;line-height:1.9}
-.studio-action{margin-top:13px;display:inline-flex;border:0;border-radius:11px;padding:9px 13px;background:#1d7a43;color:white;font:inherit;font-size:11px;font-weight:900;cursor:pointer}.studio-action:disabled{background:#edf2ed;color:#8a968b;cursor:default}
-.studio-empty{padding:30px 18px;text-align:center;border:1px dashed #cdddc9;border-radius:20px;background:#fbfdf8;color:#829084}.studio-empty b{display:block;color:#426a4a;font-size:14px;margin-bottom:5px}.studio-empty p{font-size:11px;margin:0}
-.studio-alert{padding:11px 14px;border-radius:12px;margin:13px 0;font-size:12px;background:#e9f7ed;color:#176b38}.studio-alert.error{background:#fff0ed;color:#a33b2b}
-.studio-lower{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:17px}.studio-info{padding:17px;border:1px solid #e2ebdf;border-radius:18px;background:#fff}.studio-info h3{font-size:14px;margin:0 0 7px}.studio-info p{font-size:11px;color:#7e8b80;line-height:2;margin:0}
-@media(max-width:700px){.studio-hero{grid-template-columns:1fr;padding:23px}.studio-art{display:none}.studio-stats{grid-template-columns:repeat(2,1fr);gap:9px}.studio-grid,.studio-lower{grid-template-columns:1fr}.studio-stat{padding:12px}.studio-stat strong{font-size:22px}}
+.ps-page{max-width:1160px;margin:auto;padding:28px 20px 68px;direction:rtl;color:#244331}.ps-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.ps-crumb{font-size:11px;color:#8a988d}.ps-crumb b{color:#3c7950}
+.ps-hero{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:1fr auto;align-items:center;gap:20px;padding:29px 32px;border-radius:26px;background:linear-gradient(120deg,#143e2a,#1d7042 62%,#5a9e43);color:#fff;box-shadow:0 18px 44px #174b2c20}.ps-hero:before{content:"";position:absolute;z-index:-1;left:-70px;top:-120px;width:300px;height:300px;border:1px solid #ffffff28;border-radius:50%;box-shadow:0 0 0 38px #ffffff09,0 0 0 78px #ffffff06}.ps-kicker{display:inline-flex;padding:6px 10px;border:1px solid #ffffff40;border-radius:99px;background:#ffffff12;color:#e7f3e8;font-size:10px;font-weight:800}.ps-hero h1{margin:11px 0 5px;font-size:clamp(24px,4vw,32px)}.ps-hero p{margin:0;color:#dcece0;font-size:12px;line-height:2}.ps-mark{width:105px;height:105px;display:grid;place-items:center;border:1px solid #ffffff40;border-radius:28px;background:#ffffff13;transform:rotate(-5deg)}.ps-mark img{width:80px;height:80px;object-fit:contain;transform:rotate(5deg)}
+.ps-progress{max-width:440px;margin-top:17px}.ps-progress-top{display:flex;justify-content:space-between;gap:8px;margin-bottom:7px;color:#e6f2e8;font-size:10px}.ps-track{height:8px;border-radius:99px;background:#ffffff36;overflow:hidden}.ps-track span{display:block;height:100%;border-radius:99px;background:#c9e58d}
+.ps-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:15px 0 25px}.ps-stat{padding:14px;border:1px solid #e4ece1;border-radius:16px;background:#fff;box-shadow:0 7px 22px #244a2b08}.ps-stat small{display:block;color:#859286;font-size:10px}.ps-stat strong{display:block;margin-top:4px;color:#23643b;font-size:25px}.ps-stat span{display:block;color:#a0aaa0;font-size:9px}
+.ps-alert{padding:11px 14px;margin:12px 0;border-radius:12px;background:#eaf6ec;color:#276a3d;font-size:11px}.ps-alert.error{background:#fff0ed;color:#a33b2b}
+.ps-section{margin-top:24px}.ps-section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px}.ps-section-head h2{margin:0;color:#214c31;font-size:17px}.ps-section-head p{margin:3px 0 0;color:#8c998e;font-size:10px}
+.ps-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.ps-card{min-width:0;padding:17px;border:1px solid #e3ebe0;border-radius:17px;background:#fff;box-shadow:0 7px 22px #244a2b08}.ps-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.ps-icon{width:39px;height:39px;display:grid;place-items:center;border-radius:12px;background:#eff6e9;font-size:19px}.ps-status{padding:5px 9px;border-radius:99px;font-size:9px;font-weight:900;white-space:nowrap}.ps-pending{background:#fff4db;color:#946514}.ps-review{background:#edf2ff;color:#4966a3}.ps-done{background:#eaf6ec;color:#287343}.ps-card h3{margin:11px 0 4px;color:#2b5136;font-size:14px}.ps-card p{margin:0;color:#7f8c81;font-size:11px;line-height:2;white-space:pre-line}.ps-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:11px;padding-top:9px;border-top:1px solid #edf1eb;color:#929d93;font-size:9px}.ps-note{margin-top:10px;padding:9px 11px;border-radius:10px;background:#f3f8ef;color:#58745a;font-size:10px;line-height:1.9}.ps-btn{display:inline-flex;align-items:center;justify-content:center;margin-top:11px;padding:9px 12px;border:0;border-radius:10px;background:#247b46;color:#fff;font:inherit;font-size:10px;font-weight:900;cursor:pointer}.ps-btn:disabled{background:#edf2ec;color:#849184;cursor:default}.ps-btn.soft{background:#eff5eb;color:#4b704f;text-decoration:none}
+.ps-empty{padding:27px 15px;border:1px dashed #cbdcc8;border-radius:17px;background:#fbfdf9;text-align:center;color:#879488}.ps-empty b{display:block;margin-bottom:4px;color:#41694a;font-size:12px}.ps-empty p{margin:0;font-size:10px}
+.ps-bottom{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:19px}.ps-info{padding:15px;border:1px solid #e4ece1;border-radius:15px;background:#fff}.ps-info strong{display:block;color:#31583b;font-size:12px}.ps-info p{margin:5px 0 0;color:#829084;font-size:10px;line-height:2}
+@media(max-width:760px){.ps-page{padding:18px 12px 48px}.ps-hero{padding:22px;grid-template-columns:1fr}.ps-mark{display:none}.ps-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ps-stat{padding:12px}.ps-stat strong{font-size:22px}.ps-grid,.ps-bottom{grid-template-columns:1fr}.ps-section-head{align-items:center}}
 </style>
-<section class="studio">
-<header class="studio-hero">
-  <div class="studio-hello">
-    <span class="studio-kicker">🌱 مسیر رشد من در پیچک</span>
-    <h1>سلام {{ student.user.first_name|default:student.user.username }}! خوش اومدی</h1>
-    <p>هر قدم کوچیک، یک پیشرفت بزرگه. مأموریت‌هات رو انجام بده و مسیر یادگیری خودت رو بساز.</p>
-    <div class="studio-level">
-      <div class="studio-level-top"><span>سطح {{ student.level }} · {{ student.xp }} امتیاز تجربه</span><span>{{ student.xp_to_next_level }} تا سطح بعدی</span></div>
-      <div class="studio-track"><span style="width:{{ student.level_progress_percent }}%"></span></div>
-    </div>
-  </div>
-  <div class="studio-art"><img src="{% static 'img/brand/sprout.svg' %}" alt="نماد رشد پیچک"></div>
-</header>
-{% if message %}<div class="studio-alert">{{ message }}</div>{% endif %}{% if error %}<div class="studio-alert error">{{ error }}</div>{% endif %}
-<div class="studio-stats">
-  <div class="studio-stat"><small>امتیازهای من</small><strong>{{ student.points }}</strong><span>⭐ امتیاز تلاش‌ها</span></div>
-  <div class="studio-stat"><small>فعالیت‌های من</small><strong>{{ total_tasks }}</strong><span>📚 در مجموع</span></div>
-  <div class="studio-stat"><small>تأییدشده</small><strong>{{ completed_tasks }}</strong><span>🏅 با موفقیت</span></div>
-  <div class="studio-stat"><small>در انتظار انجام</small><strong>{{ pending_tasks }}</strong><span>🌱 قدم بعدی من</span></div><div class="studio-stat"><small>در انتظار بررسی</small><strong>{{ waiting_tasks }}</strong><span>📨 فرستاده‌شده برای معلم</span></div>
-</div>
-<section class="studio-section">
-  <div class="studio-section-head"><div><h2>🎯 مأموریت‌های یادگیری من</h2><p>فعالیت‌هایی که معلم برای کلاس تو فرستاده است</p></div></div>
-  {% if task_records %}
-  <div class="studio-grid">
-  {% for record in task_records %}
-    <article class="studio-task">
-      <div class="studio-task-top">
-        <div class="studio-task-icon">{% if record.status == "done" %}🏅{% elif record.status == "review" %}📨{% else %}🌟{% endif %}</div>
-        {% if record.status == "done" %}<span class="studio-status status-done">تأیید شده</span>{% elif record.status == "review" %}<span class="studio-status status-review">در انتظار بررسی</span>{% else %}<span class="studio-status status-pending">منتظر شروع</span>{% endif %}
-      </div>
-      <h3>{{ record.task.title }}</h3>
-      {% if record.task.description %}<p>{{ record.task.description }}</p>{% else %}<p>برای این مأموریت آماده شو و با تمرکز انجامش بده.</p>{% endif %}
-      <div class="studio-task-meta"><span>📅 {{ record.task.task_date|date:"Y/m/d" }}</span><span>⭐ تا {{ record.task.max_score }} امتیاز</span><span>📘 {{ record.task.classroom.name }}</span></div>
-      {% if record.note %}<div class="studio-feedback"><b>پیام معلم:</b> {{ record.note }}</div>{% endif %}
-      {% if record.score != None %}<div class="studio-feedback">امتیاز ثبت‌شده: <b>{{ record.score }} از {{ record.task.max_score }}</b></div>{% endif %}
-      {% if record.status == "pending" %}
-      <form method="post">{% csrf_token %}<input type="hidden" name="action" value="submit_task"><input type="hidden" name="record_id" value="{{ record.id }}"><button class="studio-action" type="submit">انجام دادم؛ ارسال برای معلم ←</button></form>
-      {% elif record.status == "review" %}<button class="studio-action" type="button" disabled>منتظر نظر معلم هستم</button>
-      {% else %}<button class="studio-action" type="button" disabled>این مأموریت کامل شد ✓</button>{% endif %}
-    </article>
-  {% endfor %}
-  </div>
-  {% else %}
-  <div class="studio-empty"><b>هنوز مأموریتی برایت ثبت نشده 🌿</b><p>به‌زودی معلمت فعالیت‌های تازه‌ای به اینجا اضافه می‌کند.</p></div>
-  {% endif %}
-</section>
-<section class="studio-section"><div class="studio-section-head"><div><h2>🧩 آزمون‌های من</h2><p>نتیجه تلاش‌های قبلی و آزمون‌های منتشرشده</p></div><a class="studio-action" href="{% url 'student-test-list' %}">دیدن آزمون‌ها ←</a></div>{% if attempts %}<div class="studio-grid">{% for attempt in attempts %}<article class="studio-task"><div class="studio-task-top"><div class="studio-task-icon">🧠</div><span class="studio-status status-done">ثبت‌شده</span></div><h3>{{ attempt.test.title }}</h3><p>نتیجه: {{ attempt.correct_answers }} پاسخ درست از {{ attempt.total_questions }}</p><div class="studio-task-meta"><span>📊 {{ attempt.score }}٪</span><span>📅 {{ attempt.completed_at|date:"Y/m/d" }}</span></div></article>{% endfor %}</div>{% else %}<div class="studio-empty"><b>هنوز آزمونی انجام نداده‌ای</b><p>وقتی معلم آزمونی منتشر کند، از بخش آزمون‌ها می‌توانی شروع کنی.</p></div>{% endif %}</section>
-<div class="studio-lower">
-  <section class="studio-info"><h3>🏫 کلاس من</h3><p>{{ student.classroom.name|default:"هنوز کلاسی به حساب تو متصل نشده است." }}{% if student.classroom %} · پایه {{ student.grade }}{% endif %}</p></section>
-  <section class="studio-info"><h3>💡 یک یادآوری کوچک</h3><p>قرار نیست همیشه بی‌نقص باشی؛ مهم اینه که هر روز چیزی تازه یاد بگیری و از دیروز خودت یک قدم جلوتر باشی.</p></section>
-</div>
-<form method="post" action="{% url 'logout' %}" style="margin-top:20px">{% csrf_token %}<button class="studio-action" type="submit" style="background:#edf4ec;color:#42654a">خروج امن از حساب</button></form>
+<section class="ps-page">
+ <div class="ps-head"><div class="ps-crumb">پیچک دانش <span> / </span><b>فضای یادگیری من</b></div><span class="ps-crumb">هر روز یک قدم رو به جلو 🌱</span></div>
+ <header class="ps-hero"><div><span class="ps-kicker">🌱 مسیر رشد من</span><h1>سلام {{ student.user.first_name|default:student.user.username }}!</h1><p>خوش آمدی! اینجا می‌توانی فعالیت‌ها، آزمون‌ها و پیشرفت خودت را دنبال کنی.</p><div class="ps-progress"><div class="ps-progress-top"><span>سطح {{ student.level }} · {{ student.xp }} امتیاز تجربه</span><span>{{ student.xp_to_next_level }} تا سطح بعدی</span></div><div class="ps-track"><span style="width:{{ student.level_progress_percent }}%"></span></div></div></div><div class="ps-mark"><img src="{% static 'img/brand/sprout.svg' %}" alt="نشان پیچک دانش"></div></header>
+ {% if message %}<div class="ps-alert">{{ message }}</div>{% endif %}{% if error %}<div class="ps-alert error">{{ error }}</div>{% endif %}
+ <div class="ps-stats"><article class="ps-stat"><small>امتیازهای من</small><strong>{{ student.points }}</strong><span>⭐ تلاش‌های من</span></article><article class="ps-stat"><small>فعالیت‌ها</small><strong>{{ total_tasks }}</strong><span>📚 در مجموع</span></article><article class="ps-stat"><small>تأییدشده</small><strong>{{ completed_tasks }}</strong><span>🏅 کامل‌شده</span></article><article class="ps-stat"><small>در انتظار انجام</small><strong>{{ pending_tasks }}</strong><span>🌿 قدم بعدی</span></article><article class="ps-stat"><small>در انتظار بررسی</small><strong>{{ waiting_tasks }}</strong><span>📨 ارسال‌شده</span></article></div>
+ <section class="ps-section"><div class="ps-section-head"><div><h2>مأموریت‌های یادگیری من</h2><p>فعالیت‌هایی که معلم برای کلاس تو فرستاده است</p></div></div>
+ {% if task_records %}<div class="ps-grid">{% for record in task_records %}<article class="ps-card"><div class="ps-card-top"><span class="ps-icon">{% if record.status == "done" %}🏅{% elif record.status == "review" %}📨{% else %}🌟{% endif %}</span>{% if record.status == "done" %}<span class="ps-status ps-done">تأیید شده</span>{% elif record.status == "review" %}<span class="ps-status ps-review">در انتظار بررسی</span>{% else %}<span class="ps-status ps-pending">منتظر انجام</span>{% endif %}</div><h3>{{ record.task.title }}</h3><p>{% if record.task.description %}{{ record.task.description }}{% else %}برای این فعالیت آماده شو و با تمرکز انجامش بده.{% endif %}</p><div class="ps-meta"><span>📅 {{ record.task.task_date|date:"Y/m/d" }}</span><span>⭐ تا {{ record.task.max_score }} امتیاز</span><span>📘 {{ record.task.classroom.name }}</span></div>{% if record.note %}<div class="ps-note"><b>پیام معلم:</b> {{ record.note }}</div>{% endif %}{% if record.score != None %}<div class="ps-note">امتیاز ثبت‌شده: <b>{{ record.score }} از {{ record.task.max_score }}</b></div>{% endif %}{% if record.status == "pending" %}<form method="post">{% csrf_token %}<input type="hidden" name="action" value="submit_task"><input type="hidden" name="record_id" value="{{ record.id }}"><button class="ps-btn" type="submit">انجام دادم؛ ارسال برای معلم ←</button></form>{% elif record.status == "review" %}<button class="ps-btn" type="button" disabled>منتظر نظر معلم هستم</button>{% else %}<button class="ps-btn" type="button" disabled>این فعالیت کامل شد ✓</button>{% endif %}</article>{% endfor %}</div>{% else %}<div class="ps-empty"><b>هنوز فعالیتی برایت ثبت نشده 🌿</b><p>به‌زودی فعالیت‌های تازه معلمت را اینجا می‌بینی.</p></div>{% endif %}</section>
+ <section class="ps-section"><div class="ps-section-head"><div><h2>آزمون‌های من</h2><p>نتیجه تلاش‌های قبلی و آزمون‌های منتشرشده</p></div><a class="ps-btn soft" href="{% url 'student-test-list' %}">دیدن آزمون‌ها ←</a></div>{% if attempts %}<div class="ps-grid">{% for attempt in attempts %}<article class="ps-card"><div class="ps-card-top"><span class="ps-icon">🧩</span><span class="ps-status ps-done">ثبت‌شده</span></div><h3>{{ attempt.test.title }}</h3><p>{{ attempt.correct_answers }} پاسخ درست از {{ attempt.total_questions }}</p><div class="ps-meta"><span>📊 {{ attempt.score }}٪</span><span>📅 {{ attempt.completed_at|date:"Y/m/d" }}</span></div></article>{% endfor %}</div>{% else %}<div class="ps-empty"><b>هنوز آزمونی انجام نداده‌ای</b><p>وقتی معلم آزمونی منتشر کند، از بخش آزمون‌ها می‌توانی شروع کنی.</p></div>{% endif %}</section>
+ <div class="ps-bottom"><section class="ps-info"><strong>🏫 کلاس من</strong><p>{{ student.classroom.name|default:"هنوز کلاسی به حساب تو متصل نشده است." }}{% if student.classroom %} · پایه {{ student.grade }}{% endif %}</p></section><section class="ps-info"><strong>💡 یادت باشد</strong><p>قرار نیست همیشه بی‌نقص باشی؛ مهم این است که هر روز چیزی تازه یاد بگیری و یک قدم جلوتر بروی.</p></section></div>
+ <form method="post" action="{% url 'logout' %}" style="margin-top:18px">{% csrf_token %}<button class="ps-btn soft" type="submit">خروج امن از حساب</button></form>
 </section>
 {% endblock %}
