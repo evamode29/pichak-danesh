@@ -22,8 +22,8 @@ def seo_context(request):
     path = request.path or "/"
     canonical = urljoin(settings.SEO_SITE_URL + "/", path.lstrip("/"))
     description = (
-        "پیچک دانش؛ فضای ساده پایه ششم برای ورود دانش‌آموزان، "
-        "آزمون هوش تصویری و مشاهده نتیجه‌ها توسط معلم."
+        "پیچک دانش؛ فضای یادگیری و مدیریت آموزش برای دانش‌آموزان پایه ششم، "
+        "با فعالیت‌های کلاسی، آزمون، بازخورد معلم و پیگیری پیشرفت."
     )
     robots = "index, follow" if path == "/" else "noindex, nofollow"
     schema = {
