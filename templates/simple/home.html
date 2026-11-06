@@ -4,27 +4,53 @@
 {% block og_title %}پیچک دانش | با هم، از یادگیری لذت ببریم{% endblock %}
 {% block content %}
 <style>
-.p-home{direction:rtl;overflow:hidden;background:#f6f8f2;color:#203c2b;padding:30px 20px 68px}
-.p-home-wrap{width:min(1160px,100%);margin:auto}
-.p-home-nav{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:0 0 20px}.p-home-label{display:flex;align-items:center;gap:9px;color:#52705a;font-size:12px;font-weight:800}.p-home-dot{width:9px;height:9px;border-radius:50%;background:#78b64b;box-shadow:0 0 0 5px #78b64b20}.p-home-mini{color:#8a988b;font-size:11px}
-.p-home-hero{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:35px;min-height:430px;padding:clamp(28px,5vw,62px);border-radius:30px;background:linear-gradient(120deg,#143e2a 0%,#1d6540 58%,#3a8a4c 100%);color:white;box-shadow:0 22px 60px #173e2b20}
-.p-home-hero:before{content:"";position:absolute;z-index:-1;left:-130px;top:-190px;width:520px;height:520px;border:1px solid #ffffff1d;border-radius:50%;box-shadow:0 0 0 48px #ffffff08,0 0 0 100px #ffffff05}
-.p-home-hero:after{content:"";position:absolute;z-index:-1;right:0;bottom:0;width:100%;height:45%;background:linear-gradient(0deg,#0e332322,transparent);pointer-events:none}
-.p-home-copy{position:relative;z-index:2}.p-home-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid #ffffff3b;border-radius:99px;background:#ffffff12;color:#e7f4e8;font-size:11px;font-weight:800}.p-home-kicker b{color:#c5e58c}
-.p-home-copy h1{margin:20px 0 13px;font-size:clamp(34px,5vw,58px);line-height:1.42;letter-spacing:-1.4px;color:#fff}.p-home-copy h1 span{color:#c5e58c}.p-home-copy p{max-width:500px;margin:0;color:#d8e9dc;font-size:14px;line-height:2.25}
-.p-home-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:27px}.p-home-btn{display:inline-flex;align-items:center;justify-content:center;min-height:49px;padding:0 21px;border-radius:13px;text-decoration:none;font-size:12px;font-weight:900;transition:.18s}.p-home-btn.main{background:#f4f7e9;color:#194a30;box-shadow:0 10px 25px #082e1d35}.p-home-btn.alt{border:1px solid #ffffff55;background:#ffffff12;color:#fff}.p-home-btn:hover{transform:translateY(-2px)}
-.p-home-art{position:relative;z-index:1;display:grid;place-items:center;min-height:300px}.p-home-glow{position:absolute;width:min(340px,85%);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#d9edb8 0%,#a8cf7040 50%,transparent 72%)}.p-home-mascot{position:relative;width:min(290px,90%);height:300px;display:grid;place-items:center}.p-home-mascot img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 22px 22px #092d1d60)}.p-home-float{position:absolute;padding:10px 14px;border:1px solid #ffffff55;border-radius:13px;background:#ffffffeb;color:#315b3c;font-size:11px;font-weight:900;box-shadow:0 12px 30px #082e1d30}.p-home-float.one{right:0;top:45px}.p-home-float.two{left:0;bottom:36px}
-.p-home-benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:16px}.p-home-benefit{display:flex;align-items:center;gap:13px;padding:18px;border:1px solid #e5ebe1;border-radius:17px;background:#fff;box-shadow:0 8px 22px #244a2b08}.p-home-icon{width:45px;height:45px;flex:0 0 45px;display:grid;place-items:center;border-radius:14px;background:#eff6e9;font-size:21px}.p-home-benefit strong{display:block;color:#294e34;font-size:13px}.p-home-benefit small{display:block;margin-top:3px;color:#89958b;font-size:10px}
-.p-home-bottom{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:26px;padding:17px 3px;border-top:1px solid #e2e9df;color:#89958b;font-size:11px}.p-home-bottom strong{color:#52765a}
-@media(max-width:760px){.p-home{padding:18px 12px 45px}.p-home-hero{grid-template-columns:1fr;gap:0;padding:25px 21px;min-height:auto;text-align:center}.p-home-art{grid-row:1;min-height:220px}.p-home-mascot{height:215px;width:210px}.p-home-copy h1{font-size:36px;margin:12px 0}.p-home-copy p{font-size:12px;margin:auto}.p-home-actions{justify-content:center;margin-top:19px}.p-home-benefits{grid-template-columns:1fr;gap:8px}.p-home-benefit{padding:13px}.p-home-float.one{right:2px;top:25px}.p-home-float.two{left:0;bottom:18px}.p-home-bottom{flex-direction:column;text-align:center}.p-home-mini{display:none}}
+.px-landing{--px-green:#16833e;--px-dark:#14532d;--px-ink:#172033;--px-muted:#64748b;--px-line:#e2e8f0;direction:rtl;background:#fdfbf7;color:var(--px-ink);padding:30px 20px 54px;overflow:hidden}
+.px-wrap{width:min(1080px,100%);margin:auto}
+.px-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:22px 18px 0}
+.px-mascot-row{display:flex;align-items:center;justify-content:center;gap:14px;min-height:150px;margin-bottom:14px}
+.px-mascot{width:142px;height:154px;object-fit:contain;animation:px-float 4s ease-in-out infinite}
+.px-speech{position:relative;max-width:245px;padding:13px 16px;border:2px solid #a7f3d0;border-radius:19px;background:#fff;box-shadow:0 8px 24px #14532d0d;color:#334155;font-size:12px;font-weight:700;line-height:2;text-align:right}
+.px-speech:after{content:"";position:absolute;right:-9px;top:38px;width:14px;height:14px;background:#fff;border-top:2px solid #a7f3d0;border-right:2px solid #a7f3d0;transform:rotate(45deg)}
+.px-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid #bbf7d0;border-radius:99px;background:#ecfdf5;color:#047857;font-size:12px;font-weight:900}
+.px-title{margin:19px 0 10px;font-size:clamp(32px,5vw,48px);line-height:1.55;font-weight:900;letter-spacing:-1.2px;color:#172033}
+.px-title span{color:#16833e}
+.px-lead{max-width:690px;margin:0 auto;color:#64748b;font-size:15px;line-height:2.2}
+.px-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:25px}
+.px-button{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:51px;padding:0 25px;border-radius:15px;text-decoration:none;font-size:14px;font-weight:900;transition:.2s}
+.px-button.primary{background:linear-gradient(135deg,#1e9b50,#13743b);color:#fff;box-shadow:0 9px 20px #16833e30;border-bottom:3px solid #0d5b2d}
+.px-button.secondary{background:#fff;border:1px solid #dce7df;color:#31533c}
+.px-button:hover{transform:translateY(-3px);box-shadow:0 13px 25px #14532d1c}
+.px-pill-row{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:19px;color:#87918b;font-size:11px}
+.px-pill{padding:7px 12px;border:1px solid #dbece0;border-radius:12px;background:#f0fdf4;color:#287346;font-weight:800}
+.px-features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px;margin-top:52px;text-align:right}
+.px-feature{padding:22px 21px 20px;border:1px solid #e6e9e3;border-radius:24px;background:#fff;box-shadow:0 9px 26px #17203308;transition:.2s}
+.px-feature:hover{transform:translateY(-4px);box-shadow:0 15px 32px #17203312;border-color:#b7e4c7}
+.px-feature-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:16px;font-size:23px;margin-bottom:13px}
+.px-feature:nth-child(1) .px-feature-icon{background:#ecfdf5}.px-feature:nth-child(2) .px-feature-icon{background:#fffbeb}.px-feature:nth-child(3) .px-feature-icon{background:#fff1f2}
+.px-feature h2{margin:0 0 7px;color:#243b2c;font-size:15px;font-weight:900}
+.px-feature p{margin:0;color:#778278;font-size:12px;line-height:2.1}
+.px-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:35px;padding:18px 4px 0;border-top:1px solid #e8ece6;color:#929b93;font-size:11px}
+.px-bottom strong{color:#3d6b49}
+@keyframes px-float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+@media(max-width:680px){.px-landing{padding:18px 13px 38px}.px-mascot-row{gap:6px;min-height:130px}.px-mascot{width:112px;height:128px}.px-speech{max-width:205px;font-size:10px;padding:10px 12px}.px-title{font-size:32px;margin-top:13px}.px-lead{font-size:12px}.px-features{grid-template-columns:1fr;gap:10px;margin-top:35px}.px-feature{display:flex;align-items:flex-start;gap:13px;padding:15px}.px-feature-icon{flex:0 0 43px;width:43px;height:43px;margin:0}.px-bottom{flex-direction:column;text-align:center}.px-pill-row{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.px-mascot{animation:none}.px-button,.px-feature{transition:none}}
 </style>
-<section class="p-home"><div class="p-home-wrap">
- <div class="p-home-nav"><div class="p-home-label"><span class="p-home-dot"></span> فضای یادگیری و رشد پایه ششم</div><span class="p-home-mini">ویژه دانش‌آموزان، معلمان و خانواده‌ها</span></div>
- <header class="p-home-hero">
-  <div class="p-home-copy"><span class="p-home-kicker"><b>✦</b> یادگیری، تمرین و پیشرفت در کنار هم</span><h1>با هم، از یادگیری<br><span>لذت ببریم!</span></h1><p>پیچک دانش جایی است برای تمرین کردن، آزمون دادن، دیدن نتیجه تلاش‌ها و قدم برداشتن به سوی پیشرفت؛ هر روز کمی بیشتر از دیروز.</p><div class="p-home-actions"><a class="p-home-btn main" href="{% url 'login' %}">ورود به فضای یادگیری ←</a><a class="p-home-btn alt" href="#p-home-benefits">امکانات پیچک</a></div></div>
-  <div class="p-home-art" aria-label="شخصیت پیچک دانش"><div class="p-home-glow"></div><div class="p-home-mascot"><img src="{% static 'img/brand/sprout.svg' %}" alt="پیچک، همراه مسیر یادگیری"></div><div class="p-home-float one">🌱 هر روز یک قدم رو به رشد</div><div class="p-home-float two">⭐ تلاش تو ارزشمنده</div></div>
- </header>
- <div class="p-home-benefits" id="p-home-benefits"><article class="p-home-benefit"><span class="p-home-icon">📚</span><div><strong>تمرین و فعالیت‌های کلاسی</strong><small>تکلیف‌ها را ببین و نتیجه تلاشت را ثبت کن</small></div></article><article class="p-home-benefit"><span class="p-home-icon">🧩</span><div><strong>آزمون و سنجش یادگیری</strong><small>آموخته‌هایت را در آزمون‌ها محک بزن</small></div></article><article class="p-home-benefit"><span class="p-home-icon">🌿</span><div><strong>رشد و بازخورد</strong><small>پیشرفتت را ببین و از معلم بازخورد بگیر</small></div></article></div>
- <footer class="p-home-bottom"><strong>پیچک دانش · با هم یاد می‌گیریم و رشد می‌کنیم</strong><span>یک فضای امن برای یادگیری و تلاش روزانه</span></footer>
-</div></section>
+<section class="px-landing">
+<div class="px-wrap">
+ <div class="px-hero">
+  <div class="px-mascot-row"><img class="px-mascot" src="{% static 'img/brand/pichak-mascot.svg' %}" alt="پیچک، همیار یادگیری"><div class="px-speech">سلام! من پیچک هستم، همیار یادگیری شما 🌱<br>با هم قدم‌به‌قدم پیشرفت می‌کنیم.</div></div>
+  <span class="px-badge">✦ سامانه آموزشی ویژه پایه ششم دبستان</span>
+  <h1 class="px-title">با هم، از یادگیری <span>لذت ببریم!</span></h1>
+  <p class="px-lead">پیچک دانش، بستری ساده، آرام و انگیزه‌بخش برای تعامل صمیمانه آموزگار و دانش‌آموزان است؛ جایی که تکالیف، آزمون‌ها و بازخوردهای کلاسی در محیطی دوست‌داشتنی سامان می‌یابند.</p>
+  <div class="px-actions"><a class="px-button primary" href="{% url 'login' %}">ورود به سامانه <span aria-hidden="true">←</span></a><a class="px-button secondary" href="#px-features">آشنایی با امکانات</a></div>
+  <div class="px-pill-row"><span>فضایی برای:</span><span class="px-pill">📚 تمرین و یادگیری</span><span class="px-pill">🧩 آزمون و سنجش</span><span class="px-pill">🌱 رشد و پیشرفت</span></div>
+ </div>
+ <div class="px-features" id="px-features">
+  <article class="px-feature"><span class="px-feature-icon">📚</span><div><h2>تکالیف و آزمون‌های منظم</h2><p>دریافت آسان فعالیت‌ها، زمان تحویل مشخص و ثبت پاسخ‌ها بدون دغدغه و پیچیدگی.</p></div></article>
+  <article class="px-feature"><span class="px-feature-icon">🏅</span><div><h2>مشاهده سریع نمرات و رشد</h2><p>کارنامه روان، مشاهده روند پیشرفت در درس‌ها و ارزیابی عادلانه مهارت‌ها.</p></div></article>
+  <article class="px-feature"><span class="px-feature-icon">💚</span><div><h2>بازخورد صمیمانه معلم</h2><p>ارتباط مهرآمیز و یادداشت‌های روحیه‌بخش آموزگار برای افزایش انگیزه و اعتمادبه‌نفس.</p></div></article>
+ </div>
+ <footer class="px-bottom"><strong>پیچک دانش • با هم یاد می‌گیریم و رشد می‌کنیم</strong><span>سامانه آموزش پایه ششم دبستان</span></footer>
+</div>
+</section>
 {% endblock %}
