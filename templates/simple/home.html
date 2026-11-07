@@ -1,59 +1,69 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}پیچک دانش | با هم یاد می‌گیریم{% endblock %}
-{% block og_title %}پیچک دانش | با هم یاد می‌گیریم{% endblock %}
+{% block title %}پیچک دانش | با هم، از یادگیری لذت ببریم!{% endblock %}
+{% block og_title %}پیچک دانش | با هم، از یادگیری لذت ببریم!{% endblock %}
 {% block content %}
 <style>
-.pichak-home{direction:rtl;min-height:calc(100vh - 140px);padding:48px 18px 56px;background:linear-gradient(145deg,#fffdf5 0%,#f2f8ed 100%);color:#294536;overflow:hidden}
-.ph-wrap{width:min(1040px,100%);margin:auto}
-.ph-hero{display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:32px;padding:clamp(24px,5vw,54px);border:1px solid #e4eddd;border-radius:30px;background:#ffffffd9;box-shadow:0 18px 55px #244b2c0d}
-.ph-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:99px;background:#eff7e8;color:#347044;font-size:12px;font-weight:800}
-.ph-kicker:before{content:"";width:8px;height:8px;border-radius:50%;background:#65a943}
-.ph-copy h1{margin:18px 0 12px;font-size:clamp(32px,5vw,51px);line-height:1.45;color:#17472c;letter-spacing:-1px}
-.ph-copy h1 span{color:#4a982f}
-.ph-copy p{max-width:510px;margin:0;color:#718174;font-size:15px;line-height:2.2}
-.ph-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:25px}
-.ph-btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 21px;border-radius:13px;text-decoration:none;font-size:13px;font-weight:900;transition:.18s}
-.ph-btn-main{background:#1d7843;color:#fff;box-shadow:0 9px 20px #1d784326}
-.ph-btn-main:hover{background:#155e34;transform:translateY(-2px)}
-.ph-btn-soft{background:#f4f8ef;border:1px solid #e1ebd9;color:#356444}
-.ph-art{min-height:285px;display:grid;place-items:center;position:relative}
-.ph-orbit{position:absolute;width:min(275px,80%);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#e4f2cf,#f4f8e9 68%,#fff8e8)}
-.ph-mascot{position:relative;width:min(245px,90%);height:255px;display:grid;place-items:center}
-.ph-mascot img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 14px 16px #315b2c20)}
-.ph-note{position:absolute;right:0;bottom:12px;padding:10px 13px;border:1px solid #e6eedf;border-radius:13px;background:#fff;color:#55715b;font-size:11px;font-weight:800;box-shadow:0 8px 22px #315b2c10}
-.ph-features{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:16px}
-.ph-feature{display:flex;align-items:center;gap:12px;padding:16px;border:1px solid #e5eddf;border-radius:17px;background:#ffffffc9}
-.ph-icon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:13px;background:#eff7e8;font-size:20px}
-.ph-feature strong{display:block;color:#31573c;font-size:13px}
-.ph-feature small{display:block;margin-top:3px;color:#849186;font-size:11px}
-.ph-footer{text-align:center;margin-top:22px;color:#98a397;font-size:10px}
-@media(max-width:720px){.pichak-home{padding:25px 13px 36px}.ph-hero{grid-template-columns:1fr;gap:12px;text-align:center;padding:25px 19px}.ph-copy p{margin:auto;font-size:13px}.ph-actions{justify-content:center}.ph-art{min-height:220px;grid-row:1}.ph-mascot{height:210px;width:205px}.ph-features{grid-template-columns:1fr;gap:9px}.ph-feature{text-align:right}.ph-copy h1{font-size:34px}}
+.pichak-home{direction:rtl;position:relative;isolation:isolate;overflow:hidden;min-height:calc(100vh - 105px);padding:0 24px 42px;background:linear-gradient(180deg,#eaf8fa 0%,#f7fff2 43%,#f4fbdc 100%);color:#172b20}
+.ph-sky{position:absolute;inset:0 0 auto;height:69%;z-index:-2;background:radial-gradient(ellipse at 73% 44%,#fff 0%,#ffffffd9 24%,transparent 54%),linear-gradient(180deg,#e5f7fb 0%,#f5ffe8 100%)}
+.ph-land{position:absolute;z-index:-1;left:-5%;right:-5%;bottom:0;height:36%;border-radius:50% 50% 0 0/18% 18% 0 0;background:linear-gradient(180deg,#d9f3a5,#a8df66 78%,#91d64c)}
+.ph-land:before{content:"";position:absolute;left:-4%;right:-4%;top:-22px;height:62px;border-radius:50%;background:#f4fbdc}
+.ph-wrap{width:min(1500px,100%);margin:auto}
+.ph-hero{display:grid;grid-template-columns:minmax(390px,.95fr) minmax(470px,1.2fr);align-items:center;gap:20px;min-height:500px;padding:26px 3.5% 16px}
+.ph-art{position:relative;min-height:440px;display:flex;align-items:center;justify-content:center}
+.ph-orbit{position:absolute;width:min(440px,88%);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#d9f8bb 0%,#c9f0a7 55%,#eaf8d8 74%,transparent 75%)}
+.ph-mascot{position:relative;width:min(510px,100%);height:440px;display:grid;place-items:center}
+.ph-mascot img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 16px 22px #315b2c28)}
+.ph-float{position:absolute;z-index:2;font-size:48px;filter:drop-shadow(0 6px 5px #536b3420);animation:ph-float 4s ease-in-out infinite}
+.ph-float.pencil{top:5%;left:12%}.ph-float.book{bottom:12%;left:1%;font-size:58px}.ph-float.star{right:5%;top:45%;font-size:38px}
+@keyframes ph-float{50%{transform:translateY(-9px) rotate(4deg)}}
+.ph-copy{text-align:right;padding:25px 10px 35px}
+.ph-kicker{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:99px;background:#e8f6df;color:#36763d;font-size:13px;font-weight:900}
+.ph-kicker:before{content:"";width:9px;height:9px;border-radius:50%;background:#5ab83c}
+.ph-copy h1{margin:24px 0 17px;font-size:clamp(35px,4.1vw,66px);line-height:1.55;font-weight:900;letter-spacing:-1.8px;color:#172a20}
+.ph-copy h1 span{color:#09964b;position:relative;white-space:nowrap}
+.ph-copy h1 span:after{content:"";position:absolute;bottom:-5px;right:8%;width:85%;height:8px;border-radius:50%;border-bottom:7px solid #f5bb28;transform:rotate(-2deg)}
+.ph-copy p{margin:0;color:#33473b;font-size:clamp(15px,1.35vw,20px);line-height:2.1;font-weight:700}
+.ph-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:27px}
+.ph-btn{display:inline-flex;align-items:center;justify-content:center;gap:14px;min-height:72px;padding:0 42px;border-radius:999px;text-decoration:none;font-size:22px;font-weight:900;transition:.2s}
+.ph-btn-main{background:linear-gradient(135deg,#0cae56,#078d45);color:#fff;box-shadow:0 13px 26px #078d4530}
+.ph-btn-main:hover{transform:translateY(-3px);box-shadow:0 17px 30px #078d4540}
+.ph-arrow{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#fff;color:#07964a;font-size:25px;line-height:1}
+.ph-features{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;position:relative;z-index:3;margin:0 auto;padding:0 3%}
+.ph-feature{min-height:205px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:7px;padding:18px 14px 15px;border:1px solid #e8f0df;border-radius:25px;background:rgba(255,255,255,.96);box-shadow:0 12px 25px #315b2c16;transition:transform .2s,box-shadow .2s}
+.ph-feature:hover{transform:translateY(-5px);box-shadow:0 18px 30px #315b2c20}
+.ph-icon{height:78px;display:grid;place-items:center;font-size:57px;line-height:1}
+.ph-feature strong{display:block;color:#172b20;font-size:19px;font-weight:900}
+.ph-feature small{display:block;color:#657266;font-size:13px}
+.ph-feature-link{display:grid;place-items:center;width:39px;height:39px;margin-top:3px;border-radius:50%;background:#e7f7df;color:#15974c;font-size:23px;text-decoration:none}
+.ph-footer{text-align:center;margin:18px 0 0;color:#477047;font-size:12px;font-weight:700}
+@media(max-width:1000px){.ph-hero{grid-template-columns:.9fr 1.1fr;min-height:430px;gap:8px}.ph-art{min-height:370px}.ph-mascot{height:370px}.ph-features{gap:12px;padding:0}.ph-feature{min-height:180px}.ph-feature strong{font-size:16px}}
+@media(max-width:700px){.pichak-home{padding:0 13px 28px}.ph-hero{grid-template-columns:1fr;gap:0;min-height:unset;padding:10px 8px 22px}.ph-art{grid-row:1;min-height:265px}.ph-mascot{height:270px;width:min(340px,100%)}.ph-orbit{width:260px}.ph-copy{text-align:center;padding:5px 5px 20px}.ph-copy h1{font-size:37px;margin:12px 0}.ph-copy p{font-size:14px}.ph-actions{justify-content:center;margin-top:19px}.ph-btn{min-height:56px;padding:0 29px;font-size:18px}.ph-features{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ph-feature{min-height:165px;padding:12px 8px;border-radius:18px}.ph-icon{height:58px;font-size:42px}.ph-feature strong{font-size:14px}.ph-feature small{font-size:11px}.ph-float{font-size:35px}.ph-float.book{font-size:42px}}
+@media(prefers-reduced-motion:reduce){.ph-float{animation:none}}
 </style>
 <section class="pichak-home">
+ <div class="ph-sky"></div><div class="ph-land"></div>
  <div class="ph-wrap">
   <div class="ph-hero">
-   <div class="ph-copy">
-    <span class="ph-kicker">فضای یادگیری پایه ششم</span>
-    <h1>با هم، از یادگیری<br><span>لذت ببریم!</span></h1>
-    <p>به پیچک دانش خوش آمدی؛ یک فضای ساده برای دیدن تکلیف‌ها، شرکت در آزمون‌ها و دنبال کردن قدم‌های کوچک پیشرفت.</p>
-    <div class="ph-actions">
-     <a class="ph-btn ph-btn-main" href="{% url 'login' %}">ورود به سامانه <span aria-hidden="true">←</span></a>
-     <a class="ph-btn ph-btn-soft" href="#ph-features">آشنایی با امکانات</a>
-    </div>
-   </div>
-   <div class="ph-art" aria-label="شخصیت پیچک دانش">
+   <div class="ph-art" aria-label="شخصیت همراه پیچک دانش">
     <div class="ph-orbit"></div>
-    <div class="ph-mascot"><img src="{% static 'img/brand/sprout.svg' %}" alt="پیچک، همراه یادگیری"></div>
-    <div class="ph-note">🌱 هر روز، یک قدم رو به رشد</div>
+    <span class="ph-float pencil" aria-hidden="true">✏️</span><span class="ph-float book" aria-hidden="true">📖</span><span class="ph-float star" aria-hidden="true">⭐</span>
+    <div class="ph-mascot"><img src="{% static 'img/brand/01_pichak_danesh.png' %}" alt="شخصیت پیچک دانش"></div>
+   </div>
+   <div class="ph-copy">
+    <span class="ph-kicker">پایه ششم دبستان</span>
+    <h1>با هم، از <span>یادگیری</span><br>لذت ببریم!</h1>
+    <p>پیچک دانش، همراه هوشمند شما در مسیر یادگیری؛ جایی برای تمرین، آزمون و دیدن هر قدم از پیشرفت.</p>
+    <div class="ph-actions"><a class="ph-btn ph-btn-main" href="{% url 'login' %}">شروع کنید <span class="ph-arrow" aria-hidden="true">‹</span></a></div>
    </div>
   </div>
   <div class="ph-features" id="ph-features">
-   <div class="ph-feature"><span class="ph-icon">📚</span><div><strong>یادگیری و تمرین</strong><small>تکلیف‌ها و فعالیت‌های کلاسی</small></div></div>
-   <div class="ph-feature"><span class="ph-icon">🧠</span><div><strong>فکر کردن و آزمون</strong><small>فرصتی برای سنجیدن آموخته‌ها</small></div></div>
-   <div class="ph-feature"><span class="ph-icon">🌿</span><div><strong>دیدن پیشرفت</strong><small>پیگیری تلاش‌ها و بازخورد معلم</small></div></div>
+   <article class="ph-feature"><span class="ph-icon" aria-hidden="true">🏆</span><strong>آموزش لذت‌بخش</strong><small>یادگیری آسان و سرگرم‌کننده</small><a class="ph-feature-link" href="{% url 'login' %}" aria-label="ورود برای آموزش">←</a></article>
+   <article class="ph-feature"><span class="ph-icon" aria-hidden="true">📈</span><strong>پیگیری پیشرفت</strong><small>مشاهده کارنامه و پیشرفت</small><a class="ph-feature-link" href="{% url 'login' %}" aria-label="ورود برای مشاهده پیشرفت">←</a></article>
+   <article class="ph-feature"><span class="ph-icon" aria-hidden="true">📚</span><strong>تکالیف هوشمند</strong><small>تمرین‌های هدفمند کلاسی</small><a class="ph-feature-link" href="{% url 'login' %}" aria-label="ورود برای تکالیف">←</a></article>
+   <article class="ph-feature"><span class="ph-icon" aria-hidden="true">📋</span><strong>آزمون‌های متنوع</strong><small>آزمون‌های جذاب و استاندارد</small><a class="ph-feature-link" href="{% url 'login' %}" aria-label="ورود برای آزمون‌ها">←</a></article>
   </div>
-  <div class="ph-footer">پیچک دانش · با هم یاد می‌گیریم و رشد می‌کنیم</div>
+  <div class="ph-footer">پیچک دانش · با هم، از یادگیری لذت می‌بریم!</div>
  </div>
 </section>
 {% endblock %}
