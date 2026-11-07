@@ -1,73 +1,133 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}مدیریت کلاس | پیچک دانش{% endblock %}
+{% block title %}پنل معلم | پیچک دانش{% endblock %}
 {% block content %}
 <style>
-:root{--pd-forest:#153f2b;--pd-green:#218451;--pd-lime:#a8cf70;--pd-ink:#203b2d;--pd-muted:#7d8b80;--pd-line:#e5ece4;--pd-paper:#f6f8f4}
-.pd-dashboard{max-width:1320px;margin:auto;padding:30px 22px 72px;direction:rtl;color:var(--pd-ink)}
-.pd-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.pd-breadcrumb{font-size:12px;color:var(--pd-muted)}.pd-breadcrumb b{color:var(--pd-green)}
-.pd-hero{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:25px;padding:30px 34px;border-radius:26px;background:linear-gradient(115deg,#123d29 0%,#17613b 54%,#398c4c 100%);color:#fff;box-shadow:0 18px 45px #143e2a20}
-.pd-hero:before{content:"";position:absolute;z-index:-1;left:-55px;top:-110px;width:340px;height:340px;border:1px solid #ffffff22;border-radius:50%;box-shadow:0 0 0 34px #ffffff08,0 0 0 72px #ffffff06}
-.pd-hero:after{content:"";position:absolute;z-index:-1;left:10%;bottom:-100px;width:210px;height:190px;background:url("{% static 'img/brand/vine-divider.svg' %}") center/contain no-repeat;opacity:.2;transform:rotate(-12deg)}
-.pd-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 11px;border:1px solid #ffffff38;border-radius:99px;background:#ffffff12;color:#e8f4e9;font-size:11px;font-weight:800}.pd-eyebrow i{width:7px;height:7px;border-radius:50%;background:#c6e58b;box-shadow:0 0 0 4px #c6e58b22}
-.pd-hero h1{margin:12px 0 5px;font-size:clamp(24px,3vw,34px);line-height:1.5;letter-spacing:-.7px}.pd-hero p{margin:0;color:#d7e9dc;font-size:13px;line-height:2}
-.pd-hero-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}.pd-action{display:inline-flex;align-items:center;justify-content:center;min-height:43px;padding:0 15px;border-radius:11px;text-decoration:none;font-size:12px;font-weight:900;transition:.18s}.pd-action.primary{background:#f7f8ed;color:#194a30}.pd-action.ghost{border:1px solid #ffffff52;background:#ffffff12;color:#fff}.pd-action:hover{transform:translateY(-2px);box-shadow:0 8px 20px #092e1b25}
-.pd-hero-mark{width:112px;height:112px;display:grid;place-items:center;border:1px solid #ffffff35;border-radius:30px;background:#ffffff13;transform:rotate(-5deg)}.pd-hero-mark img{width:86px;height:86px;object-fit:contain;transform:rotate(5deg);filter:drop-shadow(0 8px 12px #092b1b45)}
-.pd-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:17px 0 19px}.pd-stat{position:relative;overflow:hidden;padding:17px 18px;border:1px solid var(--pd-line);border-radius:17px;background:#fff;box-shadow:0 6px 20px #173f2a08}.pd-stat:after{content:"";position:absolute;left:-18px;bottom:-25px;width:78px;height:78px;border:12px solid #edf5e9;border-radius:50%}.pd-stat small{display:block;color:var(--pd-muted);font-size:11px}.pd-stat strong{display:block;margin-top:4px;color:var(--pd-forest);font-size:29px;line-height:1.4;font-weight:900}.pd-stat em{display:block;margin-top:2px;color:#99a39a;font-size:10px;font-style:normal}
-.pd-section-title{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:28px 0 12px}.pd-section-title h2{margin:0;color:var(--pd-forest);font-size:18px}.pd-section-title p{margin:3px 0 0;color:var(--pd-muted);font-size:11px}
-.pd-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(270px,.75fr);gap:15px;align-items:start}.pd-panel{min-width:0;padding:19px;border:1px solid var(--pd-line);border-radius:18px;background:#fff;box-shadow:0 7px 24px #173f2a07}.pd-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.pd-panel-head h2{margin:0;font-size:15px;color:var(--pd-forest)}.pd-panel-head span{font-size:11px;color:var(--pd-muted)}
-.pd-filterbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:8px;border:1px solid var(--pd-line);border-radius:12px;background:#f9fbf8}.pd-search{display:flex;align-items:center;gap:8px;flex:1;min-width:120px}.pd-search b{color:#7d9882;font-size:18px}.pd-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--pd-ink);font:inherit;font-size:12px}.pd-filterbar select{max-width:160px;padding:7px 9px;border:0;border-right:1px solid var(--pd-line);background:transparent;color:#506b58;font:inherit;font-size:11px;outline:0}.pd-count{white-space:nowrap;padding:5px 8px;border-radius:8px;background:#edf5e9;color:#39734b;font-size:10px;font-weight:800}
-.pd-table-wrap{overflow:auto}.pd-table{width:100%;min-width:510px;border-collapse:collapse}.pd-table th,.pd-table td{padding:12px 9px;text-align:right;border-bottom:1px solid #edf1ec;font-size:11px}.pd-table th{color:#8b988d;font-weight:700;background:#fbfcfa}.pd-table td{color:#526457}.pd-table tbody tr:hover{background:#f8fbf7}.pd-student{display:flex;align-items:center;gap:9px;color:#264b33!important;font-weight:900}.pd-avatar{width:31px;height:31px;display:grid;place-items:center;border-radius:10px;background:#eaf4e6;color:#3c7b4b;font-size:13px}.pd-level{display:inline-flex;padding:4px 8px;border-radius:99px;background:#f1f6e9;color:#5e7a3f;font-size:10px}.pd-link{color:#267748;text-decoration:none;font-weight:900;white-space:nowrap}.pd-link:hover{text-decoration:underline}.pd-empty{padding:28px!important;text-align:center!important;color:#98a398!important}
-.pd-class-list{display:grid;gap:8px}.pd-class{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid #edf1eb;border-radius:12px;background:#fbfcfa}.pd-class strong{display:block;color:#31543a;font-size:12px}.pd-class small{display:block;margin-top:3px;color:#879388;font-size:10px}.pd-tag{padding:4px 8px;border-radius:99px;background:#edf6e9;color:#3e7c4a;font-size:10px;font-weight:800;white-space:nowrap}
-.pd-task{padding:12px 0;border-bottom:1px solid #edf1ec}.pd-task:last-child{border-bottom:0;padding-bottom:0}.pd-task strong{display:block;color:#31543a;font-size:12px}.pd-task small{display:block;margin-top:4px;color:#89968b;font-size:10px}.pd-progress{height:6px;margin-top:9px;overflow:hidden;border-radius:99px;background:#edf2ec}.pd-progress span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#91c35f,#26804b)}
-.pd-shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.pd-shortcut{display:flex;align-items:center;gap:8px;padding:11px;border:1px solid #e8eee5;border-radius:11px;background:#fbfcfa;color:#42634a;text-decoration:none;font-size:11px;font-weight:800}.pd-shortcut:hover{border-color:#c8dec6;background:#f2f8ef}.pd-shortcut span{font-size:17px}
-@media(max-width:850px){.pd-layout{grid-template-columns:1fr}.pd-hero-mark{width:88px;height:88px}.pd-hero-mark img{width:68px;height:68px}}
-@media(max-width:620px){.pd-dashboard{padding:18px 12px 48px}.pd-hero{grid-template-columns:1fr;padding:22px;gap:14px}.pd-hero-mark{display:none}.pd-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.pd-stat{padding:13px}.pd-stat strong{font-size:24px}.pd-filterbar{flex-wrap:wrap}.pd-filterbar select{max-width:none;flex:1}.pd-count{margin-right:auto}.pd-panel{padding:14px}.pd-section-title{margin-top:22px}}
-@media(prefers-reduced-motion:reduce){.pd-action{transition:none}}
+:root{--td-ink:#183d2b;--td-green:#24794a;--td-soft:#eef6ef;--td-muted:#718176;--td-line:#e5ece6;--td-bg:#f7faf7}
+.td-page{max-width:1240px;margin:auto;padding:28px 20px 64px;direction:rtl;color:var(--td-ink)}
+.td-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;color:var(--td-muted);font-size:12px}
+.td-top strong{color:var(--td-green)}
+.td-hero{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:30px 32px;border-radius:24px;background:linear-gradient(115deg,#153f2c,#1c6840 65%,#328552);color:white;box-shadow:0 16px 38px #163e2a18}
+.td-hero:after{content:"";position:absolute;left:-55px;top:-110px;width:300px;height:300px;border:1px solid #ffffff22;border-radius:50%;box-shadow:0 0 0 35px #ffffff09,0 0 0 72px #ffffff06;pointer-events:none}
+.td-hero-copy{position:relative;z-index:1;max-width:720px}
+.td-kicker{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border:1px solid #ffffff38;border-radius:99px;background:#ffffff12;color:#e6f3e9;font-size:11px;font-weight:800}
+.td-kicker:before{content:"";width:7px;height:7px;border-radius:50%;background:#c5e58e}
+.td-hero h1{margin:13px 0 6px;font-size:clamp(23px,3vw,32px);line-height:1.5;letter-spacing:-.5px}
+.td-hero p{margin:0;color:#d9ebdf;font-size:13px;line-height:2}
+.td-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:19px}
+.td-btn{display:inline-flex;align-items:center;justify-content:center;min-height:43px;padding:0 15px;border-radius:11px;text-decoration:none;font-size:12px;font-weight:900;transition:transform .18s,background .18s}
+.td-btn:hover{transform:translateY(-2px)}
+.td-btn-main{background:#f7f9ef;color:#194b30}.td-btn-ghost{border:1px solid #ffffff55;background:#ffffff12;color:white}
+.td-mark{position:relative;z-index:1;flex:0 0 104px;width:104px;height:104px;display:grid;place-items:center;border:1px solid #ffffff38;border-radius:28px;background:#ffffff12}
+.td-mark img{width:78px;height:78px;object-fit:contain}
+.td-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0 24px}
+.td-stat{padding:16px 17px;border:1px solid var(--td-line);border-radius:16px;background:white;box-shadow:0 5px 18px #183d2b07}
+.td-stat-label{color:var(--td-muted);font-size:11px}.td-stat-value{display:block;margin-top:4px;color:var(--td-ink);font-size:27px;font-weight:900;line-height:1.5}.td-stat-note{color:#9aa69c;font-size:10px}
+.td-heading{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:25px 0 12px}
+.td-heading h2{margin:0;font-size:17px;color:var(--td-ink)}.td-heading p{margin:4px 0 0;color:var(--td-muted);font-size:11px}
+.td-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(260px,.8fr);gap:14px;align-items:start}
+.td-panel{min-width:0;padding:18px;border:1px solid var(--td-line);border-radius:17px;background:#fff;box-shadow:0 6px 20px #183d2b06}
+.td-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}
+.td-panel-head h2{margin:0;font-size:14px;color:var(--td-ink)}.td-panel-head span{color:var(--td-muted);font-size:10px}
+.td-tools{display:flex;gap:8px;align-items:center;margin-bottom:12px;padding:8px;border:1px solid var(--td-line);border-radius:11px;background:#fafcfa}
+.td-tools input,.td-tools select{min-width:0;padding:8px;border:0;background:transparent;color:var(--td-ink);font:inherit;font-size:11px;outline-offset:2px}
+.td-tools input{flex:1}.td-tools select{max-width:160px;border-right:1px solid var(--td-line)}
+.td-count{white-space:nowrap;padding:5px 8px;border-radius:8px;background:var(--td-soft);color:var(--td-green);font-size:10px;font-weight:800}
+.td-table-wrap{overflow:auto}.td-table{width:100%;min-width:490px;border-collapse:collapse}
+.td-table th,.td-table td{padding:11px 9px;text-align:right;border-bottom:1px solid #edf1ed;font-size:11px}
+.td-table th{background:#fafcfa;color:#839087;font-weight:700}.td-table td{color:#52665a}.td-table tbody tr:hover{background:#f8fbf8}
+.td-person{display:flex;align-items:center;gap:8px;color:#254b34!important;font-weight:900}
+.td-avatar{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#eaf4e9;color:#36774b;font-size:12px}
+.td-pill{display:inline-flex;padding:4px 8px;border-radius:99px;background:#f0f5e9;color:#637d43;font-size:10px}
+.td-link{color:var(--td-green);font-weight:900;text-decoration:none;white-space:nowrap}.td-link:hover{text-decoration:underline}
+.td-empty{padding:24px!important;text-align:center!important;color:#8b988e!important}
+.td-nav{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.td-nav a{display:flex;align-items:center;gap:9px;min-height:58px;padding:10px;border:1px solid var(--td-line);border-radius:12px;background:#fbfdfb;color:#365b40;text-decoration:none;font-size:11px;font-weight:800;transition:.18s}
+.td-nav a:hover{border-color:#bfd9c4;background:#f1f8f1;transform:translateY(-1px)}
+.td-nav-icon{width:31px;height:31px;display:grid;place-items:center;border-radius:9px;background:#eaf4e9;font-size:16px}
+.td-class-list{display:grid;gap:8px}.td-class{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px;border:1px solid #edf1ed;border-radius:11px;background:#fbfcfb}
+.td-class strong{display:block;font-size:11px;color:#31543b}.td-class small{display:block;margin-top:3px;color:#879389;font-size:10px}
+.td-task{padding:11px 0;border-bottom:1px solid #edf1ed}.td-task:last-child{border-bottom:0;padding-bottom:0}
+.td-task strong{display:block;color:#31543b;font-size:11px}.td-task small{display:block;margin-top:4px;color:#879389;font-size:10px}
+.td-progress{height:6px;margin-top:8px;overflow:hidden;border-radius:99px;background:#edf2ed}.td-progress span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#9bc96d,#27804d)}
+.td-callout{margin-top:12px;padding:11px 12px;border-radius:11px;background:#f1f7ee;color:#56704c;font-size:10px;line-height:1.9}
+@media(max-width:850px){.td-layout{grid-template-columns:1fr}}
+@media(max-width:620px){.td-page{padding:17px 12px 45px}.td-hero{padding:22px}.td-mark{display:none}.td-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.td-stat{padding:12px}.td-stat-value{font-size:23px}.td-panel{padding:14px}.td-tools{flex-wrap:wrap}.td-tools select{max-width:none;flex:1}.td-count{margin-right:auto}.td-heading{margin-top:21px}}
+@media(prefers-reduced-motion:reduce){.td-btn,.td-nav a{transition:none}.td-btn:hover,.td-nav a:hover{transform:none}}
 </style>
-<section class="pd-dashboard">
- <div class="pd-topline"><div class="pd-breadcrumb">پیچک دانش <span> / </span><b>مدیریت کلاس</b></div><span class="pd-breadcrumb">فضای اختصاصی معلم</span></div>
- <header class="pd-hero">
-  <div>
-   <span class="pd-eyebrow"><i></i> فضای مدیریت و یادگیری</span>
+<section class="td-page">
+ <div class="td-top"><span>پیچک دانش <span aria-hidden="true">/</span> <strong>پنل معلم</strong></span><span>فضای مدیریت کلاس</span></div>
+ <header class="td-hero">
+  <div class="td-hero-copy">
+   <span class="td-kicker">همراه مسیر یادگیری دانش‌آموزان</span>
    <h1>سلام، {{ request.user.first_name|default:request.user.username }} 👋</h1>
-   <p>اینجا همه چیز کلاس در دسترس توست؛ از دانش‌آموزان تا آزمون‌ها و فعالیت‌های روزانه.</p>
-   <div class="pd-hero-actions">
-    <a class="pd-action primary" href="{% url 'teacher-activities' %}">＋ ساخت فعالیت جدید</a>
-    <a class="pd-action ghost" href="{% url 'teacher-test-manager' %}">مدیریت آزمون‌ها ←</a>
+   <p>از اینجا می‌توانی وضعیت کلاس را ببینی، برای دانش‌آموزان فعالیت بسازی و آزمون‌ها را مدیریت کنی.</p>
+   <div class="td-actions">
+    <a class="td-btn td-btn-main" href="{% url 'teacher-activities' %}">＋ ساخت فعالیت</a>
+    <a class="td-btn td-btn-ghost" href="{% url 'teacher-test-manager' %}">ساخت و مدیریت آزمون</a>
    </div>
   </div>
-  <div class="pd-hero-mark"><img src="{% static 'img/brand/sprout.svg' %}" alt="نشان پیچک دانش"></div>
+  <div class="td-mark"><img src="{% static 'img/brand/sprout.svg' %}" alt="نشان پیچک دانش"></div>
  </header>
- <section class="pd-stats" aria-label="خلاصه کلاس">
-  <article class="pd-stat"><small>دانش‌آموزان</small><strong>{{ student_count }}</strong><em>پرونده‌های قابل مشاهده</em></article>
-  <article class="pd-stat"><small>کلاس‌های فعال</small><strong>{{ classroom_count }}</strong><em>کلاس‌های تحت مدیریت</em></article>
-  <article class="pd-stat"><small>فعالیت‌های ثبت‌شده</small><strong>{{ task_count }}</strong><em>تمرین‌ها و تکالیف</em></article>
-  <article class="pd-stat"><small>در انتظار بررسی</small><strong>{{ review_count }}</strong><em>ارسال‌های دانش‌آموزان</em></article>
+ <section class="td-stats" aria-label="خلاصه وضعیت کلاس">
+  <article class="td-stat"><span class="td-stat-label">دانش‌آموزان</span><strong class="td-stat-value">{{ student_count }}</strong><span class="td-stat-note">دانش‌آموز قابل مشاهده</span></article>
+  <article class="td-stat"><span class="td-stat-label">کلاس‌های فعال</span><strong class="td-stat-value">{{ classroom_count }}</strong><span class="td-stat-note">کلاس تحت مدیریت</span></article>
+  <article class="td-stat"><span class="td-stat-label">فعالیت‌ها</span><strong class="td-stat-value">{{ task_count }}</strong><span class="td-stat-note">فعالیت ثبت‌شده</span></article>
+  <article class="td-stat"><span class="td-stat-label">نیازمند بررسی</span><strong class="td-stat-value">{{ review_count }}</strong><span class="td-stat-note">ارسال دانش‌آموزان</span></article>
  </section>
- <div class="pd-section-title"><div><h2>نمای کلی کلاس</h2><p>فهرست دانش‌آموزان و آخرین فعالیت‌ها</p></div></div>
- <div class="pd-layout">
-  <section class="pd-panel">
-   <div class="pd-panel-head"><h2>دانش‌آموزان کلاس</h2><span>{{ student_count }} پرونده</span></div>
-   <label class="pd-filterbar"><span class="pd-search"><b aria-hidden="true">⌕</b><input id="studentSearch" type="search" placeholder="نام دانش‌آموز را جست‌وجو کن…" autocomplete="off" aria-label="جست‌وجوی دانش‌آموز"></span><select id="studentClassFilter" aria-label="انتخاب کلاس"><option value="">همه کلاس‌ها</option>{% for classroom in classrooms %}<option value="{{ classroom.id }}">{{ classroom.name }}</option>{% endfor %}<option value="none">بدون کلاس</option></select><span class="pd-count" id="studentSearchCount">{{ student_count }} نفر</span></label>
-   <div class="pd-table-wrap"><table class="pd-table"><thead><tr><th>دانش‌آموز</th><th>کلاس</th><th>امتیاز</th><th>سطح</th><th></th></tr></thead><tbody id="studentRows">
-   {% for student in students %}<tr data-class="{{ student.classroom_id|default:'none' }}"><td><span class="pd-student"><span class="pd-avatar">{{ student.user.first_name|default:student.user.username|slice:":1" }}</span>{{ student.user.get_full_name|default:student.user.username }}</span></td><td>{{ student.classroom.name|default:"بدون کلاس" }}</td><td>{{ student.points }}</td><td><span class="pd-level">سطح {{ student.level }}</span></td><td><a class="pd-link" href="{% url 'teacher-student-detail' student.id %}">پرونده ←</a></td></tr>{% empty %}<tr><td colspan="5" class="pd-empty">هنوز دانش‌آموزی در این فهرست نیست.</td></tr>{% endfor %}
+ <div class="td-heading"><div><h2>مدیریت کلاس</h2><p>نمای کلی دانش‌آموزان و فعالیت‌های اخیر</p></div></div>
+ <div class="td-layout">
+  <section class="td-panel">
+   <div class="td-panel-head"><h2>فهرست دانش‌آموزان</h2><span>{{ student_count }} پرونده</span></div>
+   <div class="td-tools"><input id="tdStudentSearch" type="search" placeholder="جست‌وجوی نام دانش‌آموز…" autocomplete="off" aria-label="جست‌وجوی دانش‌آموز"><select id="tdClassFilter" aria-label="فیلتر بر اساس کلاس"><option value="">همه کلاس‌ها</option>{% for classroom in classrooms %}<option value="{{ classroom.id }}">{{ classroom.name }}</option>{% endfor %}<option value="none">بدون کلاس</option></select><span class="td-count" id="tdStudentCount">{{ student_count }} نفر</span></div>
+   <div class="td-table-wrap"><table class="td-table"><thead><tr><th>دانش‌آموز</th><th>کلاس</th><th>امتیاز</th><th>سطح</th><th>پرونده</th></tr></thead><tbody id="tdStudentRows">
+   {% for student in students %}<tr data-class="{{ student.classroom_id|default:'none' }}"><td><span class="td-person"><span class="td-avatar">{{ student.user.first_name|default:student.user.username|slice:":1" }}</span>{{ student.user.get_full_name|default:student.user.username }}</span></td><td>{{ student.classroom.name|default:"بدون کلاس" }}</td><td>{{ student.points }}</td><td><span class="td-pill">سطح {{ student.level }}</span></td><td><a class="td-link" href="{% url 'teacher-student-detail' student.id %}">مشاهده ←</a></td></tr>{% empty %}<tr><td colspan="5" class="td-empty">هنوز دانش‌آموزی در این فهرست نیست.</td></tr>{% endfor %}
    </tbody></table></div>
   </section>
   <aside>
-   <section class="pd-panel"><div class="pd-panel-head"><h2>دسترسی سریع</h2><span>میان‌برها</span></div><div class="pd-shortcuts"><a class="pd-shortcut" href="{% url 'teacher-activities' %}"><span>📚</span>فعالیت‌ها</a><a class="pd-shortcut" href="{% url 'teacher-test-manager' %}"><span>📝</span>آزمون‌ها</a><a class="pd-shortcut" href="{% url 'teacher-activities' %}"><span>🏫</span>کلاس‌ها</a><a class="pd-shortcut" href="{% url 'teacher-activities' %}"><span>📊</span>گزارش فعالیت</a></div></section>
-   <section class="pd-panel" style="margin-top:13px"><div class="pd-panel-head"><h2>کلاس‌های من</h2><span>{{ classroom_count }} کلاس</span></div><div class="pd-class-list">{% for classroom in classrooms %}<div class="pd-class"><div><strong>{{ classroom.name }}</strong><small>پایه {{ classroom.grade }} · {{ classroom.students.count }} دانش‌آموز</small></div><span class="pd-tag">فعال</span></div>{% empty %}<div class="pd-empty">هنوز کلاسی ساخته نشده است.</div><a class="pd-link" href="{% url 'teacher-activities' %}">راه‌اندازی کلاس ←</a>{% endfor %}</div></section>
-   <section class="pd-panel" style="margin-top:13px"><div class="pd-panel-head"><h2>فعالیت‌های اخیر</h2><span>{{ pending_count }} انجام‌نشده</span></div>{% for task in tasks %}<div class="pd-task"><strong>{{ task.title }}</strong><small>{{ task.classroom.name }} · {{ task.task_date|date:"Y/m/d" }} · {{ task.completed_count }} از {{ task.assigned_count }} انجام شده</small><div class="pd-progress"><span style="width:{% if task.assigned_count %}{% widthratio task.completed_count task.assigned_count 100 %}{% else %}0{% endif %}%"></span></div></div>{% empty %}<div class="pd-empty">هنوز فعالیتی ثبت نشده است.</div>{% endfor %}</section>
+   <section class="td-panel">
+    <div class="td-panel-head"><h2>دسترسی‌های اصلی</h2><span>میان‌برهای کاربردی</span></div>
+    <nav class="td-nav" aria-label="دسترسی‌های پنل معلم">
+     <a href="{% url 'teacher-activities' %}"><span class="td-nav-icon">📚</span><span>فعالیت‌ها و بررسی تکالیف</span></a>
+     <a href="{% url 'teacher-test-manager' %}"><span class="td-nav-icon">📝</span><span>آزمون‌ها و سؤال‌ها</span></a>
+     <a href="{% url 'teacher-activities' %}"><span class="td-nav-icon">✅</span><span>بررسی عملکردها</span></a>
+     <a href="#tdClasses"><span class="td-nav-icon">🏫</span><span>کلاس‌های من</span></a>
+    </nav>
+    <div class="td-callout">{{ review_count }} مورد در انتظار بررسی. برای ثبت وضعیت و بازخورد دانش‌آموزان وارد بخش فعالیت‌ها شو.</div>
+   </section>
+   <section class="td-panel" id="tdClasses" style="margin-top:12px">
+    <div class="td-panel-head"><h2>کلاس‌های من</h2><span>{{ classroom_count }} کلاس</span></div>
+    <div class="td-class-list">{% for classroom in classrooms %}<div class="td-class"><div><strong>{{ classroom.name }}</strong><small>پایه {{ classroom.grade }} · {{ classroom.students.count }} دانش‌آموز</small></div><span class="td-pill">فعال</span></div>{% empty %}<div class="td-empty">هنوز کلاسی ثبت نشده است.</div><a class="td-link" href="{% url 'teacher-activities' %}">راه‌اندازی کلاس ←</a>{% endfor %}</div>
+   </section>
+   <section class="td-panel" style="margin-top:12px">
+    <div class="td-panel-head"><h2>فعالیت‌های اخیر</h2><span>{{ pending_count }} انجام‌نشده</span></div>
+    {% for task in tasks %}<div class="td-task"><strong>{{ task.title }}</strong><small>{{ task.classroom.name }} · {{ task.task_date|date:"Y/m/d" }} · {{ task.completed_count }} از {{ task.assigned_count }} انجام شده</small><div class="td-progress"><span style="width:{% if task.assigned_count %}{% widthratio task.completed_count task.assigned_count 100 %}{% else %}0{% endif %}%"></span></div></div>{% empty %}<div class="td-empty">هنوز فعالیتی ثبت نشده است.</div>{% endfor %}
+    <div style="margin-top:12px"><a class="td-link" href="{% url 'teacher-activities' %}">مشاهده و مدیریت همه فعالیت‌ها ←</a></div>
+   </section>
   </aside>
  </div>
 </section>
 <script>
 (function(){
- const input=document.getElementById("studentSearch"),filter=document.getElementById("studentClassFilter"),counter=document.getElementById("studentSearchCount"),rows=document.querySelectorAll("#studentRows tr[data-class]");
+ const input=document.getElementById("tdStudentSearch");
+ const filter=document.getElementById("tdClassFilter");
+ const counter=document.getElementById("tdStudentCount");
+ const rows=document.querySelectorAll("#tdStudentRows tr[data-class]");
  if(!input||!filter||!counter)return;
  const normalize=value=>(value||"").toLocaleLowerCase("fa").replace(/[يى]/g,"ی").replace(/ك/g,"ک").replace(/\s+/g," ").trim();
- function apply(){const q=normalize(input.value),selected=filter.value;let count=0;rows.forEach(row=>{const visible=(!q||normalize(row.textContent).includes(q))&&(!selected||row.dataset.class===selected);row.hidden=!visible;if(visible)count++;});counter.textContent=count+" نفر";}
- input.addEventListener("input",apply);filter.addEventListener("change",apply);
+ function applyFilter(){
+  const query=normalize(input.value),selected=filter.value;
+  let visibleCount=0;
+  rows.forEach(row=>{
+   const matchesName=!query||normalize(row.textContent).includes(query);
+   const matchesClass=!selected||row.dataset.class===selected;
+   row.hidden=!(matchesName&&matchesClass);
+   if(!row.hidden)visibleCount++;
+  });
+  counter.textContent=visibleCount+" نفر";
+ }
+ input.addEventListener("input",applyFilter);
+ filter.addEventListener("change",applyFilter);
 })();
 </script>
 {% endblock %}
