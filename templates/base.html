@@ -86,6 +86,78 @@ main{min-height:calc(100vh - 170px)}
  html{scroll-behavior:auto}
 }
 
+
+/* Unified Pichak experience — shared visual language across public, student and teacher pages */
+:root{
+ --pd-brand:#168447;--pd-brand-deep:#125d36;--pd-brand-soft:#eaf6ec;
+ --pd-page:#f6faf5;--pd-card:#fff;--pd-ink:#1b3e2b;--pd-muted:#718176;
+ --pd-stroke:#e3ece2;--pd-shadow:0 12px 32px rgba(25,72,39,.075);
+ --pd-shadow-hover:0 18px 38px rgba(25,72,39,.12);
+ --pd-radius-card:20px;--pd-radius-control:13px;
+}
+body{background:var(--pd-page)}
+:where(.pd,.tv,.pd-home,.px-login-v2){color:var(--pd-ink)}
+:where(.pd-panel,.tv-panel,.pd-card,.tv-stat,.pd-stat,.tv-shortcut,.pd-feature,.pd-mini,.px-login-shell){
+ border-color:var(--pd-stroke);
+}
+:where(.pd-panel,.tv-panel,.pd-card,.tv-stat,.pd-stat,.pd-feature,.pd-mini){
+ box-shadow:var(--pd-shadow);
+}
+:where(.pd-card,.tv-shortcut,.pd-feature,.pd-mini,.pd-stat,.tv-stat){
+ transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease,background-color .2s ease;
+}
+:where(.pd-card,.tv-shortcut,.pd-feature,.pd-mini,.pd-stat,.tv-stat):hover{
+ box-shadow:var(--pd-shadow-hover);
+}
+:where(.pd-btn,.tv-btn,.px-login-submit,.pd-home .pd-btn){
+ -webkit-tap-highlight-color:transparent;
+}
+:where(.pd-btn,.tv-btn,.px-login-submit,.pd-home .pd-btn):focus-visible{
+ outline:3px solid #82c99a;outline-offset:3px;
+}
+:where(.pd-btn,.tv-btn,.px-login-submit,.pd-home .pd-btn):active{
+ transform:translateY(1px) scale(.985);
+}
+:where(.pd-nav a,.tv-nav a,.simple-nav a,.simple-nav button){
+ min-height:42px;
+}
+:where(.pd-nav a,.tv-nav a,.simple-nav a,.simple-nav button):focus-visible{
+ outline:3px solid #80c897;outline-offset:2px;
+}
+:where(.pd-panel h2,.tv-panel h2,.pd-section-head h2){
+ text-wrap:balance;
+}
+:where(.pd-empty,.tv-empty){
+ border-radius:16px;
+}
+:where(.pd input,.pd select,.pd textarea,.tv input,.tv select,.tv textarea,.px-login-v2 input){
+ accent-color:var(--pd-brand);
+}
+:where(.pd input,.pd select,.pd textarea,.tv input,.tv select,.tv textarea):focus-visible{
+ border-color:#279454;
+ box-shadow:0 0 0 4px rgba(39,148,84,.12);
+}
+.pd-user,.tv-user{box-shadow:0 5px 18px rgba(25,72,39,.045)}
+.pd-side,.tv-side{box-shadow:0 10px 28px rgba(25,72,39,.06)}
+.simple-footer{color:#718176}
+@media(max-width:760px){
+ .pd-layout,.tv-layout{grid-template-columns:minmax(0,1fr)}
+ .pd-side,.tv-side{position:static;top:auto}
+ .pd-nav,.tv-nav{display:flex;gap:6px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding:2px 1px 7px}
+ .pd-nav a,.tv-nav a{flex:0 0 auto;white-space:nowrap}
+ .pd-content-grid,.tv-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:520px){
+ .pd-stats,.tv-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .pd-panel,.tv-panel{padding:14px}
+ .pd-top,.tv-top{gap:8px}
+}
+@media(prefers-reduced-motion:reduce){
+ :where(.pd,.tv,.pd-home,.px-login-v2) *,
+ :where(.pd,.tv,.pd-home,.px-login-v2) *::before,
+ :where(.pd,.tv,.pd-home,.px-login-v2) *::after{animation:none!important;transition:none!important}
+}
+
 </style>
 </head>
 <body>
