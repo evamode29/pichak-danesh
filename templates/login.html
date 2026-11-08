@@ -3,37 +3,115 @@
 {% block title %}ورود به پیچک دانش{% endblock %}
 {% block content %}
 <style>
-.px-login{min-height:calc(100vh - 150px);display:grid;place-items:center;padding:38px 16px 58px;direction:rtl;background:radial-gradient(circle at 15% 15%,#dcfce7 0,transparent 29%),radial-gradient(circle at 88% 85%,#fef3c7 0,transparent 25%),#fdfbf7}
-.px-login-card{width:min(465px,100%);padding:30px 32px 28px;border:1px solid #e4e9e3;border-radius:30px;background:#fff;box-shadow:0 24px 70px #183b2712}
-.px-back{display:inline-flex;align-items:center;gap:7px;color:#718076;text-decoration:none;font-size:12px;font-weight:800}.px-back:hover{color:#16833e}
-.px-login-brand{display:flex;flex-direction:column;align-items:center;text-align:center;margin:18px 0 25px}
-.px-login-mascot{width:88px;height:95px;object-fit:contain;margin-bottom:8px}
-.px-login-brand h1{margin:0;color:#172033;font-size:23px;font-weight:900;line-height:1.7}
-.px-login-brand p{margin:4px 0 0;color:#849087;font-size:11px;line-height:2}
+.px-login-v2{--l-ink:#183c29;--l-green:#197443;--l-muted:#78877c;--l-line:#e4ede3;min-height:calc(100vh - 170px);display:grid;place-items:center;padding:38px 18px 54px;direction:rtl;background:radial-gradient(ellipse at 12% 12%,#e1f2e4 0,transparent 34%),radial-gradient(ellipse at 90% 88%,#fff1d7 0,transparent 28%),#f5f9f5}
+.px-login-v2 *{box-sizing:border-box}
+.px-login-shell{width:min(960px,100%);min-height:560px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.04fr);overflow:hidden;border:1px solid #e2ebe1;border-radius:28px;background:#fff;box-shadow:0 26px 80px #183b2714}
+.px-login-visual{position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:30px;background:linear-gradient(150deg,#174b30 0%,#1b7041 58%,#2d8a50 100%);color:#fff}
+.px-login-visual:before,.px-login-visual:after{content:"";position:absolute;z-index:-1;border:1px solid #ffffff23;border-radius:50%;pointer-events:none}
+.px-login-visual:before{width:420px;height:420px;left:-205px;top:-180px;box-shadow:0 0 0 36px #ffffff0b,0 0 0 76px #ffffff08}
+.px-login-visual:after{width:260px;height:260px;right:-150px;bottom:-140px;box-shadow:0 0 0 25px #ffffff0b}
+.px-login-logo{width:142px;height:auto;max-height:68px;object-fit:contain;object-position:right center;filter:brightness(0) invert(1);opacity:.96}
+.px-login-art{display:grid;place-items:center;min-height:270px}
+.px-login-mascot-wrap{position:relative;display:grid;place-items:center;width:208px;height:208px;border:1px solid #ffffff36;border-radius:48px;background:#ffffff12;box-shadow:0 20px 45px #0a321c38;transform:rotate(-3deg)}
+.px-login-mascot-wrap:before{content:"";position:absolute;inset:12px;border:1px dashed #ffffff43;border-radius:38px}
+.px-login-mascot{position:relative;width:155px;height:165px;object-fit:contain;filter:drop-shadow(0 12px 15px #0b301c55);transform:rotate(3deg)}
+.px-login-message{max-width:360px}
+.px-login-kicker{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid #ffffff3a;border-radius:99px;background:#ffffff12;color:#e1f3e4;font-size:10px;font-weight:900}
+.px-login-kicker:before{content:"";width:7px;height:7px;border-radius:50%;background:#c7ed87;box-shadow:0 0 0 4px #c7ed8722}
+.px-login-message h2{margin:12px 0 7px;color:#fff;font-size:25px;line-height:1.65;font-weight:950}
+.px-login-message p{margin:0;color:#d6e9d9;font-size:11px;line-height:2.2}
+.px-login-visual-foot{margin-top:20px;padding-top:14px;border-top:1px solid #ffffff27;color:#d5e8d8;font-size:10px}
+.px-login-form-side{display:flex;flex-direction:column;justify-content:center;padding:clamp(25px,5vw,54px)}
+.px-login-back{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;color:#748479;text-decoration:none;font-size:11px;font-weight:800;transition:color .18s,transform .18s}
+.px-login-back:hover{color:#197443;transform:translateX(3px)}
+.px-login-heading{margin:30px 0 23px}
+.px-login-heading small{display:block;margin-bottom:7px;color:#27804c;font-size:10px;font-weight:900}
+.px-login-heading h1{margin:0;color:#193d2a;font-size:27px;font-weight:950;line-height:1.6}
+.px-login-heading p{margin:5px 0 0;color:#829086;font-size:11px;line-height:2}
+.px-login-roles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:21px}
+.px-login-role{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid #e8eee7;border-radius:12px;background:#fbfdfb;color:#5b7060}
+.px-login-role-icon{width:33px;height:33px;display:grid;place-items:center;border-radius:10px;background:#edf6eb;font-size:16px}
+.px-login-role b{display:block;color:#365641;font-size:10px}
+.px-login-role small{display:block;margin-top:2px;color:#95a097;font-size:9px}
+.px-login-error{display:flex;align-items:flex-start;gap:9px;margin:0 0 15px;padding:11px 12px;border:1px solid #f4cccc;border-radius:12px;background:#fff5f4;color:#a83f3a;font-size:11px;font-weight:700;line-height:1.9}
+.px-login-error:before{content:"!";flex:0 0 20px;width:20px;height:20px;display:grid;place-items:center;border-radius:50%;background:#ffe2df;color:#a83f3a;font-weight:950}
 .px-login-form{display:grid;gap:15px}
-.px-login-form label{display:grid;gap:7px;color:#34483a;font-size:12px;font-weight:900}
+.px-login-label{display:grid;gap:7px;color:#344b3a;font-size:11px;font-weight:900}
 .px-login-field{position:relative}
-.px-login-field input{width:100%;height:51px;padding:0 15px;border:1.5px solid #e1e9e2;border-radius:14px;background:#fbfdfb;color:#183b27;font:inherit;font-size:13px;outline:none;transition:.18s}
-.px-login-field input:focus{border-color:#26a269;background:#fff;box-shadow:0 0 0 4px #10b98117}
-.px-login-field input::placeholder{color:#a4aea6}
-.px-login-submit{height:52px;margin-top:3px;border:0;border-radius:14px;background:linear-gradient(135deg,#1e9b50,#13743b);border-bottom:3px solid #0d5b2d;color:#fff;font:inherit;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 9px 20px #16833e25;transition:.18s}
-.px-login-submit:hover{transform:translateY(-2px);box-shadow:0 13px 24px #16833e30}
-.px-login-error{padding:11px 13px;border:1px solid #fecaca;border-radius:13px;background:#fff1f2;color:#be123c;font-size:12px;font-weight:700;line-height:1.9}
-.px-login-note{display:flex;align-items:center;justify-content:center;gap:7px;margin:18px 0 0;padding-top:16px;border-top:1px solid #edf1ec;color:#8a968d;font-size:10px;line-height:1.9;text-align:center}
-.px-login-note span{color:#16833e;font-size:15px}
-@media(max-width:520px){.px-login{padding:25px 13px 42px}.px-login-card{padding:25px 20px;border-radius:24px}.px-login-brand h1{font-size:21px}}
+.px-login-field input{width:100%;height:51px;padding:0 14px;border:1.5px solid #e1eae1;border-radius:13px;background:#fbfdfb;color:#183b27;font:inherit;font-size:13px;outline:none;transition:border-color .18s,box-shadow .18s,background .18s}
+.px-login-field input:focus{border-color:#29945a;background:#fff;box-shadow:0 0 0 4px #16864a17}
+.px-login-field input::placeholder{color:#a0aaa2}
+.px-login-field input[type=password],.px-login-field input.password-visible{direction:ltr;text-align:left;letter-spacing:.08em}
+.px-login-show{position:absolute;left:8px;top:50%;transform:translateY(-50%);min-width:38px;min-height:34px;padding:0 8px;border:0;border-radius:8px;background:transparent;color:#78877c;font:inherit;font-size:10px;font-weight:800;cursor:pointer}
+.px-login-show:hover{background:#edf6ed;color:#176b38}
+.px-login-password{padding-left:58px!important}
+.px-login-submit{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px;height:52px;margin-top:4px;border:0;border-radius:13px;background:linear-gradient(115deg,#23884b,#126a39);border-bottom:3px solid #0d552e;color:#fff;font:inherit;font-size:13px;font-weight:950;cursor:pointer;box-shadow:0 9px 20px #16833e25;transition:transform .18s,box-shadow .18s,filter .18s}
+.px-login-submit:before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(110deg,transparent 20%,#ffffff35 48%,transparent 75%);transform:translateX(120%);transition:transform .55s}
+.px-login-submit:hover{transform:translateY(-2px);box-shadow:0 13px 25px #16833e32;filter:saturate(1.1)}
+.px-login-submit:hover:before{transform:translateX(-120%)}
+.px-login-submit:active{transform:translateY(1px) scale(.99)}
+.px-login-submit span{font-size:17px;transition:transform .18s}
+.px-login-submit:hover span{transform:translateX(-4px)}
+.px-login-help{display:flex;align-items:flex-start;gap:9px;margin:19px 0 0;padding:13px;border:1px solid #e6efe4;border-radius:12px;background:#f7fbf5;color:#718174;font-size:10px;line-height:2}
+.px-login-help span{font-size:16px}
+.px-login-bottom{margin-top:20px;color:#a0aaa1;text-align:center;font-size:9px}
+.px-login-v2 :focus-visible{outline:3px solid #84c99b;outline-offset:3px}
+@media(max-width:760px){.px-login-v2{padding:23px 13px 38px}.px-login-shell{width:min(520px,100%);min-height:0;grid-template-columns:1fr;border-radius:23px}.px-login-visual{padding:18px 21px 20px;min-height:0}.px-login-logo{width:112px;max-height:48px}.px-login-art{position:absolute;left:18px;top:12px;min-height:0;opacity:.22}.px-login-mascot-wrap{width:100px;height:100px;border-radius:25px}.px-login-mascot-wrap:before{inset:7px;border-radius:19px}.px-login-mascot{width:78px;height:80px}.px-login-message{max-width:340px;margin-top:16px}.px-login-message h2{font-size:19px;margin:6px 0 3px}.px-login-message p{font-size:10px;line-height:1.8}.px-login-visual-foot{display:none}.px-login-form-side{padding:24px 22px 27px}.px-login-heading{margin:0 0 18px}.px-login-heading h1{font-size:23px}}
+@media(max-width:420px){.px-login-v2{padding:13px 9px 26px}.px-login-shell{border-radius:19px}.px-login-form-side{padding:21px 16px 23px}.px-login-roles{gap:6px}.px-login-role{padding:8px 7px}.px-login-role small{font-size:8px}.px-login-heading h1{font-size:21px}}
+@media(prefers-reduced-motion:reduce){.px-login-v2 *,.px-login-v2 *:before,.px-login-v2 *:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 </style>
-<section class="px-login">
- <div class="px-login-card">
-  <a class="px-back" href="/">→ بازگشت به صفحه اصلی</a>
-  <div class="px-login-brand"><img class="px-login-mascot" src="{% static 'img/brand/pichak-mascot.svg' %}" alt="پیچک"><h1>ورود به سامانه پیچک دانش</h1><p>صفحه ورود مشترک آموزگاران و دانش‌آموزان پایه ششم</p></div>
-  {% if error %}<div class="px-login-error" role="alert">{{ error }}</div>{% endif %}
-  <form method="post" class="px-login-form">{% csrf_token %}
-   <label>نام کاربری یا کد دانش‌آموزی<div class="px-login-field"><input name="identifier" type="text" autocomplete="username" required autofocus placeholder="نام کاربری خود را وارد کنید"></div></label>
-   <label>رمز عبور<div class="px-login-field"><input name="password" type="password" autocomplete="current-password" required placeholder="رمز عبور خود را وارد کنید"></div></label>
-   <button type="submit" class="px-login-submit">ورود به حساب کاربری <span aria-hidden="true">←</span></button>
-  </form>
-  <p class="px-login-note"><span>🌱</span> برای دریافت یا بازیابی رمز ورود، با آموزگار خود هماهنگ کن.</p>
+<section class="px-login-v2" aria-label="ورود به پیچک دانش">
+ <div class="px-login-shell">
+  <aside class="px-login-visual" aria-label="معرفی پیچک دانش">
+   <a href="/" aria-label="صفحه اصلی پیچک دانش"><img class="px-login-logo" src="{% static 'img/brand/wordmark.svg' %}" alt="پیچک دانش"></a>
+   <div class="px-login-art"><div class="px-login-mascot-wrap"><img class="px-login-mascot" src="{% static 'img/brand/pichak-mascot.svg' %}" alt="شخصیت همراه پیچک دانش"></div></div>
+   <div class="px-login-message">
+    <span class="px-login-kicker">فضای یادگیری پایه ششم</span>
+    <h2>هر روز، یک قدم به سوی رشد 🌱</h2>
+    <p>به فضای یادگیری پیچک خوش آمدی؛ جایی برای کشف توانایی‌ها، تمرین کردن و پیشرفت در کنار هم.</p>
+   </div>
+   <div class="px-login-visual-foot">با هم، از یادگیری لذت ببریم!</div>
+  </aside>
+  <div class="px-login-form-side">
+   <a class="px-login-back" href="/">→ بازگشت به صفحه اصلی</a>
+   <div class="px-login-heading">
+    <small>خوش آمدی!</small>
+    <h1>ورود به حساب کاربری</h1>
+    <p>برای ادامه مسیر یادگیری، اطلاعات ورودت را وارد کن.</p>
+   </div>
+   <div class="px-login-roles" aria-label="کاربران سامانه">
+    <div class="px-login-role"><span class="px-login-role-icon" aria-hidden="true">👩🏻‍🏫</span><span><b>آموزگار</b><small>مدیریت کلاس و یادگیری</small></span></div>
+    <div class="px-login-role"><span class="px-login-role-icon" aria-hidden="true">🎒</span><span><b>دانش‌آموز</b><small>تمرین و پیشرفت روزانه</small></span></div>
+   </div>
+   {% if error %}<div class="px-login-error" role="alert" aria-live="polite">{{ error }}</div>{% endif %}
+   <form method="post" class="px-login-form">
+    {% csrf_token %}
+    <label class="px-login-label" for="px-identifier">نام کاربری یا کد / شماره موبایل
+     <span class="px-login-field"><input id="px-identifier" name="identifier" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required autofocus placeholder="نام کاربری یا شماره موبایل" aria-label="نام کاربری یا شماره موبایل"></span>
+    </label>
+    <label class="px-login-label" for="px-password">رمز عبور
+     <span class="px-login-field"><input class="px-login-password" id="px-password" name="password" type="password" autocomplete="current-password" required placeholder="رمز عبور خود را وارد کن"><button class="px-login-show" type="button" id="px-toggle-password" aria-controls="px-password" aria-pressed="false">نمایش</button></span>
+    </label>
+    <button type="submit" class="px-login-submit">ورود به پیچک دانش <span aria-hidden="true">←</span></button>
+   </form>
+   <p class="px-login-help"><span aria-hidden="true">🔐</span><span>برای دریافت یا بازیابی رمز ورود، با آموزگار خود هماهنگ کن. اطلاعات ورودت را در اختیار دیگران قرار نده.</span></p>
+   <div class="px-login-bottom">پیچک دانش · با هم، از یادگیری لذت ببریم!</div>
+  </div>
  </div>
 </section>
+<script>
+(function(){
+ const button=document.getElementById('px-toggle-password');
+ const field=document.getElementById('px-password');
+ if(!button||!field)return;
+ button.addEventListener('click',function(){
+  const show=field.type==='password';
+  field.type=show?'text':'password';
+  field.classList.toggle('password-visible',show);
+  button.textContent=show?'پنهان':'نمایش';
+  button.setAttribute('aria-pressed',String(show));
+  field.focus();
+ });
+})();
+</script>
 {% endblock %}
