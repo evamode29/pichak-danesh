@@ -127,7 +127,7 @@
   root.querySelectorAll('.pd-nav a').forEach(item=>item.classList.remove('active'));
   this.classList.add('active');
  }));
- const sections=['overview','tasks','tests','report','profile'].map(id=>document.getElementById(id)).filter(Boolean);
+ const sections=['overview','tasks','report','profile'].map(id=>document.getElementById(id)).filter(Boolean);
  if('IntersectionObserver' in window){
   const observer=new IntersectionObserver(entries=>{
    entries.forEach(entry=>{
