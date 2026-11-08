@@ -3,119 +3,145 @@
 {% block title %}پنل دانش‌آموز | پیچک دانش{% endblock %}
 {% block content %}
 <style>
-.pd-page{direction:rtl;max-width:1240px;margin:auto;padding:26px 20px 64px;color:#172d21}
-.pd-topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px;color:#829087;font-size:11px}
-.pd-topline strong{color:#287343}
-.pd-hero{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) 220px;align-items:center;gap:20px;min-height:220px;padding:27px 32px;border:1px solid #e1eddf;border-radius:25px;background:linear-gradient(110deg,#fafff8 0%,#eff9ed 54%,#e4f4df 100%);box-shadow:0 14px 38px #204c2b0c}
-.pd-hero:before{content:"";position:absolute;z-index:-1;left:-75px;top:-155px;width:370px;height:370px;border:1px solid #b8d9b4;border-radius:50%;box-shadow:0 0 0 35px #cce7c51c,0 0 0 75px #cce7c512}
-.pd-hero-copy{min-width:0}.pd-eyebrow{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:99px;background:#e3f3df;color:#367543;font-size:10px;font-weight:900}
-.pd-hero h1{margin:11px 0 5px;color:#193c28;font-size:clamp(24px,3vw,34px);font-weight:900;line-height:1.5}
-.pd-hero p{margin:0;color:#65786a;font-size:12px;line-height:2}
-.pd-progress{max-width:430px;margin-top:17px}.pd-progress-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:7px;color:#53705a;font-size:10px;font-weight:800}
-.pd-progress-track{height:9px;overflow:hidden;border-radius:99px;background:#dcebd8}.pd-progress-track span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#78bd4c,#168449)}
-.pd-hero-art{display:flex;justify-content:center;align-items:center;height:165px}.pd-hero-art img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 14px #345d3420)}
-.pd-message{margin-top:13px;padding:10px 14px;border-radius:12px;background:#eaf7ec;color:#286a3d;font-size:11px}.pd-message.error{background:#fff0ed;color:#a33b2b}
-.pd-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:15px 0 25px}
-.pd-stat{padding:14px 16px;border:1px solid #e5ede2;border-radius:17px;background:#fff;box-shadow:0 7px 22px #244a2b08}
-.pd-stat small{display:block;color:#829087;font-size:10px}.pd-stat strong{display:block;margin-top:3px;color:#236b3d;font-size:25px;line-height:1.5}.pd-stat span{display:block;color:#9aa59b;font-size:9px}
-.pd-columns{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:16px;align-items:start}
-.pd-section{min-width:0;padding:19px;border:1px solid #e4ece1;border-radius:20px;background:#fff;box-shadow:0 8px 26px #244a2b07}
-.pd-section+.pd-section{margin-top:15px}
-.pd-section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:13px}
-.pd-section-title{display:flex;align-items:center;gap:9px}.pd-section-title i{width:5px;height:25px;border-radius:99px;background:#218448}
-.pd-section-title h2{margin:0;color:#214c31;font-size:17px;font-weight:900}
-.pd-count{padding:5px 10px;border-radius:99px;background:#eff7eb;color:#4d7851;font-size:9px;font-weight:900;white-space:nowrap}
-.pd-list{display:grid;gap:10px}
-.pd-card{padding:15px;border:1px solid #e7eee5;border-radius:16px;background:#fff;transition:transform .18s,box-shadow .18s}
-.pd-card:hover{transform:translateY(-2px);box-shadow:0 12px 24px #214b2c0c}
-.pd-card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.pd-card-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#eff7e9;font-size:21px;flex:0 0 auto}
-.pd-status{padding:5px 9px;border-radius:99px;font-size:9px;font-weight:900;white-space:nowrap}
-.pd-status.pending{background:#fff4db;color:#946514}.pd-status.review{background:#edf2ff;color:#4966a3}.pd-status.done{background:#eaf6ec;color:#287343}
-.pd-card h3{margin:10px 0 4px;color:#2b5136;font-size:14px;font-weight:900}
-.pd-card p{margin:0;color:#718075;font-size:11px;line-height:2;white-space:pre-line}
-.pd-meta{display:flex;flex-wrap:wrap;gap:9px 14px;margin-top:10px;padding-top:9px;border-top:1px solid #edf1eb;color:#89958b;font-size:9px}
-.pd-note{margin-top:9px;padding:9px 11px;border-radius:10px;background:#f2f8ef;color:#58745a;font-size:10px;line-height:1.9}
-.pd-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:11px;padding:9px 13px;border:0;border-radius:10px;background:#207b43;color:#fff;text-decoration:none;font:inherit;font-size:10px;font-weight:900;cursor:pointer}
-.pd-btn:hover{background:#176638;transform:translateY(-1px)}.pd-btn.soft{background:#eff6eb;color:#3e7048}.pd-btn:disabled{background:#edf2ec;color:#849184;cursor:default;transform:none}
-.pd-empty{padding:24px 14px;border:1px dashed #cbdcc8;border-radius:15px;background:#fbfdf9;text-align:center;color:#879488}
-.pd-empty b{display:block;margin-bottom:4px;color:#41694a;font-size:12px}.pd-empty p{margin:0;font-size:10px;line-height:1.8}
-.pd-score{display:flex;align-items:center;gap:11px}.pd-score-bubble{width:48px;height:48px;display:grid;place-items:center;border-radius:50%;background:#e2f5e4;color:#176d3b;font-size:15px;font-weight:900;flex:0 0 auto}
-.pd-score-copy{min-width:0;flex:1}.pd-score-copy strong{display:block;color:#31583b;font-size:11px}.pd-score-copy small{display:block;color:#89958b;font-size:9px}
-.pd-footer-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:15px}
-.pd-info{padding:14px;border:1px solid #e5ede2;border-radius:15px;background:#fbfdf9}.pd-info strong{display:block;color:#31583b;font-size:11px}.pd-info p{margin:5px 0 0;color:#829084;font-size:10px;line-height:1.9}
-.pd-logout{margin-top:15px}.pd-logout button{border:1px solid #e1eae0;background:#fff;color:#53715a}
-@media(max-width:850px){.pd-columns{grid-template-columns:1fr}.pd-hero{grid-template-columns:minmax(0,1fr) 160px}.pd-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){.pd-page{padding:17px 12px 45px}.pd-topline{font-size:10px}.pd-hero{grid-template-columns:1fr;padding:21px}.pd-hero-art{display:none}.pd-hero h1{font-size:25px}.pd-section{padding:14px}.pd-section-title h2{font-size:15px}.pd-footer-grid{grid-template-columns:1fr}.pd-stat{padding:12px}.pd-stat strong{font-size:22px}}
-@media(prefers-reduced-motion:reduce){.pd-card{transition:none}}
+.pd{--g:#16834a;--gd:#105c35;--mint:#eaf7ee;--ink:#183b2a;--muted:#748477;direction:rtl;max-width:1500px;margin:auto;padding:22px clamp(12px,2.5vw,32px) 60px;color:var(--ink)}
+.pd *{box-sizing:border-box}.pd a{text-decoration:none}.pd-top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px}.pd-brand{display:flex;align-items:center;gap:10px;font-weight:900;color:#176b3a}.pd-brand img{width:43px;height:43px;object-fit:contain}.pd-user{display:flex;align-items:center;gap:10px;padding:7px 12px;border:1px solid #e5eee5;border-radius:16px;background:#fff}.pd-avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#e6f5e9;font-size:21px}.pd-user b{display:block;font-size:12px}.pd-user small{display:block;color:var(--muted);font-size:10px}
+.pd-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;align-items:start}.pd-side{position:sticky;top:105px;padding:13px;border:1px solid #e4eee4;border-radius:22px;background:rgba(255,255,255,.9);box-shadow:0 12px 34px #174c2b0b}.pd-side-label{padding:9px 11px 12px;color:#91a095;font-size:10px;font-weight:800}.pd-nav{display:grid;gap:5px}.pd-nav a{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:13px;color:#607366;font-size:12px;font-weight:800;transition:background .2s,color .2s,transform .2s,box-shadow .2s}.pd-nav a .ico{width:30px;height:30px;display:grid;place-items:center;border-radius:10px;background:#f0f6ef;font-size:16px}.pd-nav a:hover{background:#eff8f0;color:#176b3a;transform:translateX(-3px)}.pd-nav a.active{background:linear-gradient(120deg,#18864b,#2b9c59);color:#fff;box-shadow:0 8px 18px #16834a30}.pd-nav a.active .ico{background:#ffffff24}.pd-side-tip{margin-top:15px;padding:13px;border-radius:15px;background:linear-gradient(140deg,#f2fae9,#e4f4dc);color:#3d7543;font-size:11px;line-height:1.9}.pd-side-tip b{display:block;font-size:12px;margin-bottom:3px}
+.pd-main{min-width:0}.pd-hero{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) 190px;align-items:center;gap:18px;min-height:220px;padding:26px clamp(18px,3vw,34px);border:1px solid #dceedd;border-radius:26px;background:linear-gradient(110deg,#fafff8 0%,#eff9ed 54%,#e1f3dc 100%);box-shadow:0 16px 42px #204c2b0c}.pd-hero:before{content:"";position:absolute;z-index:-1;left:-75px;top:-155px;width:370px;height:370px;border:1px solid #b8d9b4;border-radius:50%;box-shadow:0 0 0 35px #cce7c51c,0 0 0 75px #cce7c512}.pd-hero:after{content:"";position:absolute;z-index:-1;right:45%;bottom:-100px;width:180px;height:180px;border-radius:50%;background:#d9efce80;filter:blur(2px)}.pd-hero-copy{min-width:0}.pd-eyebrow{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:99px;background:#e2f3df;color:#367543;font-size:10px;font-weight:900}.pd-hero h1{margin:10px 0 5px;color:#193c28;font-size:clamp(24px,3vw,35px);font-weight:900;line-height:1.5}.pd-hero p{margin:0;color:#65786a;font-size:12px;line-height:2}.pd-hero-art{height:170px;display:flex;align-items:center;justify-content:center}.pd-hero-art img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 12px 16px #345d3425);animation:pd-float 4.5s ease-in-out infinite}@keyframes pd-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.pd-progress{max-width:470px;margin-top:17px}.pd-progress-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:7px;color:#53705a;font-size:10px;font-weight:800}.pd-progress-track{height:10px;overflow:hidden;border-radius:99px;background:#dcebd8}.pd-progress-track span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#83c94e,#168449);transform-origin:right;animation:pd-grow 1.1s ease-out both}@keyframes pd-grow{from{width:0}to{width:var(--progress)}}.pd-xp-line{margin-top:6px!important;font-size:10px!important;color:#78907a!important}
+.pd-flash{margin-top:12px;padding:11px 14px;border-radius:13px;background:#eaf7ec;color:#286a3d;font-size:11px;border:1px solid #d7edda}.pd-flash.error{background:#fff0ed;color:#a33b2b;border-color:#f5d8d2}
+.pd-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:15px 0 17px}.pd-stat{position:relative;overflow:hidden;min-width:0;padding:15px;border:1px solid #e5ede2;border-radius:18px;background:#fff;box-shadow:0 8px 23px #244a2b08;transition:transform .22s,box-shadow .22s,border-color .22s}.pd-stat:after{content:"";position:absolute;left:-18px;bottom:-28px;width:85px;height:85px;border-radius:50%;background:var(--wash,#eff7eb)}.pd-stat:hover{transform:translateY(-4px);box-shadow:0 15px 28px #244a2b12;border-color:#cde4d0}.pd-stat small{display:block;color:#829087;font-size:10px}.pd-stat strong{position:relative;z-index:1;display:block;margin-top:3px;color:var(--accent,#236b3d);font-size:27px;line-height:1.5;font-weight:900}.pd-stat span{position:relative;z-index:1;display:block;color:#9aa59b;font-size:9px}.pd-stat .pd-stat-icon{position:absolute;left:13px;top:15px;font-size:22px;opacity:.9}
+.pd-content-grid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(300px,.88fr);gap:15px;align-items:start}.pd-panel{min-width:0;padding:18px;border:1px solid #e4ece1;border-radius:21px;background:#fff;box-shadow:0 9px 28px #244a2b08}.pd-panel+.pd-panel{margin-top:15px}.pd-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.pd-title{display:flex;align-items:center;gap:9px}.pd-title i{width:5px;height:25px;border-radius:99px;background:#218448}.pd-title h2{margin:0;color:#214c31;font-size:16px;font-weight:900}.pd-count{padding:5px 10px;border-radius:99px;background:#eff7eb;color:#4d7851;font-size:9px;font-weight:900;white-space:nowrap}.pd-list{display:grid;gap:10px}.pd-card{padding:14px;border:1px solid #e7eee5;border-radius:16px;background:linear-gradient(145deg,#fff,#fcfefb);transition:transform .2s,border-color .2s,box-shadow .2s}.pd-card:hover{transform:translateY(-3px);border-color:#cfe5d0;box-shadow:0 13px 24px #214b2c10}.pd-card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.pd-card-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#eff7e9;font-size:20px;flex:0 0 auto}.pd-status{padding:5px 9px;border-radius:99px;font-size:9px;font-weight:900;white-space:nowrap}.pd-status.pending{background:#fff4db;color:#946514}.pd-status.review{background:#edf2ff;color:#4966a3}.pd-status.done{background:#eaf6ec;color:#287343}.pd-card h3{margin:10px 0 4px;color:#2b5136;font-size:13px;font-weight:900}.pd-card p{margin:0;color:#718075;font-size:11px;line-height:2;white-space:pre-line}.pd-meta{display:flex;flex-wrap:wrap;gap:8px 13px;margin-top:10px;padding-top:9px;border-top:1px solid #edf1eb;color:#89958b;font-size:9px}.pd-note{margin-top:9px;padding:9px 11px;border-radius:10px;background:#f2f8ef;color:#58745a;font-size:10px;line-height:1.9}
+.pd-btn{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:7px;margin-top:11px;padding:10px 15px;border:1px solid transparent;border-radius:12px;background:linear-gradient(120deg,#21884b,#12683a);color:#fff;text-decoration:none;font:inherit;font-size:10px;font-weight:900;cursor:pointer;box-shadow:0 6px 14px #176b3820;transition:transform .18s,box-shadow .18s,filter .18s}.pd-btn:before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(110deg,transparent 20%,#ffffff35 48%,transparent 75%);transform:translateX(120%);transition:transform .55s}.pd-btn:hover{transform:translateY(-2px);box-shadow:0 11px 21px #176b3833;filter:saturate(1.12)}.pd-btn:hover:before{transform:translateX(-120%)}.pd-btn:active{transform:translateY(1px) scale(.98);box-shadow:0 3px 8px #176b3820}.pd-btn.soft{background:#eff7ed;color:#347247;border-color:#e0eddf;box-shadow:none}.pd-btn.soft:hover{background:#e3f2e3;box-shadow:0 7px 14px #176b3810}.pd-btn:disabled{background:#edf2ec;color:#849184;cursor:default;transform:none;box-shadow:none}.pd-btn:disabled:before{display:none}.pd-btn:focus-visible,.pd-nav a:focus-visible{outline:3px solid #83c99a;outline-offset:3px}
+.pd-empty{padding:23px 14px;border:1px dashed #cbdcc8;border-radius:15px;background:#fbfdf9;text-align:center;color:#879488}.pd-empty .emoji{font-size:28px;display:block;margin-bottom:6px}.pd-empty b{display:block;margin-bottom:4px;color:#41694a;font-size:12px}.pd-empty p{margin:0;font-size:10px;line-height:1.8}.pd-empty .pd-btn{margin-top:12px}
+.pd-score{display:flex;align-items:center;gap:11px}.pd-score-bubble{width:47px;height:47px;display:grid;place-items:center;border-radius:15px;background:#e2f5e4;color:#176d3b;font-size:14px;font-weight:900;flex:0 0 auto}.pd-score-copy{min-width:0;flex:1}.pd-score-copy strong{display:block;color:#31583b;font-size:11px}.pd-score-copy small{display:block;color:#89958b;font-size:9px}.pd-score-bar{height:6px;margin-top:7px;border-radius:99px;background:#edf3eb;overflow:hidden}.pd-score-bar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#7dc74c,#168449)}
+.pd-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.pd-info{padding:13px;border:1px solid #e5ede2;border-radius:15px;background:#fbfdf9}.pd-info strong{display:block;color:#31583b;font-size:11px}.pd-info p{margin:5px 0 0;color:#829084;font-size:10px;line-height:1.9}.pd-logout{margin-top:14px}.pd-logout .pd-btn{width:100%;justify-content:center}
+.pd-mobile-toggle{display:none}.pd-bottom-nav{display:none}.pd-reveal{opacity:0;transform:translateY(12px);animation:pd-in .55s ease forwards}.pd-reveal:nth-child(2){animation-delay:.07s}.pd-reveal:nth-child(3){animation-delay:.14s}.pd-reveal:nth-child(4){animation-delay:.21s}@keyframes pd-in{to{opacity:1;transform:translateY(0)}}
+@media(max-width:1000px){.pd-layout{grid-template-columns:190px minmax(0,1fr)}.pd-content-grid{grid-template-columns:1fr}.pd-hero{grid-template-columns:minmax(0,1fr) 150px}}
+@media(max-width:720px){.pd{padding:14px 12px 35px}.pd-layout{display:block}.pd-side{position:static;margin-bottom:12px;padding:9px}.pd-side-label,.pd-side-tip{display:none}.pd-nav{display:flex;overflow-x:auto;gap:6px;padding-bottom:2px;scrollbar-width:thin}.pd-nav a{flex:0 0 auto;padding:8px 10px;font-size:10px}.pd-nav a .ico{width:26px;height:26px;font-size:14px}.pd-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.pd-stat{padding:12px}.pd-stat strong{font-size:24px}.pd-hero{min-height:190px;grid-template-columns:minmax(0,1fr) 112px;padding:19px;gap:8px}.pd-hero-art{height:125px}.pd-hero h1{font-size:25px}.pd-panel{padding:14px}.pd-title h2{font-size:14px}}
+@media(max-width:480px){.pd-top{align-items:flex-start}.pd-brand{font-size:12px}.pd-brand img{width:35px;height:35px}.pd-user{padding:5px 8px}.pd-avatar{width:32px;height:32px}.pd-user b{font-size:10px}.pd-user small{font-size:9px}.pd-hero{grid-template-columns:1fr}.pd-hero-art{display:none}.pd-hero h1{font-size:24px}.pd-info-grid{grid-template-columns:1fr}.pd-content-grid{gap:11px}.pd-head{align-items:flex-start}.pd-count{font-size:8px}.pd-btn{padding:10px 12px}}
+@media(prefers-reduced-motion:reduce){.pd *, .pd *:before,.pd *:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}.pd-reveal{opacity:1;transform:none}}
 </style>
-<section class="pd-page">
- <div class="pd-topline"><span>پیچک دانش <strong> / فضای یادگیری من</strong></span><span>هر روز یک قدم رو به جلو 🌱</span></div>
- <header class="pd-hero">
-  <div class="pd-hero-copy">
-   <span class="pd-eyebrow">🌱 مسیر رشد من · پایه {{ student.grade }}</span>
-   <h1>سلام {{ student.user.first_name|default:student.user.username }} عزیز!</h1>
-   <p>خوش آمدی! اینجا می‌توانی تکالیف، آزمون‌ها و نتیجه تلاش‌هایت را دنبال کنی.</p>
-   <div class="pd-progress">
-    <div class="pd-progress-head"><span>پیشرفت تا سطح بعدی</span><span>{{ student.level_progress_percent }}٪</span></div>
-    <div class="pd-progress-track"><span style="width:{{ student.level_progress_percent }}%"></span></div>
-    <div class="pd-progress-head" style="margin:6px 0 0"><span>سطح {{ student.level }} · {{ student.xp }} امتیاز تجربه</span><span>{{ student.xp_to_next_level }} امتیاز تا سطح بعدی</span></div>
-   </div>
-  </div>
-  <div class="pd-hero-art"><img src="{% static 'img/brand/01_pichak_danesh.png' %}" alt="شخصیت همراه پیچک دانش"></div>
+<section class="pd" aria-label="پنل دانش‌آموز">
+ <header class="pd-top">
+  <a class="pd-brand" href="{% url 'simple-student' %}"><img src="{% static 'img/brand/01_pichak_danesh.png' %}" alt=""><span>پیچک دانش</span></a>
+  <div class="pd-user"><span class="pd-avatar" aria-hidden="true">🧑🏻‍🎓</span><span><b>{{ student.user.first_name|default:student.user.username }} عزیز</b><small>دانش‌آموز پایه {{ student.grade }}</small></span></div>
  </header>
- {% if message %}<div class="pd-message" role="status">{{ message }}</div>{% endif %}
- {% if error %}<div class="pd-message error" role="alert">{{ error }}</div>{% endif %}
- <div class="pd-stats">
-  <article class="pd-stat"><small>امتیازهای من</small><strong>{{ student.points }}</strong><span>⭐ تلاش‌های ارزشمند تو</span></article>
-  <article class="pd-stat"><small>همه فعالیت‌ها</small><strong>{{ total_tasks }}</strong><span>📚 ثبت‌شده برای تو</span></article>
-  <article class="pd-stat"><small>تأییدشده</small><strong>{{ completed_tasks }}</strong><span>🏅 فعالیت‌های کامل</span></article>
-  <article class="pd-stat"><small>در انتظار انجام</small><strong>{{ pending_tasks }}</strong><span>🌿 قدم بعدی تو</span></article>
- </div>
- <div class="pd-columns">
-  <section class="pd-section">
-   <div class="pd-section-head"><div class="pd-section-title"><i></i><h2>تکالیف و تمرین‌های من</h2></div><span class="pd-count">{{ total_tasks }} فعالیت</span></div>
-   {% if task_records %}
-    <div class="pd-list">
-    {% for record in task_records %}
-     <article class="pd-card">
-      <div class="pd-card-top"><span class="pd-card-icon">{% if record.status == "done" %}🏅{% elif record.status == "review" %}📨{% else %}📚{% endif %}</span>
-       {% if record.status == "done" %}<span class="pd-status done">تأیید شده</span>{% elif record.status == "review" %}<span class="pd-status review">در انتظار بررسی معلم</span>{% else %}<span class="pd-status pending">در انتظار انجام</span>{% endif %}
-      </div>
-      <h3>{{ record.task.title }}</h3>
-      <p>{% if record.task.description %}{{ record.task.description }}{% else %}برای این فعالیت آماده شو و با تمرکز انجامش بده.{% endif %}</p>
-      <div class="pd-meta"><span>📅 {{ record.task.task_date|date:"Y/m/d" }}</span><span>⭐ تا {{ record.task.max_score }} امتیاز</span><span>🏫 {{ record.task.classroom.name }}</span></div>
-      {% if record.note %}<div class="pd-note"><b>پیام معلم:</b> {{ record.note }}</div>{% endif %}
-      {% if record.score != None %}<div class="pd-note">امتیاز ثبت‌شده: <b>{{ record.score }} از {{ record.task.max_score }}</b></div>{% endif %}
-      {% if record.status == "pending" %}<form method="post">{% csrf_token %}<input type="hidden" name="action" value="submit_task"><input type="hidden" name="record_id" value="{{ record.id }}"><button class="pd-btn" type="submit">ارسال برای بررسی معلم ←</button></form>
-      {% elif record.status == "review" %}<button class="pd-btn" type="button" disabled>منتظر نظر معلم هستم</button>
-      {% else %}<button class="pd-btn" type="button" disabled>این فعالیت کامل شد ✓</button>{% endif %}
-     </article>
-    {% endfor %}
-    </div>
-   {% else %}<div class="pd-empty"><b>هنوز فعالیتی برایت ثبت نشده 🌿</b><p>به‌زودی فعالیت‌های تازه معلمت را اینجا می‌بینی.</p></div>{% endif %}
-  </section>
-  <div>
-   <section class="pd-section">
-    <div class="pd-section-head"><div class="pd-section-title"><i style="background:#e7ad36"></i><h2>آزمون‌های من</h2></div><a class="pd-btn soft" style="margin:0" href="{% url 'student-test-list' %}">دیدن آزمون‌ها ←</a></div>
-    {% if attempts %}
-     <div class="pd-list">
-     {% for attempt in attempts %}
-      <article class="pd-card">
-       <div class="pd-card-top"><span class="pd-card-icon">🧩</span><span class="pd-status done">ثبت‌شده</span></div>
-       <h3>{{ attempt.test.title }}</h3><p>{{ attempt.correct_answers }} پاسخ درست از {{ attempt.total_questions }}</p>
-       <div class="pd-meta"><span>📊 نمره: {{ attempt.score }}٪</span><span>📅 {{ attempt.completed_at|date:"Y/m/d" }}</span></div>
-      </article>
-     {% endfor %}
+ <div class="pd-layout">
+  <aside class="pd-side" aria-label="ناوبری پنل">
+   <div class="pd-side-label">فضای یادگیری من</div>
+   <nav class="pd-nav">
+    <a class="active" href="#overview" aria-current="page"><span class="ico">⌂</span>داشبورد</a>
+    <a href="{% url 'student-test-list' %}"><span class="ico">📝</span>آزمون‌ها</a>
+    <a href="#tasks"><span class="ico">🧩</span>تمرین‌ها و تکالیف</a>
+    <a href="#report"><span class="ico">📊</span>کارنامه من</a>
+    <a href="#profile"><span class="ico">👤</span>اطلاعات من</a>
+   </nav>
+   <div class="pd-side-tip"><b>🌱 هر روز رشد کن!</b>قدم‌های کوچک امروز، موفقیت‌های بزرگ فرداست.</div>
+  </aside>
+  <main class="pd-main" id="overview">
+   <header class="pd-hero pd-reveal">
+    <div class="pd-hero-copy">
+     <span class="pd-eyebrow">🌱 مسیر رشد من · پایه {{ student.grade }}</span>
+     <h1>سلام {{ student.user.first_name|default:student.user.username }} جان!</h1>
+     <p>به فضای یادگیری خودت خوش آمدی؛ آماده‌ای امروز یک قدم جلوتر بروی؟</p>
+     <div class="pd-progress">
+      <div class="pd-progress-head"><span>پیشرفت تا سطح بعدی</span><strong>{{ student.level_progress_percent }}٪</strong></div>
+      <div class="pd-progress-track" role="progressbar" aria-label="پیشرفت تا سطح بعدی" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ student.level_progress_percent }}"><span style="width:{{ student.level_progress_percent }}%;--progress:{{ student.level_progress_percent }}%"></span></div>
+      <p class="pd-xp-line">سطح {{ student.level }} · {{ student.xp }} امتیاز تجربه · {{ student.xp_to_next_level }} امتیاز تا سطح بعدی</p>
      </div>
-    {% else %}<div class="pd-empty"><b>هنوز آزمونی انجام نداده‌ای</b><p>آزمون‌های منتشرشده را ببین و اولین تجربه‌ات را ثبت کن.</p><a class="pd-btn" href="{% url 'student-test-list' %}">مشاهده آزمون‌ها ←</a></div>{% endif %}
+    </div>
+    <div class="pd-hero-art"><img src="{% static 'img/brand/01_pichak_danesh.png' %}" alt="شخصیت همراه پیچک دانش"></div>
+   </header>
+   {% if message %}<div class="pd-flash" role="status" tabindex="-1">✨ {{ message }}</div>{% endif %}
+   {% if error %}<div class="pd-flash error" role="alert" tabindex="-1">{{ error }}</div>{% endif %}
+   <section class="pd-stats" aria-label="خلاصه عملکرد">
+    <article class="pd-stat pd-reveal" style="--accent:#176f3d;--wash:#e4f5e7"><span class="pd-stat-icon">⭐</span><small>امتیازهای من</small><strong>{{ student.points }}</strong><span>تلاش‌های ارزشمند تو</span></article>
+    <article class="pd-stat pd-reveal" style="--accent:#3e68b5;--wash:#e9f0ff"><span class="pd-stat-icon">📚</span><small>همه فعالیت‌ها</small><strong>{{ total_tasks }}</strong><span>فعالیت ثبت‌شده</span></article>
+    <article class="pd-stat pd-reveal" style="--accent:#21864c;--wash:#e5f5e9"><span class="pd-stat-icon">🏅</span><small>تأییدشده</small><strong>{{ completed_tasks }}</strong><span>فعالیت‌های کامل</span></article>
+    <article class="pd-stat pd-reveal" style="--accent:#b47a1c;--wash:#fff3df"><span class="pd-stat-icon">🚀</span><small>در انتظار انجام</small><strong>{{ pending_tasks }}</strong><span>قدم بعدی تو</span></article>
    </section>
-   <div class="pd-footer-grid">
-    <section class="pd-info"><strong>🏫 کلاس من</strong><p>{{ student.classroom.name|default:"هنوز کلاسی به حساب تو متصل نشده است." }}{% if student.classroom %} · پایه {{ student.grade }}{% endif %}</p></section>
-    <section class="pd-info"><strong>💡 یادت باشد</strong><p>قرار نیست همیشه بی‌نقص باشی؛ مهم این است که هر روز چیزی تازه یاد بگیری.</p></section>
+   <div class="pd-content-grid">
+    <section class="pd-panel pd-reveal" id="tasks">
+     <div class="pd-head"><div class="pd-title"><i></i><h2>تکالیف و تمرین‌های من</h2></div><span class="pd-count">{{ total_tasks }} فعالیت</span></div>
+     {% if task_records %}
+      <div class="pd-list">
+      {% for record in task_records %}
+       <article class="pd-card">
+        <div class="pd-card-top"><span class="pd-card-icon">{% if record.status == "done" %}🏅{% elif record.status == "review" %}📨{% else %}📚{% endif %}</span>
+         {% if record.status == "done" %}<span class="pd-status done">تأیید شده</span>{% elif record.status == "review" %}<span class="pd-status review">در انتظار بررسی معلم</span>{% else %}<span class="pd-status pending">در انتظار انجام</span>{% endif %}
+        </div>
+        <h3>{{ record.task.title }}</h3>
+        <p>{% if record.task.description %}{{ record.task.description }}{% else %}برای این فعالیت آماده شو و با تمرکز انجامش بده.{% endif %}</p>
+        <div class="pd-meta"><span>📅 {{ record.task.task_date|date:"Y/m/d" }}</span><span>⭐ تا {{ record.task.max_score }} امتیاز</span><span>🏫 {{ record.task.classroom.name }}</span></div>
+        {% if record.note %}<div class="pd-note"><b>پیام معلم:</b> {{ record.note }}</div>{% endif %}
+        {% if record.score != None %}<div class="pd-note">امتیاز ثبت‌شده: <b>{{ record.score }} از {{ record.task.max_score }}</b></div>{% endif %}
+        {% if record.status == "pending" %}<form method="post" class="pd-submit-form">{% csrf_token %}<input type="hidden" name="action" value="submit_task"><input type="hidden" name="record_id" value="{{ record.id }}"><button class="pd-btn" type="submit">ارسال برای بررسی معلم <span aria-hidden="true">←</span></button></form>
+        {% elif record.status == "review" %}<button class="pd-btn soft" type="button" disabled>منتظر نظر معلم هستم ✓</button>
+        {% else %}<button class="pd-btn soft" type="button" disabled>این فعالیت کامل شد ✓</button>{% endif %}
+       </article>
+      {% endfor %}
+      </div>
+     {% else %}<div class="pd-empty"><span class="emoji">🌿</span><b>هنوز فعالیتی برایت ثبت نشده</b><p>به‌زودی فعالیت‌های تازه معلمت را اینجا می‌بینی.</p></div>{% endif %}
+    </section>
+    <div>
+     <section class="pd-panel pd-reveal" id="tests">
+      <div class="pd-head"><div class="pd-title"><i style="background:#e7ad36"></i><h2>آزمون‌های من</h2></div><a class="pd-btn soft" style="margin:0" href="{% url 'student-test-list' %}">همه آزمون‌ها ←</a></div>
+      {% if attempts %}
+       <div class="pd-list">
+       {% for attempt in attempts %}
+        <article class="pd-card">
+         <div class="pd-score"><span class="pd-score-bubble">{{ attempt.score }}٪</span><div class="pd-score-copy"><strong>{{ attempt.test.title }}</strong><small>{{ attempt.correct_answers }} پاسخ درست از {{ attempt.total_questions }} · {{ attempt.completed_at|date:"Y/m/d" }}</small><div class="pd-score-bar"><span style="width:{{ attempt.score }}%"></span></div></div></div>
+        </article>
+       {% endfor %}
+       </div>
+      {% else %}<div class="pd-empty"><span class="emoji">🧩</span><b>آماده اولین آزمونت هستی؟</b><p>آزمون‌های منتشرشده را ببین و دانسته‌هایت را بسنج.</p><a class="pd-btn" href="{% url 'student-test-list' %}">رفتن به آزمون‌ها ←</a></div>{% endif %}
+     </section>
+     <section class="pd-panel pd-reveal" id="report">
+      <div class="pd-head"><div class="pd-title"><i style="background:#5486cf"></i><h2>کارنامه و مسیر پیشرفت</h2></div><span class="pd-count">به‌روز</span></div>
+      <div class="pd-score"><span class="pd-score-bubble">🏆</span><div class="pd-score-copy"><strong>{{ student.points }} امتیاز تلاش</strong><small>سطح {{ student.level }} · {{ student.xp }} امتیاز تجربه</small><div class="pd-score-bar"><span style="width:{{ student.level_progress_percent }}%"></span></div></div></div>
+      <div class="pd-info-grid">
+       <div class="pd-info"><strong>✅ فعالیت‌های تأییدشده</strong><p>{{ completed_tasks }} فعالیت کامل</p></div>
+       <div class="pd-info"><strong>⏳ در صف بررسی</strong><p>{{ waiting_tasks }} فعالیت</p></div>
+      </div>
+     </section>
+     <section class="pd-panel pd-reveal" id="profile">
+      <div class="pd-head"><div class="pd-title"><i style="background:#4b9c92"></i><h2>اطلاعات من</h2></div></div>
+      <div class="pd-info-grid" style="margin-top:0">
+       <div class="pd-info"><strong>👤 نام کاربری</strong><p>{{ student.user.get_full_name|default:student.user.username }}</p></div>
+       <div class="pd-info"><strong>🏫 کلاس من</strong><p>{{ student.classroom.name|default:"هنوز کلاسی متصل نشده است." }}</p></div>
+       <div class="pd-info"><strong>🎓 پایه تحصیلی</strong><p>پایه {{ student.grade }}</p></div>
+       <div class="pd-info"><strong>🌟 سطح یادگیری</strong><p>سطح {{ student.level }}</p></div>
+      </div>
+      <form class="pd-logout" method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="pd-btn soft" type="submit">خروج امن از حساب <span aria-hidden="true">↗</span></button></form>
+     </section>
+    </div>
    </div>
-   <form class="pd-logout" method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="pd-btn soft" type="submit">خروج امن از حساب</button></form>
-  </div>
+  </main>
  </div>
 </section>
+<script>
+(function(){
+ const root=document.querySelector('.pd'); if(!root)return;
+ const navLinks=root.querySelectorAll('.pd-nav a[href^="#"]');
+ navLinks.forEach(link=>link.addEventListener('click',function(){
+  root.querySelectorAll('.pd-nav a').forEach(item=>item.classList.remove('active'));
+  this.classList.add('active');
+ }));
+ const sections=['overview','tasks','tests','report','profile'].map(id=>document.getElementById(id)).filter(Boolean);
+ if('IntersectionObserver' in window){
+  const observer=new IntersectionObserver(entries=>{
+   entries.forEach(entry=>{
+    if(entry.isIntersecting){
+     root.querySelectorAll('.pd-nav a').forEach(link=>link.classList.toggle('active',link.getAttribute('href')==='#'+entry.target.id));
+    }
+   });
+  },{rootMargin:'-25% 0px -60% 0px'});
+  sections.forEach(section=>observer.observe(section));
+ }
+ root.querySelectorAll('.pd-submit-form').forEach(form=>form.addEventListener('submit',function(){
+  const button=this.querySelector('button'); if(button){button.disabled=true;button.textContent='در حال ارسال…';}
+ }));
+ const flash=root.querySelector('.pd-flash'); if(flash){flash.focus({preventScroll:true});}
+})();
+</script>
 {% endblock %}
