@@ -62,11 +62,17 @@
    </section>
    <div class="pd-content-grid">
     <section class="pd-panel pd-reveal" id="tasks">
-     <div class="pd-head"><div class="pd-title"><i></i><h2>تکالیف و تمرین‌های من</h2></div><span class="pd-count">{{ total_tasks }} فعالیت</span></div>
+     <div class="pd-head"><div class="pd-title"><i></i><h2>تکالیف و تمرین‌های من</h2></div><span class="pd-count" data-task-result-count>{{ total_tasks }} فعالیت</span></div>
      {% if task_records %}
-      <div class="pd-list">
+      <div class="pd-task-filters" role="group" aria-label="فیلتر فعالیت‌ها">
+       <button type="button" class="pd-filter-button is-active" data-task-filter="all" aria-pressed="true">همه <span>{{ total_tasks }}</span></button>
+       <button type="button" class="pd-filter-button" data-task-filter="pending" aria-pressed="false">در انتظار انجام <span>{{ pending_tasks }}</span></button>
+       <button type="button" class="pd-filter-button" data-task-filter="review" aria-pressed="false">در انتظار بررسی <span>{{ waiting_tasks }}</span></button>
+       <button type="button" class="pd-filter-button" data-task-filter="done" aria-pressed="false">تأییدشده <span>{{ completed_tasks }}</span></button>
+      </div>
+      <div class="pd-list" id="student-task-list">
       {% for record in task_records %}
-       <article class="pd-card">
+       <article class="pd-card" data-task-status="{{ record.status }}">
         <div class="pd-card-top"><span class="pd-card-icon">{% if record.status == "done" %}🏅{% elif record.status == "review" %}📨{% else %}📚{% endif %}</span>
          {% if record.status == "done" %}<span class="pd-status done">تأیید شده</span>{% elif record.status == "review" %}<span class="pd-status review">در انتظار بررسی معلم</span>{% else %}<span class="pd-status pending">در انتظار انجام</span>{% endif %}
         </div>
@@ -81,6 +87,7 @@
        </article>
       {% endfor %}
       </div>
+      <p class="pd-filter-empty" role="status" hidden>در این دسته فعالیتی وجود ندارد. فیلتر دیگری را انتخاب کن.</p>
      {% else %}<div class="pd-empty"><span class="emoji">🌿</span><b>هنوز فعالیتی برایت ثبت نشده</b><p>به‌زودی فعالیت‌های تازه معلمت را اینجا می‌بینی.</p></div>{% endif %}
     </section>
     <div>
@@ -139,6 +146,26 @@
   },{rootMargin:'-25% 0px -60% 0px'});
   sections.forEach(section=>observer.observe(section));
  }
+ const taskFilters=root.querySelectorAll('[data-task-filter]');
+ const taskCards=root.querySelectorAll('[data-task-status]');
+ const filterEmpty=root.querySelector('.pd-filter-empty');
+ const resultCount=root.querySelector('[data-task-result-count]');
+ taskFilters.forEach(button=>button.addEventListener('click',function(){
+  const selected=this.dataset.taskFilter;
+  let visible=0;
+  taskFilters.forEach(item=>{
+   const active=item===this;
+   item.classList.toggle('is-active',active);
+   item.setAttribute('aria-pressed',active?'true':'false');
+  });
+  taskCards.forEach(card=>{
+   const show=selected==='all'||card.dataset.taskStatus===selected;
+   card.hidden=!show;
+   if(show)visible++;
+  });
+  if(filterEmpty)filterEmpty.hidden=visible!==0;
+  if(resultCount)resultCount.textContent=visible+' فعالیت';
+ }));
  root.querySelectorAll('.pd-submit-form').forEach(form=>form.addEventListener('submit',function(){
   const button=this.querySelector('button'); if(button){button.disabled=true;button.textContent='در حال ارسال…';}
  }));
