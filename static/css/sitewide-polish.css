@@ -569,3 +569,79 @@ textarea.tm-field{min-height:86px}
 @media(prefers-reduced-motion:reduce){
   .pd .pd-user{transition:none}
 }
+
+
+/* Student task filters — quick, accessible sorting without changing stored records */
+.pd .pd-task-filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin:-3px 0 15px;
+}
+.pd .pd-filter-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-height:38px;
+  padding:7px 12px;
+  border:1px solid #e1ebe0;
+  border-radius:999px;
+  background:#f8fbf7;
+  color:#55705b;
+  font:inherit;
+  font-size:10px;
+  font-weight:800;
+  cursor:pointer;
+  transition:background .18s,border-color .18s,color .18s,transform .18s,box-shadow .18s;
+}
+.pd .pd-filter-button span{
+  display:inline-grid;
+  min-width:21px;
+  min-height:21px;
+  padding:0 5px;
+  place-items:center;
+  border-radius:99px;
+  background:#eaf2e7;
+  color:#527452;
+  font-size:9px;
+  font-variant-numeric:tabular-nums;
+}
+.pd .pd-filter-button:hover{
+  transform:translateY(-1px);
+  border-color:#bcd9bd;
+  background:#f0f8ed;
+  color:#1d6a3c;
+}
+.pd .pd-filter-button.is-active{
+  border-color:#176d43;
+  background:linear-gradient(120deg,#176d43,#218b50);
+  color:#fff;
+  box-shadow:0 5px 13px rgba(23,109,67,.16);
+}
+.pd .pd-filter-button.is-active span{
+  background:rgba(255,255,255,.18);
+  color:#fff;
+}
+.pd .pd-filter-button:focus-visible{
+  outline:3px solid #91d3a4;
+  outline-offset:3px;
+}
+.pd [data-task-status][hidden],.pd .pd-filter-empty[hidden]{display:none!important}
+.pd .pd-filter-empty{
+  margin:12px 0 0;
+  padding:14px;
+  border:1px dashed #cbdcc8;
+  border-radius:13px;
+  background:#fbfdf9;
+  color:#718675;
+  font-size:11px;
+  text-align:center;
+}
+@media(max-width:520px){
+  .pd .pd-task-filters{gap:6px}
+  .pd .pd-filter-button{min-height:36px;padding:6px 10px;font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+  .pd .pd-filter-button{transition:none}
+}
