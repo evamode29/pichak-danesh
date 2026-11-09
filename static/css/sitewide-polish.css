@@ -162,3 +162,104 @@ textarea.tm-field{min-height:86px}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
 }
+
+
+/* Student dashboard refinement — clearer hierarchy, calmer surfaces and stronger touch UX */
+.pd{
+  max-width:1480px;
+  padding-top:clamp(18px,2.4vw,30px);
+}
+.pd .pd-top{margin-bottom:20px}
+.pd .pd-brand{letter-spacing:-.2px}
+.pd .pd-user{
+  border-color:#e1ebdf;
+  box-shadow:0 7px 22px rgba(27,75,40,.055);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.pd .pd-user:hover{transform:translateY(-1px);box-shadow:0 11px 26px rgba(27,75,40,.09)}
+.pd .pd-hero{
+  min-height:236px;
+  border-color:#d8e9d5;
+  background:
+    radial-gradient(circle at 82% 18%,rgba(255,255,255,.78),transparent 25%),
+    linear-gradient(115deg,#fbfff9 0%,#f0f9ed 48%,#e4f3df 100%);
+  box-shadow:0 18px 46px rgba(30,83,43,.075);
+}
+.pd .pd-hero h1{letter-spacing:-.7px}
+.pd .pd-eyebrow{border:1px solid rgba(72,132,76,.12)}
+.pd .pd-progress{max-width:520px}
+.pd .pd-progress-track{height:11px;box-shadow:inset 0 1px 2px rgba(31,76,39,.07)}
+.pd .pd-stats{gap:13px;margin-block:17px 20px}
+.pd .pd-stat{
+  min-height:126px;
+  padding:17px 18px;
+  border-radius:19px;
+  background:linear-gradient(155deg,#fff 0%,#fcfefb 100%);
+}
+.pd .pd-stat strong{font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.pd .pd-stat .pd-stat-icon{left:16px;top:17px}
+.pd .pd-content-grid{gap:17px}
+.pd .pd-panel{
+  padding:clamp(16px,1.8vw,21px);
+  border-radius:21px;
+  box-shadow:0 10px 30px rgba(25,72,39,.055);
+}
+.pd .pd-head{padding-bottom:12px;border-bottom:1px solid #edf2eb}
+.pd .pd-title h2{letter-spacing:-.25px}
+.pd .pd-count{border:1px solid #e5efe2}
+.pd .pd-list{gap:12px}
+.pd .pd-card{
+  padding:16px;
+  border-color:#e5eee3;
+  background:linear-gradient(145deg,#fff 0%,#fcfefb 100%);
+}
+.pd .pd-card h3{font-size:14px;line-height:1.8}
+.pd .pd-card p{font-size:12px;line-height:2.05}
+.pd .pd-card-icon{box-shadow:inset 0 0 0 1px rgba(46,105,55,.055)}
+.pd .pd-status{padding:6px 10px}
+.pd .pd-meta{font-size:10px;line-height:1.9}
+.pd .pd-note{border:1px solid #e5efe1}
+.pd .pd-btn{min-height:44px;padding-inline:17px;font-size:11px}
+.pd .pd-btn:focus-visible,.pd .pd-nav a:focus-visible{outline-offset:4px}
+.pd .pd-score-bubble{box-shadow:inset 0 0 0 1px rgba(38,112,59,.08)}
+.pd .pd-info{transition:border-color .18s,background .18s}
+.pd .pd-info:hover{border-color:#d0e5ce;background:#f7fbf5}
+.pd .pd-empty{padding:28px 16px}
+.pd .pd-empty .emoji{font-size:32px}
+.pd .pd-side{border-color:#e1ebdf;box-shadow:0 12px 30px rgba(25,72,39,.055)}
+.pd .pd-nav a{min-height:46px}
+.pd .pd-nav a .ico{flex:0 0 30px}
+@media(max-width:1000px){
+  .pd .pd-hero{min-height:218px}
+  .pd .pd-content-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:720px){
+  .pd{padding:13px 12px 30px}
+  .pd .pd-side{padding:8px;border-radius:17px}
+  .pd .pd-nav{gap:5px}
+  .pd .pd-nav a{min-height:42px;padding:7px 9px}
+  .pd .pd-hero{min-height:190px;padding:18px;border-radius:21px}
+  .pd .pd-stats{gap:9px;margin-block:12px 14px}
+  .pd .pd-stat{min-height:112px;padding:13px;border-radius:16px}
+  .pd .pd-stat strong{font-size:24px}
+  .pd .pd-panel{padding:15px;border-radius:18px}
+  .pd .pd-card{padding:13px;border-radius:14px}
+  .pd .pd-btn{min-height:44px}
+}
+@media(max-width:480px){
+  .pd .pd-top{align-items:center}
+  .pd .pd-user{max-width:62%;min-width:0}
+  .pd .pd-user>span:last-child{min-width:0}
+  .pd .pd-user b,.pd .pd-user small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pd .pd-hero{padding:17px}
+  .pd .pd-hero h1{font-size:23px}
+  .pd .pd-hero p{font-size:11px}
+  .pd .pd-head{gap:7px}
+  .pd .pd-title h2{font-size:13px}
+  .pd .pd-card-top{align-items:flex-start}
+  .pd .pd-status{white-space:normal;text-align:center;line-height:1.6}
+  .pd .pd-meta{gap:5px 10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .pd .pd-user,.pd .pd-info{transition:none}
+}
