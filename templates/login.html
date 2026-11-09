@@ -89,7 +89,7 @@
     <button class="px-login-role" type="button" data-role="teacher" aria-pressed="false"><span class="px-login-role-icon" aria-hidden="true">👩🏻‍🏫</span><span><b>آموزگار</b><small>مدیریت کلاس و یادگیری</small></span></button>
     <button class="px-login-role" type="button" data-role="student" aria-pressed="true"><span class="px-login-role-icon" aria-hidden="true">🎒</span><span><b>دانش‌آموز</b><small>تمرین و پیشرفت روزانه</small></span></button>
    </div>
-   <p class="px-login-role-message" id="px-login-role-message" aria-live="polite">برای ورود دانش‌آموزی، نام کاربری یا کد و رمز خود را وارد کن.</p>
+   <p class="px-login-role-message" id="px-login-role-message" aria-live="polite">این انتخاب فقط راهنماست؛ سامانه نوع حساب را از اطلاعات ورود تشخیص می‌دهد.</p>
    {% if error %}<div class="px-login-error" role="alert" aria-live="polite">{{ error }}</div>{% endif %}
    <form method="post" class="px-login-form">
     {% csrf_token %}
@@ -126,8 +126,8 @@
   role.addEventListener('click',function(){
    document.querySelectorAll('.px-login-role[data-role]').forEach(function(item){item.setAttribute('aria-pressed',String(item===role));});
    if(roleMessage) roleMessage.textContent=role.dataset.role==='teacher'
-    ?'برای ورود آموزگار، نام کاربری یا شماره موبایل و رمز حساب معلم را وارد کن.'
-    :'برای ورود دانش‌آموزی، نام کاربری یا کد و رمز خود را وارد کن.';
+    ?'برای ورود آموزگار، نام کاربری یا شماره موبایل و رمز حساب معلم را وارد کن. این انتخاب فقط راهنماست؛ سامانه نوع حساب را از اطلاعات ورود تشخیص می‌دهد.'
+    :'برای ورود دانش‌آموزی، نام کاربری یا کد و رمز خود را وارد کن. این انتخاب فقط راهنماست؛ سامانه نوع حساب را از اطلاعات ورود تشخیص می‌دهد.';
   });
  });
 </script>
