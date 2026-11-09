@@ -1,6 +1,37 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}پیچک دانش | با هم، از یادگیری لذت ببریم!{% endblock %}
+{% block title %}پیچک دانش | با هم، از یادگیری لذت ببریم!
+<script>
+(function(){
+ const root=document.getElementById('pd-quick'); if(!root)return;
+ const questions=[
+  {q:'۳/۴ + ۱/۴ = ؟',o:['۱','۴/۸','۳/۸'],a:0},
+  {q:'۰٫۵ × ۱۰ = ؟',o:['۰٫۵','۵','۵۰'],a:1},
+  {q:'ک.م.م ۴ و ۶ = ؟',o:['۱۰','۲۴','۱۲'],a:2}
+ ];
+ const q=root.querySelector('#pd-quick-question'),opts=root.querySelector('#pd-quick-options'),fb=root.querySelector('#pd-quick-feedback'),count=root.querySelector('#pd-quick-count'),next=root.querySelector('#pd-quick-next');
+ let index=0,locked=false,score=0;
+ function render(){
+  const item=questions[index];locked=false;count.textContent='سؤال '+String(index+1).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])+' از ۳';q.textContent=item.q;fb.textContent='';next.style.display='none';opts.innerHTML='';
+  item.o.forEach((label,n)=>{const b=document.createElement('button');b.type='button';b.className='pd-quick-option';b.textContent=label;b.addEventListener('click',()=>choose(b,n));opts.appendChild(b)});
+ }
+ function choose(button,n){
+  if(locked)return;
+  const item=questions[index];
+  if(n!==item.a){button.classList.add('wrong');fb.textContent='نزدیک بود! دوباره فکر کن 💪';return}
+  locked=true;score++;button.classList.add('correct');fb.textContent='آفرین! پاسخ درست است ⭐';
+  opts.querySelectorAll('button').forEach(b=>b.disabled=true);
+  next.textContent=index===questions.length-1?'دیدن نتیجه 🎉':'سؤال بعدی ←';next.style.display='block';
+ }
+ next.addEventListener('click',()=>{
+  if(index<questions.length-1){index++;render();q.focus?.();return}
+  q.textContent='آفرین! '+score+' پاسخ درست از ۳';count.textContent='چالش تمام شد';opts.innerHTML='';fb.textContent='این تمرین فقط برای یادگیری بود؛ نتیجه‌ای در حساب تو ذخیره نشد.';next.textContent='دوباره تمرین کن';next.style.display='block';next.onclick=()=>{index=0;score=0;next.onclick=null;render()};
+ });
+ render();
+})();
+</script>
+
+{% endblock %}
 {% block og_title %}پیچک دانش | با هم، از یادگیری لذت ببریم!{% endblock %}
 {% block content %}
 <style>
@@ -80,6 +111,21 @@
 @media(max-width:1050px){.pd-hero{min-height:510px;gap:15px}.pd-art{min-height:400px}.pd-mascot{height:380px}.pd-strip{grid-template-columns:repeat(2,1fr)}.pd-feature-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){.pd-hero{grid-template-columns:1fr;gap:0;padding-block:26px 35px;min-height:unset}.pd-art{grid-row:1;min-height:300px}.pd-mascot{height:290px;width:min(350px,100%)}.pd-halo{width:260px}.pd-copy{text-align:center;padding:0 3px}.pd-title{font-size:clamp(36px,10vw,48px);margin:12px 0}.pd-lead{font-size:14px}.pd-actions{justify-content:center;margin-top:20px}.pd-btn{min-height:52px;padding-inline:19px;font-size:14px}.pd-trust{justify-content:center;flex-wrap:wrap}.pd-bubble{font-size:10px;padding:8px 11px}.pd-bubble strong{font-size:17px}.pd-bubble.one{top:7%;right:0}.pd-bubble.two{bottom:6%;left:0}.pd-spark.a{top:5%;left:12%}.pd-strip{gap:9px}.pd-mini{min-height:83px;padding:12px;gap:9px;border-radius:16px}.pd-mini-icon{flex-basis:42px;width:42px;height:42px;font-size:22px;border-radius:13px}.pd-mini strong{font-size:12px}.pd-mini small{font-size:10px}.pd-section{padding-block:60px}.pd-section-head{margin-bottom:24px}.pd-feature-grid{gap:10px}.pd-feature{min-height:205px;padding:18px 15px;border-radius:18px}.pd-feature-icon{width:48px;height:48px;font-size:24px}.pd-feature h3{font-size:14px;margin-top:13px}.pd-feature p{font-size:11px}.pd-journey{border-radius:24px;padding:27px 17px}.pd-steps{grid-template-columns:1fr;gap:10px}.pd-step{display:flex;align-items:center;gap:13px;text-align:right;padding:14px}.pd-step-icon{flex:0 0 45px;width:45px;height:45px;margin:0;border-radius:14px}.pd-step p{margin-top:3px}.pd-audience{grid-template-columns:1fr;gap:11px}.pd-audience-card{padding:18px;gap:13px;border-radius:19px}.pd-audience-icon{flex-basis:57px;width:57px;height:57px;font-size:29px;border-radius:17px}.pd-audience-card h3{font-size:15px}.pd-audience-card p{font-size:11px}.pd-final{padding-bottom:45px}.pd-final-inner{flex-direction:column;text-align:center;padding:25px 18px;border-radius:22px}.pd-final-inner .pd-btn{width:100%}}
 @media(prefers-reduced-motion:reduce){.pd-home *{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
+
+/* Short, optional learning challenge inspired by the Claude concept. */
+.pd-quick{margin:34px 0 8px;padding:clamp(20px,3vw,32px);border:1px solid #dcebd5;border-radius:28px;background:linear-gradient(130deg,#f1faeb,#fffdf5);box-shadow:0 14px 34px #214d2d0b}
+.pd-quick-head{text-align:center;margin-bottom:18px}.pd-quick-head span{color:#18864a;font-size:12px;font-weight:900}.pd-quick-head h2{margin:8px 0;color:#214b30;font-size:clamp(21px,2.5vw,29px)}.pd-quick-head p{margin:0;color:#778779;font-size:12px}
+.pd-quick-card{max-width:680px;margin:auto;padding:20px;border:1px solid #e4eddf;border-radius:20px;background:#fff}
+.pd-quick-meta{display:flex;justify-content:space-between;gap:10px;color:#819083;font-size:11px;font-weight:800}
+.pd-quick-question{text-align:center;margin:17px 0;color:#1f492e;font-size:clamp(20px,3vw,28px);font-weight:950}
+.pd-quick-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pd-quick-option{min-height:48px;padding:10px;border:1px solid #dfeadf;border-radius:13px;background:#f9fcf7;color:#31583b;font:inherit;font-weight:900;cursor:pointer;transition:transform .18s,border-color .18s,background .18s}
+.pd-quick-option:hover{transform:translateY(-2px);border-color:#86c596;background:#f0f9ed}.pd-quick-option:focus-visible{outline:3px solid #84c99b;outline-offset:3px}
+.pd-quick-option.correct{border-color:#72bd83;background:#e9f7eb;color:#176b39}.pd-quick-option.wrong{border-color:#e5a49b;background:#fff0ed;color:#a13d32}
+.pd-quick-feedback{min-height:28px;margin-top:13px;text-align:center;color:#52705a;font-size:12px;font-weight:800}.pd-quick-next{display:none;margin:4px auto 0;min-height:42px;padding:0 18px;border:0;border-radius:12px;background:#168447;color:#fff;font:inherit;font-size:12px;font-weight:900;cursor:pointer}
+@media(max-width:560px){.pd-quick{padding:19px 13px;border-radius:21px}.pd-quick-card{padding:14px}.pd-quick-options{grid-template-columns:1fr;gap:7px}.pd-quick-option{min-height:44px}}
+@media(prefers-reduced-motion:reduce){.pd-quick *{transition:none!important}}
+
 </style>
 
 <section class="pd-home">
@@ -110,6 +156,20 @@
    <div class="pd-mini"><span class="pd-mini-icon">📊</span><span><strong>گزارش پیشرفت</strong><small>دیدن مسیر رشد</small></span></div>
    <div class="pd-mini"><span class="pd-mini-icon">💬</span><span><strong>بازخورد معلم</strong><small>راهنمایی در مسیر یادگیری</small></span></div>
   </div>
+
+
+  <section class="pd-quick" aria-labelledby="pd-quick-title">
+   <div class="pd-quick-head"><span>🎮 چالش کوتاه یادگیری</span><h2 id="pd-quick-title">یک سؤال سریع حل می‌کنی؟</h2><p>برای گرم شدن، یک تمرین کوتاه ریاضی را امتحان کن. پاسخ‌ها ذخیره نمی‌شوند.</p></div>
+   <div class="pd-quick-card" id="pd-quick">
+    <div class="pd-quick-meta"><span id="pd-quick-count">سؤال ۱ از ۳</span><span>🌱 فقط برای تمرین</span></div>
+    <h3 class="pd-quick-question" id="pd-quick-question">۳/۴ + ۱/۴ = ؟</h3>
+    <div class="pd-quick-options" id="pd-quick-options">
+     <button class="pd-quick-option" type="button" data-answer="0">۱</button><button class="pd-quick-option" type="button" data-answer="1">۴/۸</button><button class="pd-quick-option" type="button" data-answer="2">۳/۸</button>
+    </div>
+    <div class="pd-quick-feedback" id="pd-quick-feedback" role="status" aria-live="polite"></div>
+    <button class="pd-quick-next" id="pd-quick-next" type="button">سؤال بعدی ←</button>
+   </div>
+  </section>
 
   <section class="pd-section" id="pd-features">
    <div class="pd-section-head">
