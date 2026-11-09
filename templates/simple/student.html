@@ -75,7 +75,7 @@
         <div class="pd-meta"><span>📅 {{ record.task.task_date|date:"Y/m/d" }}</span><span>⭐ تا {{ record.task.max_score }} امتیاز</span><span>🏫 {{ record.task.classroom.name }}</span></div>
         {% if record.note %}<div class="pd-note"><b>پیام معلم:</b> {{ record.note }}</div>{% endif %}
         {% if record.score != None %}<div class="pd-note">امتیاز ثبت‌شده: <b>{{ record.score }} از {{ record.task.max_score }}</b></div>{% endif %}
-        {% if record.status == "pending" %}<form method="post" class="pd-submit-form">{% csrf_token %}<input type="hidden" name="action" value="submit_task"><input type="hidden" name="record_id" value="{{ record.id }}"><button class="pd-btn" type="submit">ارسال برای بررسی معلم <span aria-hidden="true">←</span></button></form>
+        {% if record.status == "pending" %}<form method="post" class="pd-submit-form">{% csrf_token %}<input type="hidden" name="action" value="submit_task"><input type="hidden" name="record_id" value="{{ record.id }}"><button class="pd-btn" type="submit">ارسال برای معلم <span aria-hidden="true">←</span></button></form>
         {% elif record.status == "review" %}<button class="pd-btn soft" type="button" disabled>منتظر نظر معلم هستم ✓</button>
         {% else %}<button class="pd-btn soft" type="button" disabled>این فعالیت کامل شد ✓</button>{% endif %}
        </article>
@@ -101,7 +101,8 @@
       <div class="pd-score"><span class="pd-score-bubble">🏆</span><div class="pd-score-copy"><strong>{{ student.points }} امتیاز تلاش</strong><small>سطح {{ student.level }} · {{ student.xp }} امتیاز تجربه</small><div class="pd-score-bar"><span style="width:{{ student.level_progress_percent }}%"></span></div></div></div>
       <div class="pd-info-grid">
        <div class="pd-info"><strong>✅ فعالیت‌های تأییدشده</strong><p>{{ completed_tasks }} فعالیت کامل</p></div>
-       <div class="pd-info"><strong>⏳ در صف بررسی</strong><p>{{ pending_tasks }} فعالیت</p></div>
+       <div class="pd-info"><strong>📨 در صف بررسی معلم</strong><p>{{ waiting_tasks }} فعالیت</p></div>
+       <div class="pd-info"><strong>🚀 در انتظار انجام</strong><p>{{ pending_tasks }} فعالیت</p></div>
       </div>
      </section>
      <section class="pd-panel pd-reveal" id="profile">
