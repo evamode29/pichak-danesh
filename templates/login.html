@@ -56,6 +56,12 @@
 .px-login-help span{font-size:16px}
 .px-login-bottom{margin-top:20px;color:#a0aaa1;text-align:center;font-size:9px}
 .px-login-v2 :focus-visible{outline:3px solid #84c99b;outline-offset:3px}
+
+/* Playful role hints inspired by Claude; role choice is presentation only. */
+.px-login-role{width:100%;text-align:right;cursor:pointer;font:inherit;transition:border-color .18s,background .18s,transform .18s}
+.px-login-role:hover{border-color:#b9dabb;transform:translateY(-1px)}
+.px-login-role[aria-pressed="true"]{border-color:#9bcfa4;background:#f0f8ed;box-shadow:inset 0 0 0 1px #d8ecd8}
+.px-login-role-message{margin:-10px 0 16px;color:#78877c;font-size:10px;line-height:1.8}
 @media(max-width:760px){.px-login-v2{padding:23px 13px 38px}.px-login-shell{width:min(520px,100%);min-height:0;grid-template-columns:1fr;border-radius:23px}.px-login-visual{padding:18px 21px 20px;min-height:0}.px-login-logo{width:112px;max-height:48px}.px-login-art{position:absolute;left:18px;top:12px;min-height:0;opacity:.22}.px-login-mascot-wrap{width:100px;height:100px;border-radius:25px}.px-login-mascot-wrap:before{inset:7px;border-radius:19px}.px-login-mascot{width:78px;height:80px}.px-login-message{max-width:340px;margin-top:16px}.px-login-message h2{font-size:19px;margin:6px 0 3px}.px-login-message p{font-size:10px;line-height:1.8}.px-login-visual-foot{display:none}.px-login-form-side{padding:24px 22px 27px}.px-login-heading{margin:0 0 18px}.px-login-heading h1{font-size:23px}}
 @media(max-width:420px){.px-login-v2{padding:13px 9px 26px}.px-login-shell{border-radius:19px}.px-login-form-side{padding:21px 16px 23px}.px-login-roles{gap:6px}.px-login-role{padding:8px 7px}.px-login-role small{font-size:8px}.px-login-heading h1{font-size:21px}}
 @media(prefers-reduced-motion:reduce){.px-login-v2 *,.px-login-v2 *:before,.px-login-v2 *:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
@@ -80,9 +86,10 @@
     <p>برای ادامه مسیر یادگیری، اطلاعات ورودت را وارد کن.</p>
    </div>
    <div class="px-login-roles" aria-label="کاربران سامانه">
-    <div class="px-login-role"><span class="px-login-role-icon" aria-hidden="true">👩🏻‍🏫</span><span><b>آموزگار</b><small>مدیریت کلاس و یادگیری</small></span></div>
-    <div class="px-login-role"><span class="px-login-role-icon" aria-hidden="true">🎒</span><span><b>دانش‌آموز</b><small>تمرین و پیشرفت روزانه</small></span></div>
+    <button class="px-login-role" type="button" data-role="teacher" aria-pressed="false"><span class="px-login-role-icon" aria-hidden="true">👩🏻‍🏫</span><span><b>آموزگار</b><small>مدیریت کلاس و یادگیری</small></span></button>
+    <button class="px-login-role" type="button" data-role="student" aria-pressed="true"><span class="px-login-role-icon" aria-hidden="true">🎒</span><span><b>دانش‌آموز</b><small>تمرین و پیشرفت روزانه</small></span></button>
    </div>
+   <p class="px-login-role-message" id="px-login-role-message" aria-live="polite">برای ورود دانش‌آموزی، نام کاربری یا کد و رمز خود را وارد کن.</p>
    {% if error %}<div class="px-login-error" role="alert" aria-live="polite">{{ error }}</div>{% endif %}
    <form method="post" class="px-login-form">
     {% csrf_token %}
@@ -113,5 +120,15 @@
   field.focus();
  });
 })();
+
+ const roleMessage=document.getElementById('px-login-role-message');
+ document.querySelectorAll('.px-login-role[data-role]').forEach(function(role){
+  role.addEventListener('click',function(){
+   document.querySelectorAll('.px-login-role[data-role]').forEach(function(item){item.setAttribute('aria-pressed',String(item===role));});
+   if(roleMessage) roleMessage.textContent=role.dataset.role==='teacher'
+    ?'برای ورود آموزگار، نام کاربری یا شماره موبایل و رمز حساب معلم را وارد کن.'
+    :'برای ورود دانش‌آموزی، نام کاربری یا کد و رمز خود را وارد کن.';
+  });
+ });
 </script>
 {% endblock %}
