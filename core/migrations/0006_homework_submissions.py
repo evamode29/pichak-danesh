@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
+import core.storage
 
 
 class Migration(migrations.Migration):
@@ -13,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="dailytask",
             name="instruction_file",
-            field=models.FileField(blank=True, upload_to="homework/instructions/%Y/%m/"),
+            field=models.FileField(blank=True, upload_to="homework/instructions/%Y/%m/", storage=core.storage.PrivateHomeworkStorage()),
         ),
         migrations.AlterField(
             model_name="studenttask",
@@ -37,7 +38,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="studenttask",
             name="attachment",
-            field=models.FileField(blank=True, upload_to="homework/submissions/%Y/%m/"),
+            field=models.FileField(blank=True, upload_to="homework/submissions/%Y/%m/", storage=core.storage.PrivateHomeworkStorage()),
         ),
         migrations.AddField(
             model_name="studenttask",
