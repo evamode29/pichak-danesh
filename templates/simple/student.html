@@ -74,11 +74,11 @@
         <h3>{{ record.task.title }}</h3>
         <p>{% if record.task.description %}{{ record.task.description }}{% else %}برای این فعالیت آماده شو و با تمرکز انجامش بده.{% endif %}</p>
         <div class="pd-meta"><span>📅 {{ record.task.task_date|date:"Y/m/d" }}</span><span>⭐ تا {{ record.task.max_score }} امتیاز</span><span>🏫 {{ record.task.classroom.name }}</span>{% if record.task.due_time %}<span>⏰ مهلت تا {{ record.task.due_time|time:"H:i" }}</span>{% endif %}</div>
-        {% if record.task.instruction_file %}<div class="pd-note"><b>📎 فایل راهنمای معلم:</b> <a href="{{ record.task.instruction_file.url }}" target="_blank" rel="noopener">مشاهده یا دریافت فایل</a></div>{% endif %}
+        {% if record.task.instruction_file %}<div class="pd-note"><b>📎 فایل راهنمای معلم:</b> <a href="{% url 'homework-instruction-file' record.task.id %}" target="_blank" rel="noopener">مشاهده یا دریافت فایل</a></div>{% endif %}
         {% if record.note %}<div class="pd-note"><b>پیام معلم:</b> {{ record.note }}</div>{% endif %}
         {% if record.score != None %}<div class="pd-note">امتیاز ثبت‌شده: <b>{{ record.score }} از {{ record.task.max_score }}</b></div>{% endif %}
         {% if record.answer_text %}<div class="pd-note"><b>پاسخ ارسال‌شده:</b><br>{{ record.answer_text|linebreaksbr }}</div>{% endif %}
-        {% if record.attachment %}<div class="pd-note"><b>📎 فایل ارسالی:</b> <a href="{{ record.attachment.url }}" target="_blank" rel="noopener">مشاهده فایل من</a></div>{% endif %}
+        {% if record.attachment %}<div class="pd-note"><b>📎 فایل ارسالی:</b> <a href="{% url 'homework-submission-file' record.id %}" target="_blank" rel="noopener">مشاهده فایل من</a></div>{% endif %}
         {% if record.status == "pending" or record.status == "returned" %}
          <form method="post" enctype="multipart/form-data" class="pd-submit-form">
           {% csrf_token %}<input type="hidden" name="action" value="submit_task"><input type="hidden" name="record_id" value="{{ record.id }}">
