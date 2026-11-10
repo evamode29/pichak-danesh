@@ -1,10 +1,13 @@
+import os
+
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Count, Q
 from django.core.exceptions import ValidationError
 from django.forms import ImageField as DjangoImageField
+from django.http import FileResponse, Http404, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.dateparse import parse_date
+from django.utils.dateparse import parse_date, parse_time
 from django.utils import timezone
 
 from core.permissions import is_teacher, is_admin
@@ -32,6 +35,75 @@ def simple_home(request):
     return render(request, "simple/home.html")
 
 
+HOMEWORK_ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".pdf", ".doc", ".docx", ".txt"}
+HOMEWORK_MAX_FILE_SIZE = 5 * 1024 * 1024
+
+
+def _validate_homework_upload(upload):
+    if not upload:
+        return None
+    extension = os.path.splitext(upload.name)[1].lower()
+    if extension not in HOMEWORK_ALLOWED_EXTENSIONS:
+        return "فرمت فایل مجاز نیست. تصویر، PDF، Word یا فایل متنی ارسال کن."
+    if upload.size > HOMEWORK_MAX_FILE_SIZE:
+        return "حجم فایل نباید بیشتر از ۵ مگابایت باشد."
+    if extension in {".jpg", ".jpeg", ".png", ".webp"}:
+        try:
+            DjangoImageField().clean(upload)
+            upload.seek(0)
+        except ValidationError:
+            return "فایل تصویر معتبر نیست؛ یک تصویر سالم انتخاب کن."
+    return None
+
+
+def _private_homework_file(field_file):
+    if not field_file or not field_file.name:
+        raise Http404
+    try:
+        return FileResponse(
+            field_file.open("rb"),
+            as_attachment=True,
+            filename=os.path.basename(field_file.name),
+        )
+    except (FileNotFoundError, OSError):
+        raise Http404
+
+
+@login_required(login_url="login")
+def download_student_submission(request, record_id):
+    record = get_object_or_404(
+        StudentTask.objects.select_related("student__user", "task__classroom"),
+        pk=record_id,
+    )
+    allowed = record.student.user_id == request.user.id
+    if is_admin(request.user) or request.user.is_superuser:
+        allowed = True
+    elif is_teacher(request.user) and record.task.classroom.teacher_id == request.user.id:
+        allowed = True
+    if not allowed:
+        raise Http404
+    return _private_homework_file(record.attachment)
+
+
+@login_required(login_url="login")
+def download_task_instruction(request, task_id):
+    task = get_object_or_404(DailyTask.objects.select_related("classroom"), pk=task_id)
+    allowed = is_admin(request.user) or request.user.is_superuser
+    if is_teacher(request.user) and task.classroom.teacher_id == request.user.id:
+        allowed = True
+    if not allowed:
+        allowed = StudentProfile.objects.filter(
+            user=request.user, classroom=task.classroom
+        ).exists()
+    if not allowed:
+        raise Http404
+    return _private_homework_file(task.instruction_file)
+
+
+def block_public_homework_media(request, path=""):
+    return HttpResponseNotFound()
+
+
 @login_required(login_url="login")
 def simple_student(request):
     student = getattr(request.user, "student_profile", None)
@@ -46,14 +118,33 @@ def simple_student(request):
             pk=request.POST.get("record_id"),
             student=student,
         )
+        answer_text = request.POST.get("answer_text", "").strip()
+        upload = request.FILES.get("attachment")
         if record.status == StudentTask.Status.DONE:
-            error = "این فعالیت قبلاً تأیید شده است."
+            error = "این تکلیف قبلاً تأیید شده و امکان ارسال دوباره ندارد."
         elif record.status == StudentTask.Status.REVIEW:
-            message = "این فعالیت قبلاً برای بررسی معلم فرستاده شده است."
+            error = "پاسخ تو در صف بررسی معلم است؛ لطفاً منتظر نتیجه بمان."
+        elif len(answer_text) > 5000:
+            error = "پاسخ متنی نباید بیشتر از ۵۰۰۰ نویسه باشد."
+        elif not answer_text and not upload:
+            error = "پاسخت را بنویس یا یک فایل برای معلم بفرست."
         else:
-            record.status = StudentTask.Status.REVIEW
-            record.save(update_fields=["status", "updated_at"])
-            message = "آفرین! فعالیتت برای بررسی معلم فرستاده شد."
+            error = _validate_homework_upload(upload)
+            if not error:
+                old_attachment = record.attachment.name if record.attachment else ""
+                record.answer_text = answer_text
+                if upload:
+                    record.attachment = upload
+                record.status = StudentTask.Status.REVIEW
+                record.submitted_at = timezone.now()
+                record.reviewed_at = None
+                record.reviewed_by = None
+                record.score = None
+                record.note = ""
+                record.save()
+                if upload and old_attachment and old_attachment != record.attachment.name:
+                    record.attachment.storage.delete(old_attachment)
+                message = "آفرین! پاسخ تو با موفقیت برای بررسی معلم ارسال شد."
 
     task_records = StudentTask.objects.filter(
         student=student
@@ -65,6 +156,7 @@ def simple_student(request):
     completed_tasks = task_records.filter(status=StudentTask.Status.DONE).count()
     waiting_tasks = task_records.filter(status=StudentTask.Status.REVIEW).count()
     pending_tasks = task_records.filter(status=StudentTask.Status.PENDING).count()
+    returned_tasks = task_records.filter(status=StudentTask.Status.RETURNED).count()
     return render(request, "simple/student.html", {
         "student": student,
         "attempts": attempts,
@@ -73,6 +165,7 @@ def simple_student(request):
         "completed_tasks": completed_tasks,
         "waiting_tasks": waiting_tasks,
         "pending_tasks": pending_tasks,
+        "returned_tasks": returned_tasks,
         "message": message,
         "error": error,
     })
@@ -160,6 +253,10 @@ def simple_teacher(request):
             task__classroom__in=classrooms,
             status=StudentTask.Status.REVIEW,
         ).count(),
+        "returned_count": StudentTask.objects.filter(
+            task__classroom__in=classrooms,
+            status=StudentTask.Status.RETURNED,
+        ).count(),
         "tasks": tasks,
     })
 
@@ -236,6 +333,8 @@ def teacher_activities(request):
             title = request.POST.get("title", "").strip()
             description = request.POST.get("description", "").strip()
             task_date = parse_date(request.POST.get("task_date", ""))
+            due_time = parse_time(request.POST.get("due_time", "").strip()) if request.POST.get("due_time") else None
+            instruction_file = request.FILES.get("instruction_file")
             try:
                 max_score = int(request.POST.get("max_score", "20"))
             except (TypeError, ValueError):
@@ -245,15 +344,21 @@ def teacher_activities(request):
                 error = "عنوان فعالیت را وارد کن."
             elif task_date is None:
                 error = "تاریخ فعالیت معتبر نیست."
+            elif request.POST.get("due_time") and due_time is None:
+                error = "ساعت پایان مهلت معتبر نیست."
             elif not 1 <= max_score <= 100:
                 error = "امتیاز فعالیت باید بین ۱ تا ۱۰۰ باشد."
             else:
+                error = _validate_homework_upload(instruction_file)
+            if not error:
                 with transaction.atomic():
                     task = DailyTask.objects.create(
                         classroom=classroom,
                         title=title,
                         description=description,
                         task_date=task_date,
+                        due_time=due_time,
+                        instruction_file=instruction_file,
                         max_score=max_score,
                         created_by=request.user,
                     )
@@ -276,8 +381,12 @@ def teacher_activities(request):
             note = request.POST.get("note", "").strip()[:500]
             score_text = request.POST.get("score", "").strip()
 
-            if status not in StudentTask.Status.values:
-                error = "وضعیت انتخاب‌شده معتبر نیست."
+            if record.status != StudentTask.Status.REVIEW:
+                error = "فقط تکالیفی که دانش‌آموز ارسال کرده و در انتظار بررسی هستند قابل بررسی‌اند."
+            elif status not in (StudentTask.Status.DONE, StudentTask.Status.RETURNED):
+                error = "برای ثبت نتیجه، تکلیف را تأیید یا برای اصلاح برگردان."
+            elif status == StudentTask.Status.RETURNED and not note:
+                error = "برای درخواست اصلاح، راهنمایی کوتاهی برای دانش‌آموز بنویس."
             else:
                 score = None
                 if score_text:
@@ -291,8 +400,12 @@ def teacher_activities(request):
                     record.status = status
                     record.score = score
                     record.note = note
-                    record.save(update_fields=["status", "score", "note", "updated_at"])
-                    message = "عملکرد دانش‌آموز ذخیره شد."
+                    record.reviewed_by = request.user
+                    record.reviewed_at = timezone.now()
+                    record.save(update_fields=[
+                        "status", "score", "note", "reviewed_by", "reviewed_at", "updated_at"
+                    ])
+                    message = "تأیید و بازخورد تکلیف ثبت شد." if status == StudentTask.Status.DONE else "تکلیف برای اصلاح به دانش‌آموز برگشت داده شد."
 
     classrooms = classrooms.order_by("grade", "name")
     tasks = DailyTask.objects.filter(classroom__in=classrooms).select_related(
@@ -306,7 +419,8 @@ def teacher_activities(request):
     ).order_by("-task_date", "-id")
 
     records = StudentTask.objects.filter(
-        task__classroom__in=classrooms
+        task__classroom__in=classrooms,
+        status=StudentTask.Status.REVIEW,
     ).select_related("student__user", "task", "task__classroom").order_by(
         "-updated_at"
     )[:100]

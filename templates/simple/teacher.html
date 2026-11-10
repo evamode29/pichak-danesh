@@ -47,7 +47,7 @@
         <article class="pt-stat"><span>دانش‌آموزان قابل مشاهده</span><strong>{{ student_count|default:0 }}</strong><em>بر اساس کلاس‌های مجاز</em></article>
         <article class="pt-stat"><span>کلاس‌های فعال</span><strong>{{ classroom_count|default:0 }}</strong><em>کلاس‌های در دسترس شما</em></article>
         <article class="pt-stat"><span>فعالیت‌های ثبت‌شده</span><strong>{{ task_count|default:0 }}</strong><em>در کلاس‌های شما</em></article>
-        <article class="pt-stat"><span>فعالیت‌های نیازمند بررسی</span><strong>{{ review_count|default:0 }}</strong><em>ارسال‌شده توسط دانش‌آموزان</em></article>
+        <article class="pt-stat"><span>فعالیت‌های نیازمند بررسی</span><strong>{{ review_count|default:0 }}</strong><em>{{ returned_count|default:0 }} تکلیف برگشتی برای اصلاح</em></article>
       </section>
       <div class="pt-grid">
         <section class="pt-panel" id="students">

@@ -20,6 +20,7 @@
 @media(max-width:720px){.pd{padding:14px 12px 35px}.pd-layout{display:block}.pd-side{position:static;margin-bottom:12px;padding:9px}.pd-side-label,.pd-side-tip{display:none}.pd-nav{display:flex;overflow-x:auto;gap:6px;padding-bottom:2px;scrollbar-width:thin}.pd-nav a{flex:0 0 auto;padding:8px 10px;font-size:10px}.pd-nav a .ico{width:26px;height:26px;font-size:14px}.pd-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.pd-stat{padding:12px}.pd-stat strong{font-size:24px}.pd-hero{min-height:190px;grid-template-columns:minmax(0,1fr) 112px;padding:19px;gap:8px}.pd-hero-art{height:125px}.pd-hero h1{font-size:25px}.pd-panel{padding:14px}.pd-title h2{font-size:14px}}
 @media(max-width:480px){.pd-top{align-items:flex-start}.pd-brand{font-size:12px}.pd-brand img{width:35px;height:35px}.pd-user{padding:5px 8px}.pd-avatar{width:32px;height:32px}.pd-user b{font-size:10px}.pd-user small{font-size:9px}.pd-hero{grid-template-columns:1fr}.pd-hero-art{display:none}.pd-hero h1{font-size:24px}.pd-info-grid{grid-template-columns:1fr}.pd-content-grid{gap:11px}.pd-head{align-items:flex-start}.pd-count{font-size:8px}.pd-btn{padding:10px 12px}}
 @media(prefers-reduced-motion:reduce){.pd *, .pd *:before,.pd *:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}.pd-reveal{opacity:1;transform:none}}
+.pd-status.returned{background:#fff0e7;color:#a35c28}.pd-homework-label{display:grid;gap:6px;margin-top:10px;color:#587060;font-size:10px;font-weight:800}.pd-homework-label textarea,.pd-homework-label input{width:100%;padding:10px;border:1px solid #dce9dc;border-radius:10px;background:#fbfefb;color:#294b34;font:inherit;font-size:11px}.pd-homework-label textarea{resize:vertical;min-height:76px}.pd-homework-help{display:block;margin:7px 0;color:#8a998d;font-size:9px}
 </style>
 <section class="pd" aria-label="پنل دانش‌آموز">
  <header class="pd-top">
@@ -67,17 +68,27 @@
       <div class="pd-list">
       {% for record in task_records %}
        <article class="pd-card">
-        <div class="pd-card-top"><span class="pd-card-icon">{% if record.status == "done" %}🏅{% elif record.status == "review" %}📨{% else %}📚{% endif %}</span>
-         {% if record.status == "done" %}<span class="pd-status done">تأیید شده</span>{% elif record.status == "review" %}<span class="pd-status review">در انتظار بررسی معلم</span>{% else %}<span class="pd-status pending">در انتظار انجام</span>{% endif %}
+        <div class="pd-card-top"><span class="pd-card-icon">{% if record.status == "done" %}🏅{% elif record.status == "review" %}📨{% elif record.status == "returned" %}✏️{% else %}📚{% endif %}</span>
+         {% if record.status == "done" %}<span class="pd-status done">تأیید شده</span>{% elif record.status == "review" %}<span class="pd-status review">در انتظار بررسی معلم</span>{% elif record.status == "returned" %}<span class="pd-status returned">نیاز به اصلاح</span>{% else %}<span class="pd-status pending">در انتظار انجام</span>{% endif %}
         </div>
         <h3>{{ record.task.title }}</h3>
         <p>{% if record.task.description %}{{ record.task.description }}{% else %}برای این فعالیت آماده شو و با تمرکز انجامش بده.{% endif %}</p>
-        <div class="pd-meta"><span>📅 {{ record.task.task_date|date:"Y/m/d" }}</span><span>⭐ تا {{ record.task.max_score }} امتیاز</span><span>🏫 {{ record.task.classroom.name }}</span></div>
+        <div class="pd-meta"><span>📅 {{ record.task.task_date|date:"Y/m/d" }}</span><span>⭐ تا {{ record.task.max_score }} امتیاز</span><span>🏫 {{ record.task.classroom.name }}</span>{% if record.task.due_time %}<span>⏰ مهلت تا {{ record.task.due_time|time:"H:i" }}</span>{% endif %}</div>
+        {% if record.task.instruction_file %}<div class="pd-note"><b>📎 فایل راهنمای معلم:</b> <a href="{% url 'homework-instruction-file' record.task.id %}" target="_blank" rel="noopener">مشاهده یا دریافت فایل</a></div>{% endif %}
         {% if record.note %}<div class="pd-note"><b>پیام معلم:</b> {{ record.note }}</div>{% endif %}
         {% if record.score != None %}<div class="pd-note">امتیاز ثبت‌شده: <b>{{ record.score }} از {{ record.task.max_score }}</b></div>{% endif %}
-        {% if record.status == "pending" %}<form method="post" class="pd-submit-form">{% csrf_token %}<input type="hidden" name="action" value="submit_task"><input type="hidden" name="record_id" value="{{ record.id }}"><button class="pd-btn" type="submit">ارسال برای معلم <span aria-hidden="true">←</span></button></form>
-        {% elif record.status == "review" %}<button class="pd-btn soft" type="button" disabled>منتظر نظر معلم هستم ✓</button>
-        {% else %}<button class="pd-btn soft" type="button" disabled>این فعالیت کامل شد ✓</button>{% endif %}
+        {% if record.answer_text %}<div class="pd-note"><b>پاسخ ارسال‌شده:</b><br>{{ record.answer_text|linebreaksbr }}</div>{% endif %}
+        {% if record.attachment %}<div class="pd-note"><b>📎 فایل ارسالی:</b> <a href="{% url 'homework-submission-file' record.id %}" target="_blank" rel="noopener">مشاهده فایل من</a></div>{% endif %}
+        {% if record.status == "pending" or record.status == "returned" %}
+         <form method="post" enctype="multipart/form-data" class="pd-submit-form">
+          {% csrf_token %}<input type="hidden" name="action" value="submit_task"><input type="hidden" name="record_id" value="{{ record.id }}">
+          <label class="pd-homework-label">پاسخ تو<textarea name="answer_text" rows="3" maxlength="5000" placeholder="پاسخت را اینجا بنویس…">{{ record.answer_text }}</textarea></label>
+          <label class="pd-homework-label">عکس یا فایل تکلیف <input type="file" name="attachment" accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.txt"></label>
+          <small class="pd-homework-help">حداکثر ۵ مگابایت · تصویر، PDF، Word یا متن</small>
+          <button class="pd-btn" type="submit">ارسال برای معلم <span aria-hidden="true">←</span></button>
+         </form>
+        {% elif record.status == "review" %}<button class="pd-btn soft" type="button" disabled>پاسخت ارسال شده؛ منتظر بررسی معلم باش ✓</button>
+        {% else %}<button class="pd-btn soft" type="button" disabled>این تکلیف تأیید شده است ✓</button>{% endif %}
        </article>
       {% endfor %}
       </div>
@@ -103,6 +114,7 @@
        <div class="pd-info"><strong>✅ فعالیت‌های تأییدشده</strong><p>{{ completed_tasks }} فعالیت کامل</p></div>
        <div class="pd-info"><strong>📨 در صف بررسی معلم</strong><p>{{ waiting_tasks }} فعالیت</p></div>
        <div class="pd-info"><strong>🚀 در انتظار انجام</strong><p>{{ pending_tasks }} فعالیت</p></div>
+       <div class="pd-info"><strong>✏️ نیازمند اصلاح</strong><p>{{ returned_tasks }} فعالیت</p></div>
       </div>
      </section>
      <section class="pd-panel pd-reveal" id="profile">
