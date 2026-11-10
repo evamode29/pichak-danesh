@@ -85,7 +85,7 @@
           <label class="pd-homework-label">پاسخ تو<textarea name="answer_text" rows="3" maxlength="5000" placeholder="پاسخت را اینجا بنویس…">{{ record.answer_text }}</textarea></label>
           <label class="pd-homework-label">عکس یا فایل تکلیف <input type="file" name="attachment" accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.txt"></label>
           <small class="pd-homework-help">حداکثر ۵ مگابایت · تصویر، PDF، Word یا متن</small>
-          <button class="pd-btn" type="submit">ارسال پاسخ برای معلم <span aria-hidden="true">←</span></button>
+          <button class="pd-btn" type="submit">ارسال برای معلم <span aria-hidden="true">←</span></button>
          </form>
         {% elif record.status == "review" %}<button class="pd-btn soft" type="button" disabled>پاسخت ارسال شده؛ منتظر بررسی معلم باش ✓</button>
         {% else %}<button class="pd-btn soft" type="button" disabled>این تکلیف تأیید شده است ✓</button>{% endif %}
