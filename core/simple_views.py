@@ -5,6 +5,7 @@ from django.db import transaction
 from django.db.models import Count, Q
 from django.core.exceptions import ValidationError
 from django.forms import ImageField as DjangoImageField
+from django.http import FileResponse, Http404, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date, parse_time
 from django.utils import timezone
@@ -53,6 +54,54 @@ def _validate_homework_upload(upload):
         except ValidationError:
             return "فایل تصویر معتبر نیست؛ یک تصویر سالم انتخاب کن."
     return None
+
+
+def _private_homework_file(field_file):
+    if not field_file or not field_file.name:
+        raise Http404
+    try:
+        return FileResponse(
+            field_file.open("rb"),
+            as_attachment=True,
+            filename=os.path.basename(field_file.name),
+        )
+    except (FileNotFoundError, OSError):
+        raise Http404
+
+
+@login_required(login_url="login")
+def download_student_submission(request, record_id):
+    record = get_object_or_404(
+        StudentTask.objects.select_related("student__user", "task__classroom"),
+        pk=record_id,
+    )
+    allowed = record.student.user_id == request.user.id
+    if is_admin(request.user) or request.user.is_superuser:
+        allowed = True
+    elif is_teacher(request.user) and record.task.classroom.teacher_id == request.user.id:
+        allowed = True
+    if not allowed:
+        raise Http404
+    return _private_homework_file(record.attachment)
+
+
+@login_required(login_url="login")
+def download_task_instruction(request, task_id):
+    task = get_object_or_404(DailyTask.objects.select_related("classroom"), pk=task_id)
+    allowed = is_admin(request.user) or request.user.is_superuser
+    if is_teacher(request.user) and task.classroom.teacher_id == request.user.id:
+        allowed = True
+    if not allowed:
+        allowed = StudentProfile.objects.filter(
+            user=request.user, classroom=task.classroom
+        ).exists()
+    if not allowed:
+        raise Http404
+    return _private_homework_file(task.instruction_file)
+
+
+def block_public_homework_media(request, path=""):
+    return HttpResponseNotFound()
 
 
 @login_required(login_url="login")
