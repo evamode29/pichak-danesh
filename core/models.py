@@ -50,6 +50,7 @@ class DailyTask(models.Model):
     task_date = models.DateField()
     max_score = models.PositiveSmallIntegerField(default=20)
     due_time = models.TimeField(null=True, blank=True)
+    instruction_file = models.FileField(upload_to="homework/instructions/%Y/%m/", blank=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="created_daily_tasks")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -65,13 +66,19 @@ class StudentTask(models.Model):
     class Status(models.TextChoices):
         PENDING = "pending", "انجام نشده"
         DONE = "done", "انجام شد"
-        REVIEW = "review", "نیاز به بررسی"
+        REVIEW = "review", "در انتظار بررسی"
+        RETURNED = "returned", "نیاز به اصلاح"
 
     task = models.ForeignKey(DailyTask, on_delete=models.CASCADE, related_name="student_tasks")
     student = models.ForeignKey("students.StudentProfile", on_delete=models.CASCADE, related_name="task_records")
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     score = models.PositiveSmallIntegerField(null=True, blank=True)
     note = models.CharField(max_length=500, blank=True)
+    answer_text = models.TextField(blank=True)
+    attachment = models.FileField(upload_to="homework/submissions/%Y/%m/", blank=True)
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="reviewed_student_tasks")
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
