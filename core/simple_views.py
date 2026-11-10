@@ -156,6 +156,7 @@ def simple_student(request):
     completed_tasks = task_records.filter(status=StudentTask.Status.DONE).count()
     waiting_tasks = task_records.filter(status=StudentTask.Status.REVIEW).count()
     pending_tasks = task_records.filter(status=StudentTask.Status.PENDING).count()
+    returned_tasks = task_records.filter(status=StudentTask.Status.RETURNED).count()
     return render(request, "simple/student.html", {
         "student": student,
         "attempts": attempts,
@@ -164,6 +165,7 @@ def simple_student(request):
         "completed_tasks": completed_tasks,
         "waiting_tasks": waiting_tasks,
         "pending_tasks": pending_tasks,
+        "returned_tasks": returned_tasks,
         "message": message,
         "error": error,
     })
@@ -250,6 +252,10 @@ def simple_teacher(request):
         "review_count": StudentTask.objects.filter(
             task__classroom__in=classrooms,
             status=StudentTask.Status.REVIEW,
+        ).count(),
+        "returned_count": StudentTask.objects.filter(
+            task__classroom__in=classrooms,
+            status=StudentTask.Status.RETURNED,
         ).count(),
         "tasks": tasks,
     })
