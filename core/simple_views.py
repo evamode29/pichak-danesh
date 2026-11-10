@@ -381,7 +381,9 @@ def teacher_activities(request):
             note = request.POST.get("note", "").strip()[:500]
             score_text = request.POST.get("score", "").strip()
 
-            if status not in (StudentTask.Status.DONE, StudentTask.Status.RETURNED):
+            if record.status != StudentTask.Status.REVIEW:
+                error = "فقط تکالیفی که دانش‌آموز ارسال کرده و در انتظار بررسی هستند قابل بررسی‌اند."
+            elif status not in (StudentTask.Status.DONE, StudentTask.Status.RETURNED):
                 error = "برای ثبت نتیجه، تکلیف را تأیید یا برای اصلاح برگردان."
             elif status == StudentTask.Status.RETURNED and not note:
                 error = "برای درخواست اصلاح، راهنمایی کوتاهی برای دانش‌آموز بنویس."
@@ -417,7 +419,8 @@ def teacher_activities(request):
     ).order_by("-task_date", "-id")
 
     records = StudentTask.objects.filter(
-        task__classroom__in=classrooms
+        task__classroom__in=classrooms,
+        status=StudentTask.Status.REVIEW,
     ).select_related("student__user", "task", "task__classroom").order_by(
         "-updated_at"
     )[:100]
