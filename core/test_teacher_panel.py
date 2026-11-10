@@ -196,7 +196,7 @@ class StudentLearningPanelTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "تمرین ریاضی")
         self.assertContains(response, "پنج مسئله حل کن.")
-        self.assertContains(response, "ارسال پاسخ برای معلم")
+        self.assertContains(response, "ارسال برای معلم")
 
     def test_student_can_submit_task_for_teacher_review(self):
         response = self.client.post(
