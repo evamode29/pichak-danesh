@@ -103,7 +103,7 @@ class TeacherPanelTests(TestCase):
             max_score=20,
             created_by=self.teacher,
         )
-        record = StudentTask.objects.create(task=task, student=student)
+        record = StudentTask.objects.create(task=task, student=student, status=StudentTask.Status.REVIEW)
 
         response = self.client.post(
             reverse("teacher-activities"),
@@ -196,17 +196,17 @@ class StudentLearningPanelTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "تمرین ریاضی")
         self.assertContains(response, "پنج مسئله حل کن.")
-        self.assertContains(response, "ارسال برای معلم")
+        self.assertContains(response, "ارسال پاسخ برای معلم")
 
     def test_student_can_submit_task_for_teacher_review(self):
         response = self.client.post(
             reverse("simple-student"),
-            {"action": "submit_task", "record_id": self.record.pk},
+            {"action": "submit_task", "record_id": self.record.pk, "answer_text": "پاسخ تمرین"},
         )
         self.assertEqual(response.status_code, 200)
         self.record.refresh_from_db()
         self.assertEqual(self.record.status, StudentTask.Status.REVIEW)
-        self.assertContains(response, "برای بررسی معلم فرستاده شد")
+        self.assertContains(response, "با موفقیت برای بررسی معلم ارسال شد")
 
     def test_student_cannot_submit_another_students_task(self):
         other_user = User.objects.create_user(
