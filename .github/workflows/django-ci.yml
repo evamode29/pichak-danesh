@@ -50,4 +50,4 @@ jobs:
         env:
           DJANGO_DEBUG: "True"
           DJANGO_SECRET_KEY: "ci-secret-key"
-        run: python manage.py test core.test_teacher_panel exams.test_question_bank
+        run: python manage.py test core.test_teacher_panel exams.test_question_bank exams.test_teacher_reports
