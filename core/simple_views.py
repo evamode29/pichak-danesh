@@ -666,7 +666,7 @@ def student_take_test(request, test_id):
                 )
                 diagnostic = {}
                 for question in questions:
-                    selected = answers[str(question.id)]
+                    selected = answers[question.answer_key]
                     is_bank = isinstance(question, BankQuestion)
                     categories = sorted(list(question.categories.select_related("parent").all()), key=_category_depth) if is_bank else []
                     category_names = [category.name for category in categories]
