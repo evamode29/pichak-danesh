@@ -13,6 +13,21 @@ from students.models import StudentProfile
 SUBJECT_LABELS = dict(PlacementQuestion.Subject.choices)
 
 
+def _answer_category_paths(answer):
+    """Read new branch-aware snapshots and retain legacy flat snapshots."""
+    paths = answer.category_paths
+    if isinstance(paths, list) and paths and all(
+        isinstance(path, list) and path and all(isinstance(part, str) for part in path)
+        for path in paths
+    ):
+        return paths
+    names = answer.category_names
+    if isinstance(names, list):
+        legacy_path = [str(name) for name in names if name]
+        return [legacy_path] if legacy_path else []
+    return []
+
+
 def _teacher_scope(user):
     manager = is_admin(user) or user.is_superuser
     students = StudentProfile.objects.select_related("user", "classroom")
@@ -86,15 +101,15 @@ def teacher_learning_reports(request):
         row["total"] += 1
         row["correct"] += int(answer.is_correct)
 
-        names = answer.category_names if isinstance(answer.category_names, list) else []
-        for depth, name in enumerate(names):
-            if not name:
-                continue
-            category_path = tuple(str(part) for part in names[:depth + 1] if part)
-            category_key = (subject, category_path)
-            category_stats[category_key]["subject"] = subject
-            category_stats[category_key]["total"] += 1
-            category_stats[category_key]["correct"] += int(answer.is_correct)
+        for names in _answer_category_paths(answer):
+            for depth, name in enumerate(names):
+                if not name:
+                    continue
+                category_path = tuple(str(part) for part in names[:depth + 1] if part)
+                category_key = (subject, category_path)
+                category_stats[category_key]["subject"] = subject
+                category_stats[category_key]["total"] += 1
+                category_stats[category_key]["correct"] += int(answer.is_correct)
 
     subject_rows = []
     for code, stats in subject_stats.items():
