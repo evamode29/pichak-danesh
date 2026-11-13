@@ -9,7 +9,7 @@ from openpyxl import Workbook
 from core.models import UserProfile
 from exams.models import (
     BankQuestion, PlacementAnswer, PlacementAttempt, PlacementDiagnosticResult,
-    PlacementTest, QuestionCategory, TestBankQuestion,
+    PlacementQuestion, PlacementTest, QuestionCategory, TestBankQuestion,
 )
 from students.models import StudentProfile
 
@@ -93,6 +93,31 @@ class QuestionBankFlowTests(TestCase):
         imported = BankQuestion.objects.get(text="حاصل ۱/۲ + ۱/۲ چیست؟")
         self.assertEqual(imported.correct_option, "B")
         self.assertEqual(imported.categories.count(), 3)
+
+    def test_legacy_and_bank_questions_with_same_id_keep_separate_answers(self):
+        legacy = PlacementQuestion.objects.create(
+            id=self.question.pk,
+            test=self.test,
+            text="سؤال قدیمی با شناسه یکسان",
+            option_a="الف", option_b="ب", option_c="ج", option_d="د",
+            correct_option="A",
+            subject="math",
+            order=1,
+        )
+        self.client.force_login(self.student_user)
+        response = self.client.post(
+            reverse("student-take-test", args=[self.test.pk]),
+            {
+                f"question_bank-{self.question.pk}": "B",
+                f"question_legacy-{legacy.pk}": "A",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        attempt = PlacementAttempt.objects.get(student=self.student, test=self.test)
+        answers = PlacementAnswer.objects.filter(attempt=attempt)
+        self.assertEqual(answers.count(), 2)
+        self.assertTrue(answers.filter(bank_question=self.question, selected_option="B", is_correct=True).exists())
+        self.assertTrue(answers.filter(legacy_question=legacy, selected_option="A", is_correct=True).exists())
 
     def test_student_can_take_bank_test_and_answers_are_saved_per_question(self):
         self.client.force_login(self.student_user)
