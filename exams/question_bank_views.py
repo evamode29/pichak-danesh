@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.forms import ImageField as DjangoImageField
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from openpyxl import load_workbook
@@ -160,18 +161,38 @@ def teacher_question_bank(request):
                 "difficulty": request.POST.get("difficulty", "2"),
                 "explanation": request.POST.get("explanation", ""),
             }, 1)
+            uploads = {
+                "question_image": request.FILES.get("question_image"),
+                "option_a_image": request.FILES.get("option_a_image"),
+                "option_b_image": request.FILES.get("option_b_image"),
+                "option_c_image": request.FILES.get("option_c_image"),
+                "option_d_image": request.FILES.get("option_d_image"),
+            }
             if row["errors"]:
                 error = " ".join(row["errors"])
             else:
-                question = BankQuestion.objects.create(
-                    subject=row["subject"], grade=row["grade"], text=row["text"],
-                    option_a=row["option_a"], option_b=row["option_b"],
-                    option_c=row["option_c"], option_d=row["option_d"],
-                    correct_option=row["correct"], difficulty=row["difficulty"],
-                    explanation=row["explanation"], created_by=request.user,
-                )
-                _attach_categories(question, row)
-                message = "سؤال با موفقیت به بانک افزوده شد."
+                try:
+                    for upload in uploads.values():
+                        if upload:
+                            if upload.size > 5 * 1024 * 1024:
+                                raise ValidationError("حجم هر تصویر نباید بیشتر از ۵ مگابایت باشد.")
+                            DjangoImageField().clean(upload)
+                            upload.seek(0)
+                except ValidationError as exc:
+                    error = " ".join(exc.messages)
+                if not error:
+                    question = BankQuestion.objects.create(
+                        subject=row["subject"], grade=row["grade"], text=row["text"],
+                        option_a=row["option_a"], option_a_image=uploads["option_a_image"],
+                        option_b=row["option_b"], option_b_image=uploads["option_b_image"],
+                        option_c=row["option_c"], option_c_image=uploads["option_c_image"],
+                        option_d=row["option_d"], option_d_image=uploads["option_d_image"],
+                        question_image=uploads["question_image"],
+                        correct_option=row["correct"], difficulty=row["difficulty"],
+                        explanation=row["explanation"], created_by=request.user,
+                    )
+                    _attach_categories(question, row)
+                    message = "سؤال با موفقیت به بانک افزوده شد."
 
         elif action == "preview_excel":
             upload = request.FILES.get("workbook")
