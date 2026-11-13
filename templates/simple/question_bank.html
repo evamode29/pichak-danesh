@@ -15,7 +15,11 @@
 <input class="qb-field" name="chapter" placeholder="فصل"><input class="qb-field" name="topic" placeholder="مبحث‌ها (با ویرگول جدا کن)">
 <input class="qb-field" name="subtopic" placeholder="زیرمبحث‌ها (با ویرگول جدا کن)"><select class="qb-field" name="difficulty"><option value="1">خیلی آسان</option><option value="2" selected>آسان</option><option value="3">متوسط</option><option value="4">دشوار</option><option value="5">خیلی دشوار</option></select>
 <textarea class="qb-field qb-full" name="text" rows="2" placeholder="متن سؤال" required></textarea>
-<input class="qb-field" name="option_a" placeholder="گزینه ۱" required><input class="qb-field" name="option_b" placeholder="گزینه ۲" required><input class="qb-field" name="option_c" placeholder="گزینه ۳" required><input class="qb-field" name="option_d" placeholder="گزینه ۴" required>
+<label class="qb-note qb-full">تصویر سؤال (اختیاری)<input class="qb-field" type="file" name="question_image" accept="image/*"></label>
+<input class="qb-field" name="option_a" placeholder="گزینه ۱" required><label class="qb-note">تصویر گزینه ۱<input class="qb-field" type="file" name="option_a_image" accept="image/*"></label>
+<input class="qb-field" name="option_b" placeholder="گزینه ۲" required><label class="qb-note">تصویر گزینه ۲<input class="qb-field" type="file" name="option_b_image" accept="image/*"></label>
+<input class="qb-field" name="option_c" placeholder="گزینه ۳" required><label class="qb-note">تصویر گزینه ۳<input class="qb-field" type="file" name="option_c_image" accept="image/*"></label>
+<input class="qb-field" name="option_d" placeholder="گزینه ۴" required><label class="qb-note">تصویر گزینه ۴<input class="qb-field" type="file" name="option_d_image" accept="image/*"></label>
 <select class="qb-field" name="correct"><option value="A">پاسخ صحیح: گزینه ۱</option><option value="B">پاسخ صحیح: گزینه ۲</option><option value="C">پاسخ صحیح: گزینه ۳</option><option value="D">پاسخ صحیح: گزینه ۴</option></select><input class="qb-field" name="explanation" placeholder="توضیح پاسخ (اختیاری)">
 <div class="qb-full"><button class="qb-btn" type="submit">＋ ثبت سؤال در بانک</button></div></form></section>
 </div>
