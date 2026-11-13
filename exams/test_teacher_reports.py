@@ -66,6 +66,8 @@ class TeacherLearningReportTests(TestCase):
         self.assertIn("عددها ← کسرها ← جمع کسرها", paths)
         self.assertIn("عددها ← اعشار ← مقایسه اعشار", paths)
         self.assertNotIn("عددها ← کسرها ← مقایسه اعشار", paths)
+        root_row = next(row for row in response.context["category_rows"] if row["path"] == "عددها")
+        self.assertEqual(root_row["total"], 2)
 
     def test_teacher_cannot_view_student_outside_scope(self):
         other_user = User.objects.create_user(username="outside_student", password="test-password-123")
