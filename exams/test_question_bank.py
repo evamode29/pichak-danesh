@@ -1,3 +1,4 @@
+import base64
 from io import BytesIO
 
 from django.contrib.auth import get_user_model
@@ -54,6 +55,50 @@ class QuestionBankFlowTests(TestCase):
         response = self.client.get(reverse("teacher-question-bank"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "بانک سؤال پیچک دانش")
+
+    def test_teacher_can_add_image_only_question_and_options(self):
+        image_bytes = base64.b64decode(
+            "R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+        )
+
+        def image(name):
+            return SimpleUploadedFile(
+                name, image_bytes, content_type="image/gif"
+            )
+
+        self.client.force_login(self.teacher)
+        response = self.client.post(
+            reverse("teacher-question-bank"),
+            {
+                "action": "add_question",
+                "subject": "math",
+                "grade": "6",
+                "chapter": "فصل تصویری",
+                "topic": "الگوها",
+                "text": "",
+                "option_a": "",
+                "option_b": "",
+                "option_c": "",
+                "option_d": "",
+                "correct": "C",
+                "difficulty": "2",
+                "question_image": image("question.gif"),
+                "option_a_image": image("a.gif"),
+                "option_b_image": image("b.gif"),
+                "option_c_image": image("c.gif"),
+                "option_d_image": image("d.gif"),
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(BankQuestion.objects.count(), 2)
+        question = BankQuestion.objects.get(text="")
+        self.assertTrue(question.question_image)
+        self.assertTrue(question.option_a_image)
+        self.assertTrue(question.option_b_image)
+        self.assertTrue(question.option_c_image)
+        self.assertTrue(question.option_d_image)
+        self.assertEqual(question.correct_option, "C")
 
     def test_excel_import_requires_preview_then_saves_rows(self):
         workbook = Workbook()
