@@ -261,6 +261,15 @@ def simple_teacher(request):
     })
 
 
+def _category_depth(category):
+    depth = 0
+    parent = category.parent
+    while parent is not None:
+        depth += 1
+        parent = parent.parent
+    return depth
+
+
 def _can_manage_learning(user):
     return bool(
         user.is_authenticated
@@ -653,9 +662,9 @@ def student_take_test(request, test_id):
                 for question in questions:
                     selected = answers[str(question.id)]
                     is_bank = isinstance(question, BankQuestion)
-                    categories = list(question.categories.all()) if is_bank else []
+                    categories = sorted(list(question.categories.select_related("parent").all()), key=_category_depth) if is_bank else []
                     category_names = [category.name for category in categories]
-                    topic = question.topic if not is_bank else (categories[-2].name if len(categories) > 1 else (categories[0].name if categories else ""))
+                    topic = question.topic if not is_bank else (categories[-2].name if len(categories) > 2 else (categories[-1].name if categories else ""))
                     skill = question.skill if not is_bank else (categories[-1].name if len(categories) > 2 else "")
                     PlacementAnswer.objects.create(
                         attempt=attempt,
