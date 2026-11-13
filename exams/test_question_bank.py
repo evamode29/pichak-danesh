@@ -150,6 +150,7 @@ class QuestionBankFlowTests(TestCase):
         self.assertEqual(answer.correct_option, "B")
         self.assertTrue(answer.is_correct)
         self.assertEqual(answer.category_names, ["فصل اول", "عددنویسی"])
+        self.assertEqual(answer.category_paths, [["فصل اول", "عددنویسی"]])
         diagnostic = PlacementDiagnosticResult.objects.get(attempt=attempt)
         self.assertEqual(diagnostic.subject, "math")
         self.assertEqual(diagnostic.correct_answers, 1)
