@@ -7,6 +7,7 @@ from django.views.static import serve
 from core.seo import PublicSitemap, robots_txt
 from core.simple_auth import login_view, logout_view
 from exams.question_bank_views import teacher_question_bank
+from exams.report_views import teacher_learning_reports
 from core.simple_views import simple_home, simple_iq_test, simple_student, simple_teacher, teacher_student_detail, teacher_activities, teacher_test_manager, student_test_list, student_take_test, download_student_submission, download_task_instruction, block_public_homework_media
 
 sitemaps = {"public": PublicSitemap()}
@@ -25,6 +26,7 @@ urlpatterns = [
     path("teacher/activities/", teacher_activities, name="teacher-activities"),
     path("teacher/tests/", teacher_test_manager, name="teacher-test-manager"),
     path("teacher/question-bank/", teacher_question_bank, name="teacher-question-bank"),
+    path("teacher/reports/", teacher_learning_reports, name="teacher-learning-reports"),
     path("student/tests/", student_test_list, name="student-test-list"),
     path("student/tests/<int:test_id>/", student_take_test, name="student-take-test"),
     path("homework/submissions/<int:record_id>/file/", download_student_submission, name="homework-submission-file"),
