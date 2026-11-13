@@ -73,7 +73,7 @@ def teacher_learning_reports(request):
         total_answers += 1
         total_correct += int(answer.is_correct)
 
-        key = (answer.attempt.student_id, answer.attempt.test_id)
+        key = answer.attempt_id
         row = student_stats.setdefault(key, {
             "student": answer.attempt.student,
             "test": answer.attempt.test,
@@ -118,7 +118,7 @@ def teacher_learning_reports(request):
 
     performance_rows = []
     for attempt in attempt_rows:
-        stats = student_stats.get((attempt.student_id, attempt.test_id))
+        stats = student_stats.get(attempt.pk)
         if stats and stats["total"]:
             correct, total = stats["correct"], stats["total"]
         else:
