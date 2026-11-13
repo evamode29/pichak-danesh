@@ -169,3 +169,10 @@ class QuestionBankFlowTests(TestCase):
         self.assertEqual(diagnostic.correct_answers, 1)
         self.assertEqual(diagnostic.total_questions, 1)
         self.assertEqual(diagnostic.percentage, 100)
+        diagnostic_rows = list(
+            PlacementDiagnosticResult.objects.filter(attempt=attempt).order_by("topic")
+        )
+        self.assertEqual(
+            [(row.topic, row.skill, row.correct_answers, row.total_questions) for row in diagnostic_rows],
+            [("اعشار", "", 1, 1), ("عددنویسی", "", 1, 1)],
+        )
