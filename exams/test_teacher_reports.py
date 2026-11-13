@@ -59,6 +59,23 @@ class TeacherLearningReportTests(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
+    def test_teacher_without_classroom_sees_no_student_data(self):
+        unassigned_teacher = User.objects.create_user(
+            username="teacher_without_class", password="test-password-123"
+        )
+        UserProfile.objects.create(
+            user=unassigned_teacher, role=UserProfile.Role.TEACHER
+        )
+        self.client.force_login(unassigned_teacher)
+
+        response = self.client.get(reverse("teacher-learning-reports"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["student_count"], 0)
+        self.assertEqual(response.context["attempt_count"], 0)
+        self.assertEqual(response.context["answer_count"], 0)
+        self.assertEqual(response.context["performance_rows"], [])
+
     def test_student_cannot_open_teacher_reports(self):
         self.client.force_login(self.student_user)
         response = self.client.get(reverse("teacher-learning-reports"))
