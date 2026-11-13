@@ -1,13 +1,11 @@
 import json
 from io import BytesIO
 
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import ImageField as DjangoImageField
 from django.shortcuts import redirect, render
-from django.utils import timezone
 from openpyxl import load_workbook
 
 from core.permissions import is_admin, is_teacher
@@ -50,14 +48,18 @@ def _cell_text(value):
     return "" if value is None else str(value).strip()
 
 
-
 def _duplicate_question(row):
+    # Text-only duplicate matching cannot distinguish image-only entries.
+    # Avoid treating every image-only question with empty text fields as the same item.
+    if row.get("has_images"):
+        return False
     return BankQuestion.objects.filter(
         subject=row["subject"], grade=row["grade"], text=row["text"],
         option_a=row["option_a"], option_b=row["option_b"],
         option_c=row["option_c"], option_d=row["option_d"],
         correct_option=row["correct"],
     ).exists()
+
 
 def _category(subject, grade, name, parent=None):
     if not name:
@@ -142,6 +144,7 @@ def _validate_row(raw, row_number, allow_images=False):
         "option_c": options[2], "option_d": options[3],
         "correct": correct, "difficulty": difficulty,
         "explanation": raw.get("explanation", "").strip(),
+        "has_images": bool(allow_images and (raw.get("question_image") or any(option_images))),
         "errors": errors,
     }
 
