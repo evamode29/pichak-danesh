@@ -51,7 +51,7 @@ class PlacementQuestion(models.Model):
     class Meta:
         ordering = ["order", "id"]
         indexes = [
-            models.Index(fields=["test", "is_active", "order"]),
+            models.Index(fields=["test", "is_active", "order"], name="test_bank_active_order_idx"),
             models.Index(fields=["subject", "difficulty"]),
             models.Index(fields=["subject", "topic", "skill"]),
         ]
@@ -126,7 +126,7 @@ class QuestionCategory(models.Model):
                 name="qcat_parent_name_subj_grade_uq",
             )
         ]
-        indexes = [models.Index(fields=["subject", "grade", "is_active"])]
+        indexes = [models.Index(fields=["subject", "grade", "is_active"], name="qcat_subj_grade_active_idx")]
 
     def __str__(self):
         return self.name
@@ -173,8 +173,8 @@ class BankQuestion(models.Model):
     class Meta:
         ordering = ["subject", "grade", "-created_at", "-id"]
         indexes = [
-            models.Index(fields=["subject", "grade", "is_active"]),
-            models.Index(fields=["difficulty", "is_active"]),
+            models.Index(fields=["subject", "grade", "is_active"], name="bankq_subj_grade_active_idx"),
+            models.Index(fields=["difficulty", "is_active"], name="bankq_diff_active_idx"),
         ]
 
     def __str__(self):
@@ -233,8 +233,8 @@ class PlacementAnswer(models.Model):
     class Meta:
         ordering = ["id"]
         indexes = [
-            models.Index(fields=["attempt", "is_correct"]),
-            models.Index(fields=["subject", "topic", "skill"]),
+            models.Index(fields=["attempt", "is_correct"], name="answer_attempt_correct_idx"),
+            models.Index(fields=["subject", "topic", "skill"], name="answer_subj_topic_skill_idx"),
         ]
 
     def __str__(self):
