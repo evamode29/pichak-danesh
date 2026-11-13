@@ -87,7 +87,8 @@ def teacher_learning_reports(request):
         for depth, name in enumerate(names):
             if not name:
                 continue
-            category_key = (subject, depth, str(name))
+            category_path = tuple(str(part) for part in names[:depth + 1] if part)
+            category_key = (subject, category_path)
             category_stats[category_key]["subject"] = subject
             category_stats[category_key]["total"] += 1
             category_stats[category_key]["correct"] += int(answer.is_correct)
@@ -104,12 +105,14 @@ def teacher_learning_reports(request):
 
     level_names = {0: "فصل", 1: "مبحث", 2: "زیرمبحث"}
     category_rows = []
-    for (subject, depth, name), stats in category_stats.items():
+    for (subject, category_path), stats in category_stats.items():
+        depth = len(category_path) - 1
         total = stats["total"]
         category_rows.append({
             "subject": SUBJECT_LABELS.get(subject, subject),
             "level": level_names.get(depth, f"سطح {depth + 1}"),
-            "name": name,
+            "name": category_path[-1],
+            "path": " ← ".join(category_path),
             "total": total,
             "correct": stats["correct"],
             "percentage": round(stats["correct"] * 100 / total) if total else 0,
