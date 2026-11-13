@@ -102,7 +102,7 @@ class QuestionBankFlowTests(TestCase):
 
         response = self.client.post(
             reverse("student-take-test", args=[self.test.pk]),
-            {f"question_{self.question.pk}": "B"},
+            {f"question_bank-{self.question.pk}": "B"},
         )
         self.assertEqual(response.status_code, 200)
         attempt = PlacementAttempt.objects.get(student=self.student, test=self.test)
