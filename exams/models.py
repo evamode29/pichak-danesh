@@ -102,3 +102,140 @@ class PlacementDiagnosticResult(models.Model):
 
     def __str__(self):
         return f"{self.attempt} - {self.get_subject_display()} - {self.topic}"
+
+
+
+class QuestionCategory(models.Model):
+    """Hierarchical curriculum category used to classify reusable bank questions."""
+
+    name = models.CharField(max_length=120)
+    subject = models.CharField(max_length=20, choices=PlacementQuestion.Subject.choices)
+    grade = models.PositiveSmallIntegerField(default=6)
+    parent = models.ForeignKey(
+        "self", on_delete=models.PROTECT, null=True, blank=True,
+        related_name="children",
+    )
+    sort_order = models.PositiveSmallIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["subject", "grade", "sort_order", "name"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["parent", "name", "subject", "grade"],
+                name="exams_qcat_parent_name_subject_grade_uniq",
+            )
+        ]
+        indexes = [models.Index(fields=["subject", "grade", "is_active"])]
+
+    def __str__(self):
+        return self.name
+
+
+class BankQuestion(models.Model):
+    """Reusable question, independent from any particular test."""
+
+    class Option(models.TextChoices):
+        A = "A", "گزینه ۱"
+        B = "B", "گزینه ۲"
+        C = "C", "گزینه ۳"
+        D = "D", "گزینه ۴"
+
+    subject = models.CharField(
+        max_length=20, choices=PlacementQuestion.Subject.choices,
+        default=PlacementQuestion.Subject.MATH,
+    )
+    grade = models.PositiveSmallIntegerField(default=6)
+    text = models.TextField()
+    question_image = models.ImageField(upload_to="question_bank/questions/", blank=True)
+    option_a = models.CharField(max_length=300, blank=True, default="")
+    option_a_image = models.ImageField(upload_to="question_bank/options/", blank=True)
+    option_b = models.CharField(max_length=300, blank=True, default="")
+    option_b_image = models.ImageField(upload_to="question_bank/options/", blank=True)
+    option_c = models.CharField(max_length=300, blank=True, default="")
+    option_c_image = models.ImageField(upload_to="question_bank/options/", blank=True)
+    option_d = models.CharField(max_length=300, blank=True, default="")
+    option_d_image = models.ImageField(upload_to="question_bank/options/", blank=True)
+    correct_option = models.CharField(max_length=1, choices=Option.choices)
+    difficulty = models.PositiveSmallIntegerField(default=2)
+    explanation = models.TextField(blank=True, default="")
+    categories = models.ManyToManyField(
+        QuestionCategory, blank=True, related_name="questions"
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name="created_bank_questions",
+    )
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["subject", "grade", "-created_at", "-id"]
+        indexes = [
+            models.Index(fields=["subject", "grade", "is_active"]),
+            models.Index(fields=["difficulty", "is_active"]),
+        ]
+
+    def __str__(self):
+        return self.text[:90]
+
+
+class TestBankQuestion(models.Model):
+    """Connects reusable bank questions to a test without copying question data."""
+
+    test = models.ForeignKey(
+        PlacementTest, on_delete=models.CASCADE, related_name="bank_links"
+    )
+    question = models.ForeignKey(
+        BankQuestion, on_delete=models.PROTECT, related_name="test_links"
+    )
+    order = models.PositiveSmallIntegerField(default=1)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["test", "question"], name="exams_test_bank_question_uniq"
+            )
+        ]
+        indexes = [models.Index(fields=["test", "is_active", "order"])]
+
+    def __str__(self):
+        return f"{self.test.title} - {self.question_id}"
+
+
+class PlacementAnswer(models.Model):
+    """Immutable per-question answer snapshot for a completed attempt."""
+
+    attempt = models.ForeignKey(
+        PlacementAttempt, on_delete=models.CASCADE, related_name="answers"
+    )
+    bank_question = models.ForeignKey(
+        BankQuestion, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="student_answers",
+    )
+    legacy_question = models.ForeignKey(
+        PlacementQuestion, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="student_answers",
+    )
+    question_text = models.TextField()
+    selected_option = models.CharField(max_length=1, choices=BankQuestion.Option.choices)
+    correct_option = models.CharField(max_length=1, choices=BankQuestion.Option.choices)
+    is_correct = models.BooleanField(default=False)
+    subject = models.CharField(max_length=20, choices=PlacementQuestion.Subject.choices)
+    topic = models.CharField(max_length=100, blank=True, default="")
+    skill = models.CharField(max_length=120, blank=True, default="")
+    category_names = models.JSONField(default=list, blank=True)
+    answered_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["id"]
+        indexes = [
+            models.Index(fields=["attempt", "is_correct"]),
+            models.Index(fields=["subject", "topic", "skill"]),
+        ]
+
+    def __str__(self):
+        return f"{self.attempt_id} - {self.selected_option}"
