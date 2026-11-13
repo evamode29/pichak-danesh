@@ -69,6 +69,28 @@ class TeacherLearningReportTests(TestCase):
         root_row = next(row for row in response.context["category_rows"] if row["path"] == "عددها")
         self.assertEqual(root_row["total"], 2)
 
+    def test_legacy_attempt_without_answer_snapshots_uses_saved_totals(self):
+        legacy_attempt = PlacementAttempt.objects.create(
+            student=self.student,
+            test=self.test,
+            score=75,
+            correct_answers=3,
+            total_questions=4,
+        )
+
+        self.client.force_login(self.teacher)
+        response = self.client.get(
+            reverse("teacher-learning-reports"),
+            {"student": self.student.pk, "test": self.test.pk},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        rows = response.context["performance_rows"]
+        row = next(item for item in rows if item["attempt"].pk == legacy_attempt.pk)
+        self.assertEqual(row["correct"], 3)
+        self.assertEqual(row["total"], 4)
+        self.assertEqual(row["percentage"], 75)
+
     def test_teacher_cannot_view_student_outside_scope(self):
         other_user = User.objects.create_user(username="outside_student", password="test-password-123")
         UserProfile.objects.create(user=other_user, role=UserProfile.Role.STUDENT)
