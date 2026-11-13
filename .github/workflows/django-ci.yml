@@ -2,7 +2,7 @@ name: Django CI
 
 on:
   push:
-    branches: [main, safe/teacher-panel-foundation, pichak-hybrid-v1-2026-11-06]
+    branches: [main, safe/teacher-panel-foundation, pichak-hybrid-v1-2026-11-06, feature/question-bank-v1]
   pull_request:
     branches: [main, production-baseline-2026-11-02, pichak-hybrid-v1-2026-11-06]
 
