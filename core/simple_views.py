@@ -309,10 +309,10 @@ def teacher_student_detail(request, student_id):
     queryset = StudentProfile.objects.select_related("user", "classroom")
     if not (is_admin(request.user) or request.user.is_superuser):
         teacher_classes = ClassRoom.objects.filter(teacher=request.user, is_active=True)
-        queryset = queryset.filter(
-            Q(classroom__in=teacher_classes)
-            | Q(classroom__isnull=True, grade=6)
-        )
+        # Unassigned grade-6 students may appear on the teacher dashboard
+        # for class placement, but their learning history is private until
+        # they are assigned to one of this teacher's active classrooms.
+        queryset = queryset.filter(classroom__in=teacher_classes)
 
     student = get_object_or_404(queryset, pk=student_id)
     task_records = StudentTask.objects.filter(
