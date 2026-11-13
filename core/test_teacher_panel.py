@@ -154,12 +154,46 @@ class TeacherPanelTests(TestCase):
         record.refresh_from_db()
         self.assertEqual(record.status, StudentTask.Status.PENDING)
 
-    def test_teacher_can_open_student_learning_profile(self):
+    def test_teacher_can_open_assigned_student_learning_profile(self):
+        classroom = ClassRoom.objects.create(
+            name="کلاس تحت مدیریت", grade=6, teacher=self.teacher
+        )
+        student = self.students[0]
+        student.classroom = classroom
+        student.save(update_fields=["classroom"])
+
+        response = self.client.get(
+            reverse("teacher-student-detail", args=[student.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "دانش‌آموز 1")
+
+    def test_teacher_cannot_open_unassigned_student_learning_profile(self):
         response = self.client.get(
             reverse("teacher-student-detail", args=[self.students[0].pk])
         )
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "دانش‌آموز 1")
+        self.assertEqual(response.status_code, 404)
+
+    def test_teacher_cannot_open_another_teachers_student_learning_profile(self):
+        other_teacher = User.objects.create_user(
+            username="profile_other_teacher", password="test-password-123"
+        )
+        UserProfile.objects.create(
+            user=other_teacher, role=UserProfile.Role.TEACHER
+        )
+        other_classroom = ClassRoom.objects.create(
+            name="کلاس متعلق به معلم دیگر", grade=6, teacher=other_teacher
+        )
+        student = self.students[0]
+        student.classroom = other_classroom
+        student.save(update_fields=["classroom"])
+
+        response = self.client.get(
+            reverse("teacher-student-detail", args=[student.pk])
+        )
+
+        self.assertEqual(response.status_code, 404)
 
 
 class StudentLearningPanelTests(TestCase):
