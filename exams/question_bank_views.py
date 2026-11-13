@@ -95,7 +95,7 @@ def _attach_categories(question, row):
         question.categories.add(*categories)
 
 
-def _validate_row(raw, row_number):
+def _validate_row(raw, row_number, allow_images=False):
     errors = []
     subject_raw = raw.get("subject", "").strip().lower()
     subject = SUBJECT_ALIASES.get(subject_raw)
@@ -110,10 +110,11 @@ def _validate_row(raw, row_number):
         errors.append("پایه باید عددی بین ۱ تا ۱۲ باشد.")
     text = raw.get("text", "").strip()
     options = [raw.get(f"option_{letter}", "").strip() for letter in "abcd"]
-    if not text:
-        errors.append("متن سؤال خالی است.")
-    if any(not value for value in options):
-        errors.append("هر چهار گزینه باید تکمیل شوند.")
+    if not text and not (allow_images and raw.get("question_image")):
+        errors.append("متن یا تصویر سؤال را وارد کن.")
+    option_images = [bool(raw.get(f"option_{letter}_image")) for letter in "abcd"]
+    if any(not value and not (allow_images and option_images[index]) for index, value in enumerate(options)):
+        errors.append("برای هر گزینه متن یا تصویر قرار بده.")
     correct = raw.get("correct", "").strip().upper()
     if correct in ("1", "۱"):
         correct = "A"
@@ -159,6 +160,11 @@ def teacher_question_bank(request):
             row = _validate_row({
                 "subject": request.POST.get("subject", "math"),
                 "grade": request.POST.get("grade", "6"),
+                "question_image": bool(request.FILES.get("question_image")),
+                "option_a_image": bool(request.FILES.get("option_a_image")),
+                "option_b_image": bool(request.FILES.get("option_b_image")),
+                "option_c_image": bool(request.FILES.get("option_c_image")),
+                "option_d_image": bool(request.FILES.get("option_d_image")),
                 "chapter": request.POST.get("chapter", ""),
                 "topic": request.POST.get("topic", ""),
                 "subtopic": request.POST.get("subtopic", ""),
@@ -170,7 +176,7 @@ def teacher_question_bank(request):
                 "correct": request.POST.get("correct", ""),
                 "difficulty": request.POST.get("difficulty", "2"),
                 "explanation": request.POST.get("explanation", ""),
-            }, 1)
+            }, 1, allow_images=True)
             uploads = {
                 "question_image": request.FILES.get("question_image"),
                 "option_a_image": request.FILES.get("option_a_image"),
