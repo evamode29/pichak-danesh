@@ -133,6 +133,14 @@ class QuestionBankFlowTests(TestCase):
         self.assertTrue(answers.filter(legacy_question=legacy, selected_option="A", is_correct=True).exists())
 
     def test_student_can_take_bank_test_and_answers_are_saved_per_question(self):
+        second_chapter = QuestionCategory.objects.create(
+            name="فصل دوم", subject="math", grade=6
+        )
+        second_topic = QuestionCategory.objects.create(
+            name="اعشار", subject="math", grade=6, parent=second_chapter
+        )
+        self.question.categories.add(second_chapter, second_topic)
+
         self.client.force_login(self.student_user)
         response = self.client.get(reverse("student-test-list"))
         self.assertEqual(response.status_code, 200)
@@ -149,8 +157,13 @@ class QuestionBankFlowTests(TestCase):
         self.assertEqual(answer.selected_option, "B")
         self.assertEqual(answer.correct_option, "B")
         self.assertTrue(answer.is_correct)
-        self.assertEqual(answer.category_names, ["فصل اول", "عددنویسی"])
-        self.assertEqual(answer.category_paths, [["فصل اول", "عددنویسی"]])
+        self.assertEqual(
+            answer.category_paths,
+            [
+                ["فصل اول", "عددنویسی"],
+                ["فصل دوم", "اعشار"],
+            ],
+        )
         diagnostic = PlacementDiagnosticResult.objects.get(attempt=attempt)
         self.assertEqual(diagnostic.subject, "math")
         self.assertEqual(diagnostic.correct_answers, 1)
