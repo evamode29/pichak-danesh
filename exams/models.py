@@ -123,7 +123,7 @@ class QuestionCategory(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["parent", "name", "subject", "grade"],
-                name="exams_qcat_parent_name_subject_grade_uniq",
+                name="qcat_parent_name_subj_grade_uq",
             )
         ]
         indexes = [models.Index(fields=["subject", "grade", "is_active"])]
