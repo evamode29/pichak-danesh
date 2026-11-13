@@ -51,7 +51,7 @@ class PlacementQuestion(models.Model):
     class Meta:
         ordering = ["order", "id"]
         indexes = [
-            models.Index(fields=["test", "is_active", "order"], name="test_bank_active_order_idx"),
+            models.Index(fields=["test", "is_active", "order"], name="exams_place_test_id_8f31dc_idx"),
             models.Index(fields=["subject", "difficulty"]),
             models.Index(fields=["subject", "topic", "skill"]),
         ]
@@ -200,7 +200,7 @@ class TestBankQuestion(models.Model):
                 fields=["test", "question"], name="exams_test_bank_question_uniq"
             )
         ]
-        indexes = [models.Index(fields=["test", "is_active", "order"])]
+        indexes = [models.Index(fields=["test", "is_active", "order"], name="test_bank_active_order_idx")]
 
     def __str__(self):
         return f"{self.test.title} - {self.question_id}"
