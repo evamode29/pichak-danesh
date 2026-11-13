@@ -40,6 +40,12 @@ jobs:
           DJANGO_SECRET_KEY: "ci-secret-key"
         run: python manage.py collectstatic --noinput
 
+      - name: Check exams migration state
+        env:
+          DJANGO_DEBUG: "True"
+          DJANGO_SECRET_KEY: "ci-secret-key"
+        run: python manage.py makemigrations exams --check --dry-run
+
       - name: Django tests
         env:
           DJANGO_DEBUG: "True"
