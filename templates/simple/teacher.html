@@ -35,13 +35,14 @@
         <a href="#students">👥 دانش‌آموزان</a>
         <a href="{% url 'teacher-activities' %}">📚 فعالیت‌ها و تکالیف</a>
         <a href="{% url 'teacher-test-manager' %}">📝 مدیریت آزمون‌ها</a>
+        <a href="{% url 'teacher-question-bank' %}">🗂️ بانک سؤال</a>
       </nav>
       <div class="pt-side-note">با هم، از یادگیری لذت ببریم!<br>از این بخش می‌توانی وضعیت کلاس و مسیر یادگیری دانش‌آموزان را دنبال کنی.</div>
     </aside>
     <main class="pt-main">
       <section class="pt-hero">
         <div class="pt-hero-copy"><h1>سلام {{ request.user.first_name|default:"معلم عزیز" }}! 🌱</h1><p>امروز هم می‌توانیم یک قدم تازه در مسیر یادگیری برداریم.</p></div>
-        <div class="pt-hero-actions"><a class="pt-btn" href="{% url 'teacher-activities' %}">＋ ساخت فعالیت</a><a class="pt-btn alt" href="{% url 'teacher-test-manager' %}">مدیریت آزمون‌ها</a></div>
+        <div class="pt-hero-actions"><a class="pt-btn" href="{% url 'teacher-activities' %}">＋ ساخت فعالیت</a><a class="pt-btn alt" href="{% url 'teacher-test-manager' %}">مدیریت آزمون‌ها</a><a class="pt-btn alt" href="{% url 'teacher-question-bank' %}">بانک سؤال</a></div>
       </section>
       <section class="pt-stats" aria-label="آمار واقعی سامانه">
         <article class="pt-stat"><span>دانش‌آموزان قابل مشاهده</span><strong>{{ student_count|default:0 }}</strong><em>بر اساس کلاس‌های مجاز</em></article>
