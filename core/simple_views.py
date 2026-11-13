@@ -692,11 +692,11 @@ def student_take_test(request, test_id):
                 for question in questions:
                     selected = answers[question.answer_key]
                     is_bank = isinstance(question, BankQuestion)
-                    categories = sorted(list(question.categories.select_related("parent").all()), key=lambda item: (_category_depth(item), item.name, item.pk)) if is_bank else []
+                    categories = list(question.categories.select_related("parent").all()) if is_bank else []
                     category_names = [category.name for category in categories]
                     category_paths = _category_path_names(categories) if is_bank else []
-                    topic = question.topic if not is_bank else (categories[-2].name if len(categories) > 2 else (categories[-1].name if categories else ""))
-                    skill = question.skill if not is_bank else (categories[-1].name if len(categories) > 2 else "")
+                    topic = question.topic if not is_bank else (category_paths[0][1] if category_paths and len(category_paths[0]) > 1 else "")
+                    skill = question.skill if not is_bank else (category_paths[0][2] if category_paths and len(category_paths[0]) > 2 else "")
                     PlacementAnswer.objects.create(
                         attempt=attempt,
                         bank_question=question if is_bank else None,
@@ -711,10 +711,14 @@ def student_take_test(request, test_id):
                         category_names=category_names,
                         category_paths=category_paths,
                     )
-                    key = (question.subject, topic, skill)
-                    bucket = diagnostic.setdefault(key, {"correct": 0, "total": 0})
-                    bucket["total"] += 1
-                    bucket["correct"] += int(selected == question.correct_option)
+                    diagnostic_paths = category_paths if is_bank and category_paths else [[topic, skill]]
+                    for path in diagnostic_paths:
+                        path_topic = path[1] if is_bank and len(path) > 1 else (topic if not is_bank else "")
+                        path_skill = path[2] if is_bank and len(path) > 2 else (skill if not is_bank else "")
+                        key = (question.subject, path_topic, path_skill)
+                        bucket = diagnostic.setdefault(key, {"correct": 0, "total": 0})
+                        bucket["total"] += 1
+                        bucket["correct"] += int(selected == question.correct_option)
                 for (subject, topic, skill), counts in diagnostic.items():
                     PlacementDiagnosticResult.objects.create(
                         attempt=attempt, subject=subject, topic=topic, skill=skill,
