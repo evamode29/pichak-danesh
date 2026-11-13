@@ -95,15 +95,28 @@ class QuestionBankFlowTests(TestCase):
         self.assertEqual(imported.categories.count(), 3)
 
     def test_legacy_and_bank_questions_with_same_id_keep_separate_answers(self):
-        legacy = PlacementQuestion.objects.create(
-            id=self.question.pk,
-            test=self.test,
-            text="سؤال قدیمی با شناسه یکسان",
-            option_a="الف", option_b="ب", option_c="ج", option_d="د",
-            correct_option="A",
-            subject="math",
-            order=1,
+        legacy, _ = PlacementQuestion.objects.get_or_create(
+            pk=self.question.pk,
+            defaults={
+                "test": self.test,
+                "text": "سؤال قدیمی با شناسه یکسان",
+                "option_a": "الف", "option_b": "ب",
+                "option_c": "ج", "option_d": "د",
+                "correct_option": "A",
+                "subject": "math",
+                "order": 1,
+            },
         )
+        legacy.test = self.test
+        legacy.text = "سؤال قدیمی با شناسه یکسان"
+        legacy.option_a = "الف"
+        legacy.option_b = "ب"
+        legacy.option_c = "ج"
+        legacy.option_d = "د"
+        legacy.correct_option = "A"
+        legacy.subject = "math"
+        legacy.order = 1
+        legacy.save()
         self.client.force_login(self.student_user)
         response = self.client.post(
             reverse("student-take-test", args=[self.test.pk]),
