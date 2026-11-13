@@ -50,6 +50,15 @@ def _cell_text(value):
     return "" if value is None else str(value).strip()
 
 
+
+def _duplicate_question(row):
+    return BankQuestion.objects.filter(
+        subject=row["subject"], grade=row["grade"], text=row["text"],
+        option_a=row["option_a"], option_b=row["option_b"],
+        option_c=row["option_c"], option_d=row["option_d"],
+        correct_option=row["correct"],
+    ).exists()
+
 def _category(subject, grade, name, parent=None):
     if not name:
         return None
@@ -180,6 +189,8 @@ def teacher_question_bank(request):
                             upload.seek(0)
                 except ValidationError as exc:
                     error = " ".join(exc.messages)
+                if not error and _duplicate_question(row):
+                    error = "این سؤال با همین متن، گزینه‌ها و پاسخ صحیح از قبل در بانک وجود دارد."
                 if not error:
                     question = BankQuestion.objects.create(
                         subject=row["subject"], grade=row["grade"], text=row["text"],
@@ -243,8 +254,13 @@ def teacher_question_bank(request):
             elif invalid:
                 error = "ابتدا خطاهای ردیف‌های مشخص‌شده را در اکسل اصلاح کن."
             else:
+                imported_count = 0
+                skipped_count = 0
                 with transaction.atomic():
                     for row in rows:
+                        if _duplicate_question(row):
+                            skipped_count += 1
+                            continue
                         question = BankQuestion.objects.create(
                             subject=row["subject"], grade=row["grade"], text=row["text"],
                             option_a=row["option_a"], option_b=row["option_b"],
@@ -253,9 +269,10 @@ def teacher_question_bank(request):
                             explanation=row["explanation"], created_by=request.user,
                         )
                         _attach_categories(question, row)
+                        imported_count += 1
                 del request.session["question_bank_preview"]
                 preview = []
-                message = f"{len(rows)} سؤال با موفقیت وارد بانک شد."
+                message = f"{imported_count} سؤال وارد شد؛ {skipped_count} سؤال تکراری نادیده گرفته شد."
 
         elif action == "clear_preview":
             request.session.pop("question_bank_preview", None)
