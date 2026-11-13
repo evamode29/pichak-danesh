@@ -20,11 +20,14 @@ def _teacher_scope(user):
     if not manager:
         classrooms = ClassRoom.objects.filter(teacher=user, is_active=True)
         grades = list(classrooms.values_list("grade", flat=True).distinct())
-        students = students.filter(
-            Q(classroom__in=classrooms) |
-            Q(classroom__isnull=True, grade__in=(grades or [6]))
-        )
-        tests = tests.filter(grade__in=(grades or [6]))
+        if grades:
+            # Only students assigned to this teacher's active classrooms are visible.
+            students = students.filter(classroom__in=classrooms)
+            tests = tests.filter(grade__in=grades)
+        else:
+            # A teacher without an assigned classroom must not see unassigned students.
+            students = students.none()
+            tests = tests.none()
     return students, tests
 
 
