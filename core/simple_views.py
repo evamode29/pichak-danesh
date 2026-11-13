@@ -635,17 +635,23 @@ def student_take_test(request, test_id):
     if not questions:
         return redirect("student-test-list")
 
+    # Primary keys from the legacy and bank tables can overlap. Use a
+    # type-qualified form key so answers can never overwrite one another.
+    for question in questions:
+        prefix = "bank" if isinstance(question, BankQuestion) else "legacy"
+        question.answer_key = f"{prefix}-{question.pk}"
+
     error = None
     if request.method == "POST":
         answers = {
-            str(question.id): request.POST.get("question_" + str(question.id), "")
+            question.answer_key: request.POST.get("question_" + question.answer_key, "")
             for question in questions
         }
         if any(value not in ("A", "B", "C", "D") for value in answers.values()):
             error = "لطفاً برای همه سؤال‌ها یک گزینه انتخاب کن."
         else:
             correct = sum(
-                answers[str(question.id)] == question.correct_option
+                answers[question.answer_key] == question.correct_option
                 for question in questions
             )
             with transaction.atomic():
