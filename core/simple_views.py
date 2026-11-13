@@ -269,6 +269,30 @@ def _category_depth(category):
         parent = parent.parent
     return depth
 
+def _category_path_names(categories):
+    """Return stable root-to-leaf paths for all selected category branches."""
+    selected = {category.pk: category for category in categories}
+    parent_ids = {
+        category.parent_id
+        for category in categories
+        if category.parent_id in selected
+    }
+    leaves = [
+        category for category in categories
+        if category.pk not in parent_ids
+    ]
+    paths = []
+    for leaf in leaves:
+        names = []
+        current = leaf
+        while current is not None:
+            names.append(current.name)
+            current = current.parent
+        path = list(reversed(names))
+        if path and path not in paths:
+            paths.append(path)
+    return sorted(paths, key=lambda path: tuple(path))
+
 
 def _can_manage_learning(user):
     return bool(
@@ -668,8 +692,9 @@ def student_take_test(request, test_id):
                 for question in questions:
                     selected = answers[question.answer_key]
                     is_bank = isinstance(question, BankQuestion)
-                    categories = sorted(list(question.categories.select_related("parent").all()), key=_category_depth) if is_bank else []
+                    categories = sorted(list(question.categories.select_related("parent").all()), key=lambda item: (_category_depth(item), item.name, item.pk)) if is_bank else []
                     category_names = [category.name for category in categories]
+                    category_paths = _category_path_names(categories) if is_bank else []
                     topic = question.topic if not is_bank else (categories[-2].name if len(categories) > 2 else (categories[-1].name if categories else ""))
                     skill = question.skill if not is_bank else (categories[-1].name if len(categories) > 2 else "")
                     PlacementAnswer.objects.create(
@@ -684,6 +709,7 @@ def student_take_test(request, test_id):
                         topic=topic,
                         skill=skill,
                         category_names=category_names,
+                        category_paths=category_paths,
                     )
                     key = (question.subject, topic, skill)
                     bucket = diagnostic.setdefault(key, {"correct": 0, "total": 0})
