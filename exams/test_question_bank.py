@@ -100,6 +100,33 @@ class QuestionBankFlowTests(TestCase):
         self.assertTrue(question.option_d_image)
         self.assertEqual(question.correct_option, "C")
 
+        # Identical empty text fields must not make distinct image-only
+        # questions look like duplicates to the text-based matcher.
+        second_response = self.client.post(
+            reverse("teacher-question-bank"),
+            {
+                "action": "add_question",
+                "subject": "math",
+                "grade": "6",
+                "chapter": "فصل تصویری",
+                "topic": "الگوها",
+                "text": "",
+                "option_a": "",
+                "option_b": "",
+                "option_c": "",
+                "option_d": "",
+                "correct": "C",
+                "difficulty": "2",
+                "question_image": image("question-second.gif"),
+                "option_a_image": image("a-second.gif"),
+                "option_b_image": image("b-second.gif"),
+                "option_c_image": image("c-second.gif"),
+                "option_d_image": image("d-second.gif"),
+            },
+        )
+        self.assertEqual(second_response.status_code, 200)
+        self.assertEqual(BankQuestion.objects.filter(text="").count(), 2)
+
     def test_excel_import_requires_preview_then_saves_rows(self):
         workbook = Workbook()
         sheet = workbook.active
