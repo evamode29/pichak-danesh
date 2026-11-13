@@ -77,6 +77,15 @@
 .pd-final-inner h2{margin:0 0 6px;color:#1e4a2d;font-size:clamp(21px,2.5vw,30px);font-weight:950}
 .pd-final-inner p{margin:0;color:#718272;font-size:13px}
 .pd-final-inner .pd-btn{flex:0 0 auto}
+.pd-class-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.pd-class-card{position:relative;display:flex;align-items:center;gap:20px;padding:25px;border:1px solid #dfebdc;border-radius:24px;background:linear-gradient(145deg,#fff,#f9fcf6);box-shadow:0 12px 30px #214d2d0b}
+.pd-class-icon{flex:0 0 68px;width:68px;height:68px;display:grid;place-items:center;border-radius:21px;background:#edf7e8;font-size:34px}
+.pd-class-card h3{margin:0 0 5px;color:#214b30;font-size:19px;font-weight:950}
+.pd-class-card p{margin:0 0 13px;color:#718272;font-size:13px;line-height:2}
+.pd-class-tag{display:inline-flex;margin-bottom:9px;padding:5px 10px;border-radius:99px;background:#edf7e8;color:#267344;font-size:11px;font-weight:900}
+.pd-class-link{display:inline-flex;align-items:center;gap:7px;color:#128b49;text-decoration:none;font-size:13px;font-weight:950}
+.pd-class-link:hover{text-decoration:underline}
+@media(max-width:700px){.pd-class-grid{grid-template-columns:1fr;gap:11px}.pd-class-card{padding:18px;gap:13px;border-radius:19px}.pd-class-icon{flex-basis:55px;width:55px;height:55px;border-radius:17px;font-size:28px}.pd-class-card h3{font-size:16px}.pd-class-card p{font-size:12px}}
 @keyframes pd-enter{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pd-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 @keyframes pd-twinkle{0%,100%{transform:scale(.9) rotate(0);opacity:.7}50%{transform:scale(1.18) rotate(12deg);opacity:1}}
@@ -104,14 +113,14 @@
  <div class="pd-shell">
   <div class="pd-hero">
    <div class="pd-copy">
-    <span class="pd-eyebrow"><i></i> فضای یادگیری پایه ششم دبستان</span>
-    <h1 class="pd-title">هر روز یک قدم<br>به سوی <span>یادگیری بهتر</span></h1>
-    <p class="pd-lead">در پیچک دانش، یادگیری فقط درس خواندن نیست؛ یک مسیر جذاب برای تمرین کردن، کشف توانایی‌ها و دیدن پیشرفت‌های کوچک و بزرگ است.</p>
+    <span class="pd-eyebrow"><i></i> آموزش تخصصی پایه ششم | پیچک دانش</span>
+    <h1 class="pd-title">پایه ششم را<br>با <span>درک عمیق‌تر</span> یاد بگیر</h1>
+    <p class="pd-lead">آموزش مفهومی و کلاس خصوصی پایه ششم؛ حضوری در قوچان و آنلاین برای دانش‌آموزان سراسر ایران. آموزش را متناسب با نیاز و مسیر یادگیری هر دانش‌آموز پیش می‌بریم.</p>
     <div class="pd-actions">
-     <a class="pd-btn pd-btn-primary" href="{% url 'login' %}">ورود به پیچک دانش <span class="arr">←</span></a>
-     <a class="pd-btn pd-btn-light" href="#pd-features">آشنایی با امکانات <span class="arr">⌄</span></a>
+     <a class="pd-btn pd-btn-primary" href="https://www.instagram.com/pichakdanesh/" target="_blank" rel="noopener noreferrer">مشاوره کلاس خصوصی <span class="arr">↗</span></a>
+     <a class="pd-btn pd-btn-light" href="{% url 'login' %}">ورود دانش‌آموزان <span class="arr">←</span></a>
     </div>
-    <div class="pd-trust"><b>🌱 یادگیری گام‌به‌گام</b><span>•</span><span>تمرین، آزمون و بازخورد در یک مسیر</span></div>
+    <div class="pd-trust"><b>🌱 حضوری در قوچان</b><span>•</span><span>کلاس آنلاین برای سراسر ایران</span></div>
    </div>
    <div class="pd-art" aria-label="شخصیت همراه پیچک دانش">
     <div class="pd-halo"></div>
@@ -129,6 +138,33 @@
    <div class="pd-mini"><span class="pd-mini-icon">💬</span><span><strong>بازخورد معلم</strong><small>راهنمایی در مسیر یادگیری</small></span></div>
   </div>
 
+  <section class="pd-section pd-classes" id="pd-classes">
+   <div class="pd-section-head">
+    <span class="pd-label">کلاس خصوصی پایه ششم</span>
+    <h2>یادگیری، به شیوه‌ای که به تو می‌رسد</h2>
+    <p>برای خانواده‌هایی که به آموزش هدفمند و همراهی متناسب با نیاز دانش‌آموز اهمیت می‌دهند.</p>
+   </div>
+   <div class="pd-class-grid">
+    <article class="pd-class-card">
+     <span class="pd-class-icon" aria-hidden="true">📍</span>
+     <div>
+      <span class="pd-class-tag">ویژه خانواده‌های قوچان</span>
+      <h3>کلاس خصوصی حضوری</h3>
+      <p>آموزش پایه ششم به‌صورت حضوری در قوچان، با توجه به نیازهای درسی دانش‌آموز.</p>
+      <a class="pd-class-link" href="https://www.instagram.com/pichakdanesh/" target="_blank" rel="noopener noreferrer">گفت‌وگو درباره کلاس حضوری ↗</a>
+     </div>
+    </article>
+    <article class="pd-class-card">
+     <span class="pd-class-icon" aria-hidden="true">💻</span>
+     <div>
+      <span class="pd-class-tag">ویژه دانش‌آموزان سراسر ایران</span>
+      <h3>کلاس خصوصی آنلاین</h3>
+      <p>آموزش آنلاین پایه ششم برای دانش‌آموزان در شهرهای مختلف ایران.</p>
+      <a class="pd-class-link" href="https://www.instagram.com/pichakdanesh/" target="_blank" rel="noopener noreferrer">گفت‌وگو درباره کلاس آنلاین ↗</a>
+     </div>
+    </article>
+   </div>
+  </section>
 
   <section class="pd-quick" aria-labelledby="pd-quick-title">
    <div class="pd-quick-head"><span>🎮 چالش کوتاه یادگیری</span><h2 id="pd-quick-title">یک سؤال سریع حل می‌کنی؟</h2><p>برای گرم شدن، یک تمرین کوتاه ریاضی را امتحان کن. پاسخ‌ها ذخیره نمی‌شوند.</p></div>
@@ -184,8 +220,8 @@
 
   <section class="pd-final">
    <div class="pd-final-inner">
-    <div><h2>آماده‌ای قدم بعدی را برداری؟</h2><p>به پیچک دانش بیا؛ با هم، از یادگیری لذت ببریم!</p></div>
-    <a class="pd-btn pd-btn-primary" href="{% url 'login' %}">شروع یادگیری <span class="arr">←</span></a>
+    <div><h2>برای مسیر یادگیری فرزندتان گفت‌وگو کنیم؟</h2><p>برای مشاوره کلاس خصوصی پایه ششم، در اینستاگرام پیام بدهید.</p></div>
+    <a class="pd-btn pd-btn-primary" href="https://www.instagram.com/pichakdanesh/" target="_blank" rel="noopener noreferrer">دریافت مشاوره <span class="arr">↗</span></a>
    </div>
   </section>
  </div>
