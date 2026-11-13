@@ -79,17 +79,18 @@ def _attach_categories(question, row):
             parents.append(_category(row["subject"], row["grade"], name, chapter))
     elif chapter:
         parents = [chapter]
+    subtopics = []
     if subtopic_names:
         for name in subtopic_names:
             for parent in parents or [chapter]:
-                _category(row["subject"], row["grade"], name, parent)
+                item = _category(row["subject"], row["grade"], name, parent)
+                if item:
+                    subtopics.append(item)
     categories = []
     if chapter:
         categories.append(chapter)
     categories.extend([x for x in parents if x])
-    for parent in parents:
-        if parent:
-            categories.extend(parent.children.filter(is_active=True))
+    categories.extend(subtopics)
     if categories:
         question.categories.add(*categories)
 
