@@ -101,15 +101,20 @@ def teacher_learning_reports(request):
         row["total"] += 1
         row["correct"] += int(answer.is_correct)
 
+        # A question may belong to multiple branches that share ancestors.
+        # Count each category prefix only once per answer so shared parents are
+        # not artificially weighted by the number of child branches.
+        answer_category_keys = set()
         for names in _answer_category_paths(answer):
             for depth, name in enumerate(names):
                 if not name:
                     continue
                 category_path = tuple(str(part) for part in names[:depth + 1] if part)
-                category_key = (subject, category_path)
-                category_stats[category_key]["subject"] = subject
-                category_stats[category_key]["total"] += 1
-                category_stats[category_key]["correct"] += int(answer.is_correct)
+                answer_category_keys.add((subject, category_path))
+        for category_key in answer_category_keys:
+            category_stats[category_key]["subject"] = subject
+            category_stats[category_key]["total"] += 1
+            category_stats[category_key]["correct"] += int(answer.is_correct)
 
     subject_rows = []
     for code, stats in subject_stats.items():
