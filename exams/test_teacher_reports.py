@@ -49,6 +49,24 @@ class TeacherLearningReportTests(TestCase):
         self.assertEqual(response.context["answer_count"], 2)
         self.assertEqual(len(response.context["category_rows"]), 3)
 
+    def test_report_keeps_multiple_category_branches_separate(self):
+        answer = self.attempt.answers.first()
+        answer.category_names = ["عددها", "کسرها", "جمع کسرها"]
+        answer.category_paths = [
+            ["عددها", "کسرها", "جمع کسرها"],
+            ["عددها", "اعشار", "مقایسه اعشار"],
+        ]
+        answer.save(update_fields=["category_names", "category_paths"])
+
+        self.client.force_login(self.teacher)
+        response = self.client.get(reverse("teacher-learning-reports"))
+
+        self.assertEqual(response.status_code, 200)
+        paths = {row["path"] for row in response.context["category_rows"]}
+        self.assertIn("عددها ← کسرها ← جمع کسرها", paths)
+        self.assertIn("عددها ← اعشار ← مقایسه اعشار", paths)
+        self.assertNotIn("عددها ← کسرها ← مقایسه اعشار", paths)
+
     def test_teacher_cannot_view_student_outside_scope(self):
         other_user = User.objects.create_user(username="outside_student", password="test-password-123")
         UserProfile.objects.create(user=other_user, role=UserProfile.Role.STUDENT)
