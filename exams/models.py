@@ -228,6 +228,7 @@ class PlacementAnswer(models.Model):
     topic = models.CharField(max_length=100, blank=True, default="")
     skill = models.CharField(max_length=120, blank=True, default="")
     category_names = models.JSONField(default=list, blank=True)
+    category_paths = models.JSONField(default=list, blank=True)
     answered_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
