@@ -2,7 +2,7 @@ name: Django CI
 
 on:
   push:
-    branches: [main, safe/teacher-panel-foundation, pichak-hybrid-v1-2026-11-06]
+    branches: [main, safe/teacher-panel-foundation, pichak-hybrid-v1-2026-11-06, feature/question-bank-v1]
   pull_request:
     branches: [main, production-baseline-2026-11-02, pichak-hybrid-v1-2026-11-06]
 
@@ -26,26 +26,28 @@ jobs:
         env:
           DJANGO_DEBUG: "True"
           DJANGO_SECRET_KEY: "ci-secret-key"
-          DJANGO_DISABLE_EXAMS_MIGRATIONS: "True"
         run: python manage.py check
 
       - name: Apply migrations
         env:
           DJANGO_DEBUG: "True"
           DJANGO_SECRET_KEY: "ci-secret-key"
-          DJANGO_DISABLE_EXAMS_MIGRATIONS: "True"
         run: python manage.py migrate --noinput
 
       - name: Collect static files for tests
         env:
           DJANGO_DEBUG: "True"
           DJANGO_SECRET_KEY: "ci-secret-key"
-          DJANGO_DISABLE_EXAMS_MIGRATIONS: "True"
         run: python manage.py collectstatic --noinput
+
+      - name: Check exams migration state
+        env:
+          DJANGO_DEBUG: "True"
+          DJANGO_SECRET_KEY: "ci-secret-key"
+        run: python manage.py makemigrations exams --check --dry-run
 
       - name: Django tests
         env:
           DJANGO_DEBUG: "True"
           DJANGO_SECRET_KEY: "ci-secret-key"
-          DJANGO_DISABLE_EXAMS_MIGRATIONS: "True"
-        run: python manage.py test core.test_teacher_panel
+        run: python manage.py test core.test_teacher_panel exams.test_question_bank exams.test_teacher_reports

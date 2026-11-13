@@ -12,7 +12,7 @@ from django.utils import timezone
 
 from core.permissions import is_teacher, is_admin
 from core.models import ClassRoom, DailyTask, StudentTask
-from exams.models import PlacementAttempt, PlacementQuestion, PlacementTest
+from exams.models import (BankQuestion, PlacementAnswer, PlacementAttempt, PlacementDiagnosticResult, PlacementQuestion, PlacementTest, TestBankQuestion)
 from students.models import StudentProfile
 
 
@@ -261,6 +261,39 @@ def simple_teacher(request):
     })
 
 
+def _category_depth(category):
+    depth = 0
+    parent = category.parent
+    while parent is not None:
+        depth += 1
+        parent = parent.parent
+    return depth
+
+def _category_path_names(categories):
+    """Return stable root-to-leaf paths for all selected category branches."""
+    selected = {category.pk: category for category in categories}
+    parent_ids = {
+        category.parent_id
+        for category in categories
+        if category.parent_id in selected
+    }
+    leaves = [
+        category for category in categories
+        if category.pk not in parent_ids
+    ]
+    paths = []
+    for leaf in leaves:
+        names = []
+        current = leaf
+        while current is not None:
+            names.append(current.name)
+            current = current.parent
+        path = list(reversed(names))
+        if path and path not in paths:
+            paths.append(path)
+    return sorted(paths, key=lambda path: tuple(path))
+
+
 def _can_manage_learning(user):
     return bool(
         user.is_authenticated
@@ -276,10 +309,10 @@ def teacher_student_detail(request, student_id):
     queryset = StudentProfile.objects.select_related("user", "classroom")
     if not (is_admin(request.user) or request.user.is_superuser):
         teacher_classes = ClassRoom.objects.filter(teacher=request.user, is_active=True)
-        queryset = queryset.filter(
-            Q(classroom__in=teacher_classes)
-            | Q(classroom__isnull=True, grade=6)
-        )
+        # Unassigned grade-6 students may appear on the teacher dashboard
+        # for class placement, but their learning history is private until
+        # they are assigned to one of this teacher's active classrooms.
+        queryset = queryset.filter(classroom__in=teacher_classes)
 
     student = get_object_or_404(queryset, pk=student_id)
     task_records = StudentTask.objects.filter(
@@ -475,15 +508,31 @@ def teacher_test_manager(request):
                 )
                 message = f"آزمون «{test.title}» ساخته شد. حالا سؤال اضافه کن."
 
-        elif action in ("add_question", "toggle_test"):
+        elif action in ("add_question", "toggle_test", "attach_bank_question"):
             test = get_object_or_404(tests, pk=request.POST.get("test_id"))
             if action == "toggle_test":
-                if not test.is_active and not test.questions.filter(is_active=True).exists():
+                has_legacy = test.questions.filter(is_active=True).exists()
+                has_bank = test.bank_links.filter(is_active=True, question__is_active=True).exists()
+                if not test.is_active and not (has_legacy or has_bank):
                     error = "برای فعال‌کردن، ابتدا دست‌کم یک سؤال فعال اضافه کن."
                 else:
                     test.is_active = not test.is_active
                     test.save(update_fields=["is_active"])
                     message = "وضعیت آزمون تغییر کرد."
+            elif action == "attach_bank_question":
+                question = get_object_or_404(
+                    BankQuestion, pk=request.POST.get("bank_question_id"),
+                    grade=test.grade, is_active=True,
+                )
+                next_order = max(
+                    test.questions.order_by("-order").values_list("order", flat=True).first() or 0,
+                    test.bank_links.order_by("-order").values_list("order", flat=True).first() or 0,
+                ) + 1
+                _link, created = TestBankQuestion.objects.get_or_create(
+                    test=test, question=question,
+                    defaults={"order": next_order, "is_active": True},
+                )
+                message = "سؤال بانک به آزمون اضافه شد." if created else "این سؤال قبلاً به آزمون اضافه شده است."
             else:
                 question_text = request.POST.get("question_text", "").strip()
                 options = [
@@ -554,11 +603,12 @@ def teacher_test_manager(request):
             question.save(update_fields=["is_active"])
             message = "وضعیت سؤال تغییر کرد."
 
-    tests = tests.prefetch_related("questions").order_by("-id")
+    tests = tests.prefetch_related("questions", "bank_links__question").order_by("-id")
+    bank_questions = BankQuestion.objects.filter(is_active=True, grade=6).order_by("-created_at")[:250]
     return render(
         request,
         "simple/test_manager.html",
-        {"tests": tests, "message": message, "error": error},
+        {"tests": tests, "bank_questions": bank_questions, "message": message, "error": error},
     )
 
 
@@ -572,13 +622,10 @@ def student_test_list(request):
             else "login"
         )
     tests = (
-        PlacementTest.objects.filter(
-            is_active=True,
-            grade=student.grade,
-            questions__is_active=True,
-        )
+        PlacementTest.objects.filter(is_active=True, grade=student.grade)
+        .filter(Q(questions__is_active=True) | Q(bank_links__is_active=True, bank_links__question__is_active=True))
         .distinct()
-        .prefetch_related("questions")
+        .prefetch_related("questions", "bank_links__question")
         .order_by("-id")
     )
     return render(request, "simple/test_list.html", {"tests": tests})
@@ -596,36 +643,88 @@ def student_take_test(request, test_id):
     test = get_object_or_404(
         PlacementTest, pk=test_id, is_active=True, grade=student.grade
     )
-    questions = list(
-        test.questions.filter(is_active=True).order_by("order", "id")
+    legacy_questions = list(test.questions.filter(is_active=True).order_by("order", "id"))
+    bank_links = list(
+        test.bank_links.filter(is_active=True, question__is_active=True)
+        .select_related("question").prefetch_related("question__categories")
+        .order_by("order", "id")
     )
+    bank_questions = []
+    for link in bank_links:
+        question = link.question
+        question.order = link.order
+        question._bank_question = True
+        bank_questions.append(question)
+    questions = sorted(legacy_questions + bank_questions, key=lambda item: (item.order, item.pk))
     if not questions:
         return redirect("student-test-list")
+
+    # Primary keys from the legacy and bank tables can overlap. Use a
+    # type-qualified form key so answers can never overwrite one another.
+    for question in questions:
+        prefix = "bank" if isinstance(question, BankQuestion) else "legacy"
+        question.answer_key = f"{prefix}-{question.pk}"
 
     error = None
     if request.method == "POST":
         answers = {
-            str(question.id): request.POST.get("question_" + str(question.id), "")
+            question.answer_key: request.POST.get("question_" + question.answer_key, "")
             for question in questions
         }
         if any(value not in ("A", "B", "C", "D") for value in answers.values()):
             error = "لطفاً برای همه سؤال‌ها یک گزینه انتخاب کن."
         else:
             correct = sum(
-                answers[str(question.id)] == question.correct_option
+                answers[question.answer_key] == question.correct_option
                 for question in questions
             )
-            attempt = PlacementAttempt.objects.create(
-                student=student,
-                test=test,
-                score=round(correct * 100 / len(questions)),
-                correct_answers=correct,
-                total_questions=len(questions),
-                level=max(
-                    1, min(10, round(correct * 10 / len(questions)))
-                ),
-                completed_at=timezone.now(),
-            )
+            with transaction.atomic():
+                attempt = PlacementAttempt.objects.create(
+                    student=student,
+                    test=test,
+                    score=round(correct * 100 / len(questions)),
+                    correct_answers=correct,
+                    total_questions=len(questions),
+                    level=max(1, min(10, round(correct * 10 / len(questions)))),
+                    completed_at=timezone.now(),
+                )
+                diagnostic = {}
+                for question in questions:
+                    selected = answers[question.answer_key]
+                    is_bank = isinstance(question, BankQuestion)
+                    categories = list(question.categories.select_related("parent").all()) if is_bank else []
+                    category_names = [category.name for category in categories]
+                    category_paths = _category_path_names(categories) if is_bank else []
+                    topic = question.topic if not is_bank else (category_paths[0][1] if category_paths and len(category_paths[0]) > 1 else "")
+                    skill = question.skill if not is_bank else (category_paths[0][2] if category_paths and len(category_paths[0]) > 2 else "")
+                    PlacementAnswer.objects.create(
+                        attempt=attempt,
+                        bank_question=question if is_bank else None,
+                        legacy_question=None if is_bank else question,
+                        question_text=question.text,
+                        selected_option=selected,
+                        correct_option=question.correct_option,
+                        is_correct=(selected == question.correct_option),
+                        subject=question.subject,
+                        topic=topic,
+                        skill=skill,
+                        category_names=category_names,
+                        category_paths=category_paths,
+                    )
+                    diagnostic_paths = category_paths if is_bank and category_paths else [[topic, skill]]
+                    for path in diagnostic_paths:
+                        path_topic = path[1] if is_bank and len(path) > 1 else (topic if not is_bank else "")
+                        path_skill = path[2] if is_bank and len(path) > 2 else (skill if not is_bank else "")
+                        key = (question.subject, path_topic, path_skill)
+                        bucket = diagnostic.setdefault(key, {"correct": 0, "total": 0})
+                        bucket["total"] += 1
+                        bucket["correct"] += int(selected == question.correct_option)
+                for (subject, topic, skill), counts in diagnostic.items():
+                    PlacementDiagnosticResult.objects.create(
+                        attempt=attempt, subject=subject, topic=topic, skill=skill,
+                        correct_answers=counts["correct"], total_questions=counts["total"],
+                        percentage=round(counts["correct"] * 100 / counts["total"]),
+                    )
             return render(
                 request,
                 "simple/result.html",

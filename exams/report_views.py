@@ -1,0 +1,171 @@
+from collections import defaultdict
+
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect, render
+
+from core.models import ClassRoom
+from core.permissions import is_admin, is_teacher
+from exams.models import PlacementAnswer, PlacementAttempt, PlacementQuestion, PlacementTest
+from students.models import StudentProfile
+
+
+SUBJECT_LABELS = dict(PlacementQuestion.Subject.choices)
+
+
+def _answer_category_paths(answer):
+    """Read new branch-aware snapshots and retain legacy flat snapshots."""
+    paths = answer.category_paths
+    if isinstance(paths, list) and paths and all(
+        isinstance(path, list) and path and all(isinstance(part, str) for part in path)
+        for path in paths
+    ):
+        return paths
+    names = answer.category_names
+    if isinstance(names, list):
+        legacy_path = [str(name) for name in names if name]
+        return [legacy_path] if legacy_path else []
+    return []
+
+
+def _teacher_scope(user):
+    manager = is_admin(user) or user.is_superuser
+    students = StudentProfile.objects.select_related("user", "classroom")
+    tests = PlacementTest.objects.all()
+    if not manager:
+        classrooms = ClassRoom.objects.filter(teacher=user, is_active=True)
+        grades = list(classrooms.values_list("grade", flat=True).distinct())
+        if grades:
+            # Only students assigned to this teacher's active classrooms are visible.
+            students = students.filter(classroom__in=classrooms)
+            tests = tests.filter(grade__in=grades)
+        else:
+            # A teacher without an assigned classroom must not see unassigned students.
+            students = students.none()
+            tests = tests.none()
+    return students, tests
+
+
+@login_required(login_url="login")
+def teacher_learning_reports(request):
+    if not (is_teacher(request.user) or is_admin(request.user) or request.user.is_superuser):
+        return redirect("simple-student")
+
+    students, tests = _teacher_scope(request.user)
+    student_id = request.GET.get("student", "").strip()
+    test_id = request.GET.get("test", "").strip()
+
+    selected_student = None
+    selected_test = None
+    if student_id:
+        selected_student = get_object_or_404(students, pk=student_id)
+    if test_id:
+        selected_test = get_object_or_404(tests, pk=test_id)
+
+    attempts = PlacementAttempt.objects.filter(
+        student__in=students, test__in=tests
+    ).select_related("student__user", "student__classroom", "test").order_by(
+        "-completed_at", "-id"
+    )
+    if selected_student:
+        attempts = attempts.filter(student=selected_student)
+    if selected_test:
+        attempts = attempts.filter(test=selected_test)
+
+    attempt_rows = list(attempts[:150])
+    attempt_ids = [item.pk for item in attempt_rows]
+    answers = PlacementAnswer.objects.filter(
+        attempt_id__in=attempt_ids
+    ).select_related("attempt__student__user", "attempt__test").order_by("attempt_id", "id")
+
+    subject_stats = defaultdict(lambda: {"correct": 0, "total": 0})
+    category_stats = defaultdict(lambda: {"correct": 0, "total": 0, "subject": ""})
+    student_stats = {}
+    total_correct = 0
+    total_answers = 0
+
+    for answer in answers:
+        subject = answer.subject or "unknown"
+        subject_stats[subject]["total"] += 1
+        subject_stats[subject]["correct"] += int(answer.is_correct)
+        total_answers += 1
+        total_correct += int(answer.is_correct)
+
+        key = answer.attempt_id
+        row = student_stats.setdefault(key, {
+            "student": answer.attempt.student,
+            "test": answer.attempt.test,
+            "correct": 0,
+            "total": 0,
+        })
+        row["total"] += 1
+        row["correct"] += int(answer.is_correct)
+
+        # A question may belong to multiple branches that share ancestors.
+        # Count each category prefix only once per answer so shared parents are
+        # not artificially weighted by the number of child branches.
+        answer_category_keys = set()
+        for names in _answer_category_paths(answer):
+            for depth, name in enumerate(names):
+                if not name:
+                    continue
+                category_path = tuple(str(part) for part in names[:depth + 1] if part)
+                answer_category_keys.add((subject, category_path))
+        for category_key in answer_category_keys:
+            category_stats[category_key]["subject"] = subject
+            category_stats[category_key]["total"] += 1
+            category_stats[category_key]["correct"] += int(answer.is_correct)
+
+    subject_rows = []
+    for code, stats in subject_stats.items():
+        subject_rows.append({
+            "name": SUBJECT_LABELS.get(code, code),
+            "total": stats["total"],
+            "correct": stats["correct"],
+            "percentage": round(stats["correct"] * 100 / stats["total"]) if stats["total"] else 0,
+        })
+    subject_rows.sort(key=lambda row: (row["percentage"], row["name"]))
+
+    level_names = {0: "فصل", 1: "مبحث", 2: "زیرمبحث"}
+    category_rows = []
+    for (subject, category_path), stats in category_stats.items():
+        depth = len(category_path) - 1
+        total = stats["total"]
+        category_rows.append({
+            "subject": SUBJECT_LABELS.get(subject, subject),
+            "level": level_names.get(depth, f"سطح {depth + 1}"),
+            "name": category_path[-1],
+            "path": " ← ".join(category_path),
+            "total": total,
+            "correct": stats["correct"],
+            "percentage": round(stats["correct"] * 100 / total) if total else 0,
+        })
+    category_rows.sort(key=lambda row: (row["percentage"], row["total"], row["name"]))
+
+    performance_rows = []
+    for attempt in attempt_rows:
+        stats = student_stats.get(attempt.pk)
+        if stats and stats["total"]:
+            correct, total = stats["correct"], stats["total"]
+        else:
+            correct, total = attempt.correct_answers, attempt.total_questions
+        performance_rows.append({
+            "attempt": attempt,
+            "correct": correct,
+            "total": total,
+            "percentage": round(correct * 100 / total) if total else attempt.score,
+        })
+
+    return render(request, "simple/teacher_reports.html", {
+        "students": students.order_by("user__first_name", "user__last_name"),
+        "tests": tests.order_by("-id"),
+        "selected_student": selected_student,
+        "selected_test": selected_test,
+        "subject_rows": subject_rows,
+        "category_rows": category_rows[:60],
+        "performance_rows": performance_rows,
+        "attempt_count": len(attempt_rows),
+        "answer_count": total_answers,
+        "student_count": len({item.student_id for item in attempt_rows}),
+        "overall_percentage": round(total_correct * 100 / total_answers) if total_answers else 0,
+    })
